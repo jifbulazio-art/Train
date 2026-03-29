@@ -184,6 +184,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .mgmt-info{flex:1;min-width:0}
 .mgmt-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mgmt-sub{font-size:11px;color:var(--tx2);font-family:'DM Mono',monospace;margin-top:2px}
+.mgmt-link{font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mgmt-arrow{color:var(--tx3);font-size:16px}
 .btn-outline{padding:10px 16px;background:transparent;border:1px solid var(--b2);border-radius:var(--rs);font-size:13px;color:var(--tx);white-space:nowrap}
 .btn-danger-outline{padding:10px 16px;background:transparent;border:1px solid rgba(232,93,58,.35);border-radius:var(--rs);font-size:13px;color:var(--push)}
@@ -458,6 +459,8 @@ const EXERCISE_SLUG_OVERRIDES={
   'plancha lateral':'side-plank',
   'burpee':'burpee',
   'mountain climber':'mountain-climber',
+  'scapular pull-up':'pull-ups',
+  'wall walk':'pike-push-up',
 };
 
 function normalizeExerciseKey(name=''){
@@ -888,7 +891,7 @@ function excHTML(ex,di,i,inGroup){
     ondragend="dragEnd(event)"
     ${pending?'data-pending-super="true"':''}>
     <span class="drag-handle" onclick="event.stopPropagation()"></span>
-    <div class="exc-thumb">${img?`<img src="${img}" onerror="this.parentElement.innerHTML='${getTypeEmoji(getExType(ex.name))}'">`:getTypeEmoji(getExType(ex.name))}</div>
+    <div class="exc-thumb">${img?`<img src="${img}" onerror="this.onerror=null;this.src='${getTypeThumb(getExType(ex.name))}'">`:getTypeEmoji(getExType(ex.name))}</div>
     <div class="exc-info${pending?' exc-pending':''}">
       <div class="exc-title-row">
         <div class="exc-name">${ex.name}</div>
@@ -1044,7 +1047,7 @@ function renderAddOpts(){
       window._opts[idx]={name:e.name,type:e.type};
       html+=`<div class="opt-row${sel?' on':''}" id="opt${idx}" onclick="toggleOpt(${idx},event)">
         <div class="opt-check"></div>
-        <div class="opt-thumb">${img?`<img src="${img}" onerror="this.parentElement.innerHTML='${getTypeEmoji(e.type)}'">`:getTypeEmoji(e.type)}</div>
+        <div class="opt-thumb">${img?`<img src="${img}" onerror="this.onerror=null;this.src='${getTypeThumb(e.type)}'">`:getTypeEmoji(e.type)}</div>
         <span class="opt-name">${e.name}</span>
         <div class="opt-inputs" onclick="event.stopPropagation()">
           <input type="number" placeholder="s" value="${p?p.sets:''}" min="1" max="20" inputmode="numeric"
@@ -1225,27 +1228,31 @@ function separateFromSuper(di,i){
 // â•â• TYPE PICKER (day) already defined above â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 // â•â• EXERCISE EDIT â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-function openExEdit(id=null,prefillName='',prefillType='push',prefillMuscle='',returnToAdd=false){
+function openExEdit(id=null,prefillName='',prefillType='push',prefillMuscle='',returnToAdd=false,prefillImageUrl=''){
   eeCtx={id};eeImgData=null;eeReturnToAdd=returnToAdd;
   document.getElementById('ex-edit-title').textContent=id?'Editar ejercicio':'Nuevo ejercicio';
   document.getElementById('ee-delete-btn').style.display=id?'block':'none';
   refreshMuscleOptions();
   if(id){
     const ex=exercises.find(e=>e.id===id)||{};
+    const fallbackLink=getStrengthLevelThumb(ex.name||prefillName,ex.type||prefillType||'push');
     document.getElementById('ee-name').value=ex.name||'';
     document.getElementById('ee-type').value=ex.type||'push';
     refreshMuscleOptions(ex.muscle||'');
-    document.getElementById('ee-img-url').value=ex.imageUrl||'';
+    document.getElementById('ee-img-url').value=ex.imageUrl||fallbackLink||'';
     const preview=document.getElementById('ee-img-preview');
-    const img=ex.imageData||ex.imageUrl;
+    const img=ex.imageData||ex.imageUrl||fallbackLink;
     preview.innerHTML=img?`<img src="${img}" style="width:100%;height:100%;object-fit:cover">`:
       '<span class="img-preview-ph">sin imagen</span>';
   } else {
     document.getElementById('ee-name').value=prefillName;
     document.getElementById('ee-type').value=prefillType||'push';
     refreshMuscleOptions(prefillMuscle||'');
-    document.getElementById('ee-img-url').value='';
-    document.getElementById('ee-img-preview').innerHTML='<span class="img-preview-ph">sin imagen</span>';
+    const resolved=prefillImageUrl||getStrengthLevelThumb(prefillName,prefillType||'push');
+    document.getElementById('ee-img-url').value=resolved||'';
+    document.getElementById('ee-img-preview').innerHTML=resolved
+      ? `<img src="${resolved}" style="width:100%;height:100%;object-fit:cover">`
+      : '<span class="img-preview-ph">sin imagen</span>';
   }
   openSheet('ex-edit-sheet');
 }
@@ -1268,11 +1275,11 @@ function refreshMuscleOptions(selected=''){
   if(selected) document.getElementById('ee-muscle').value=selected;
 }
 
-function openExEditByName(name,type='',muscle=''){
+function openExEditByName(name,type='',muscle='',imageUrl=''){
   eeReturnToAdd=false;
   const existing=exercises.find(e=>e.name.toLowerCase()===name.toLowerCase());
   if(existing) openExEdit(existing.id);
-  else openExEdit(null,name,type,muscle);
+  else openExEdit(null,name,type,muscle,false,imageUrl||getStrengthLevelThumb(name,type||'push'));
 }
 
 function readFileAsDataURL(file){
@@ -1496,8 +1503,9 @@ function renderMgmtEx(){
 
   document.getElementById('mgmt-ex-list').innerHTML=all.map(e=>{
     const img=e.imageData||e.imageUrl;
-    return `<div class="mgmt-item" onclick="openExEditByName('${e.name.replace(/'/g,"\\'")}','${(e.type||'').replace(/'/g,"\\'")}','${(e.muscle||'').replace(/'/g,"\\'")}')">
-      <div class="mgmt-thumb">${img?`<img src="${img}" onerror="this.parentElement.innerHTML='${getTypeEmoji(e.type)}'">`:getTypeEmoji(e.type)}</div>
+    const link=(e.imageUrl||getStrengthLevelThumb(e.name,e.type)).replace(/'/g,"\\'");
+    return `<div class="mgmt-item" onclick="openExEditByName('${e.name.replace(/'/g,"\\'")}','${(e.type||'').replace(/'/g,"\\'")}','${(e.muscle||'').replace(/'/g,"\\'")}','${link}')">
+      <div class="mgmt-thumb">${img?`<img src="${img}" onerror="this.onerror=null;this.src='${getTypeThumb(e.type)}'">`:getTypeEmoji(e.type)}</div>
       <div class="mgmt-info">
         <div class="mgmt-name">${e.name}</div>
         <div class="mgmt-sub">${TYPE_MAP[e.type]||e.type}${e.muscle?' · '+e.muscle:''}</div>
@@ -1509,6 +1517,44 @@ function renderMgmtEx(){
 
 function setMgmtFilter(f){mgmtFilter=f;renderMgmtEx();}
 function setMgmtSearch(v){mgmtQuery=v||'';renderMgmtEx();}
+
+// override: show editable image links and stronger fallback handling
+function renderMgmtEx(){
+  const filters=[{id:'',label:'Todos'},{id:'warm',label:'Warm'},{id:'push',label:'Push'},
+    {id:'pull',label:'Pull'},{id:'legs',label:'Piernas'},{id:'combo',label:'Combo'},{id:'free',label:'Core'}];
+  document.getElementById('mgmt-filter-row').innerHTML=filters.map(f=>
+    `<button class="fchip${mgmtFilter===f.id?' on':''}" onclick="setMgmtFilter('${f.id}')">${f.label}</button>`
+  ).join('');
+
+  const searchInput=document.getElementById('mgmt-search');
+  if(searchInput && searchInput.value!==mgmtQuery) searchInput.value=mgmtQuery;
+
+  const q=mgmtQuery.trim().toLowerCase();
+  const all=getAllExercises().filter(e=>{
+    const typeOk=!mgmtFilter||e.type===mgmtFilter;
+    const text=`${e.name} ${e.muscle||''} ${TYPE_MAP[e.type]||e.type}`.toLowerCase();
+    const searchOk=!q || text.includes(q);
+    return typeOk&&searchOk;
+  });
+
+  document.getElementById('mgmt-ex-list').innerHTML=all.map(e=>{
+    const img=e.imageData||e.imageUrl||getStrengthLevelThumb(e.name,e.type);
+    const link=(e.imageUrl||getStrengthLevelThumb(e.name,e.type));
+    const safeName=(e.name||'').replace(/'/g,"\\'");
+    const safeType=(e.type||'').replace(/'/g,"\\'");
+    const safeMuscle=(e.muscle||'').replace(/'/g,"\\'");
+    const safeLink=(link||'').replace(/'/g,"\\'");
+    return `<div class="mgmt-item" onclick="openExEditByName('${safeName}','${safeType}','${safeMuscle}','${safeLink}')">
+      <div class="mgmt-thumb">${img?`<img src="${img}" onerror="this.onerror=null;this.src='${getTypeThumb(e.type)}'">`:getTypeEmoji(e.type)}</div>
+      <div class="mgmt-info">
+        <div class="mgmt-name">${e.name}</div>
+        <div class="mgmt-sub">${TYPE_MAP[e.type]||e.type}${e.muscle?' - '+e.muscle:''}</div>
+        <div class="mgmt-link">${link}</div>
+      </div>
+      <span class="mgmt-arrow">></span>
+    </div>`;
+  }).join('')||'<div style="color:var(--tx3);font-size:13px;padding:12px">Sin resultados</div>';
+}
 
 function renderMgmtRoutines(){
   document.getElementById('mgmt-routine-list').innerHTML=routines.length?
