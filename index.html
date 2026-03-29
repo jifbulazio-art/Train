@@ -99,6 +99,9 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 
 .add-ex-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:12px;background:transparent;border:1px dashed var(--b2);border-radius:var(--r);color:var(--tx3);font-size:13px;margin-top:8px}
 .add-ex-btn:active{background:var(--s1)}
+.week-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.week-action-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:12px;background:transparent;border:1px dashed var(--b2);border-radius:var(--r);color:var(--tx3);font-size:13px}
+.week-action-btn:active{background:var(--s1)}
 
 /* â”€â”€ MODALS â”€â”€ */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;backdrop-filter:blur(5px);align-items:flex-end;justify-content:center}
@@ -377,6 +380,21 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
         <button class="btn-full" onclick="saveRoutine()">Guardar rutina</button>
         <button class="btn-danger-outline" id="re-delete-btn" onclick="deleteRoutine()" style="display:none">Eliminar</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- PICK ROUTINE SHEET -->
+<div class="overlay" id="routine-picker-sheet" onclick="if(event.target===this)closeSheet('routine-picker-sheet')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <span class="sheet-title">Aplicar rutina</span>
+      <button class="sheet-close" onclick="closeSheet('routine-picker-sheet')">x</button>
+    </div>
+    <div class="sheet-body">
+      <div id="rp-list"></div>
+      <button class="btn-outline" style="width:100%" onclick="closeSheet('routine-picker-sheet');showView('mgmt',document.querySelectorAll('.ntab')[2]);">Ir a crear rutina</button>
     </div>
   </div>
 </div>
@@ -661,10 +679,16 @@ function renderDay(){
       <button class="chip ${cfg.typeCfg.cls}" onclick="openTypePicker(${di})">${cfg.typeCfg.label}</button>
     </div>
     <div class="ex-list" id="exlist-${di}">${buildExListHTML(di,exs)}</div>
-    <button class="add-ex-btn" onclick="openAdd(${di})">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Agregar ejercicios
-    </button>`;
+    <div class="week-actions">
+      <button class="week-action-btn" onclick="openAdd(${di})">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Ejercicios
+      </button>
+      <button class="week-action-btn" onclick="openRoutinePicker()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        Rutina
+      </button>
+    </div>`;
 }
 
 function buildExListHTML(di,exs){
@@ -1389,6 +1413,23 @@ function deleteRoutine(){
   if(!reCtx.id||!confirm('Eliminar rutina?')) return;
   routines=routines.filter(r=>r.id!==reCtx.id);
   sbSave();closeSheet('routine-edit-sheet');renderMgmt();
+}
+
+function openRoutinePicker(){
+  renderRoutinePicker();
+  openSheet('routine-picker-sheet');
+}
+
+function renderRoutinePicker(){
+  const el=document.getElementById('rp-list');
+  if(!el) return;
+  el.innerHTML=routines.length
+    ? routines.map(r=>`
+      <div class="routine-card" onclick="applyRoutine('${r.id}')">
+        <div class="rc-name">${r.name}</div>
+        <div class="rc-sub">${TYPE_MAP[r.type]||r.type} - ${(r.items||[]).length} ejercicios</div>
+      </div>`).join('')
+    : '<div style="color:var(--tx3);font-size:13px;text-align:center;padding:16px">No hay rutinas guardadas</div>';
 }
 
 function applyRoutine(routineId){
