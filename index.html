@@ -400,6 +400,7 @@ const TYPES=[
   {id:'rest',label:'Descanso',cls:'chip-rest',color:'var(--rest)'},
 ];
 const TYPE_MAP={push:'Push',pull:'Pull',legs:'Piernas',combo:'Push+Pull',free:'Libre/Core',warm:'Calentamiento',rest:'Descanso'};
+const TYPE_ACCENT={push:'#6da8ff',pull:'#4ecf7a',legs:'#ffb347',combo:'#b06bff',free:'#f5c518',warm:'#9aa0a6',rest:'#7b8088'};
 const SC=[ // super colors
   {b:'rgba(74,158,255,.28)',bg:'rgba(74,158,255,.05)',l:'rgba(74,158,255,.75)'},
   {b:'rgba(232,93,58,.28)',bg:'rgba(232,93,58,.05)',l:'rgba(232,93,58,.75)'},
@@ -411,6 +412,49 @@ const DEF_DAY=[
   {type:'push',run:true},{type:'pull',run:false},{type:'legs',run:true},
   {type:'combo',run:false},{type:'free',run:true},{type:'rest',run:false},{type:'rest',run:false}
 ];
+
+function svgDataUri(svg){
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+function buildTypeThumb(type){
+  const accent=TYPE_ACCENT[type]||'#6da8ff';
+  const mark={
+    push:'M30 34 L42 34 L50 50 L42 66 L30 66 L38 50 Z M58 34 L70 34 L62 50 L70 66 L58 66 L50 50 Z',
+    pull:'M34 42 L66 42 L62 56 L38 56 Z M30 58 L42 58 L44 70 L32 70 Z M56 58 L68 58 L66 70 L54 70 Z',
+    legs:'M40 58 L48 58 L48 82 L40 82 Z M52 58 L60 58 L60 82 L52 82 Z',
+    combo:'M34 46 L46 46 L46 58 L34 58 Z M54 46 L66 46 L66 58 L54 58 Z M44 60 L56 60 L56 80 L44 80 Z',
+    free:'M36 36 L64 36 L64 44 L36 44 Z M46 46 L54 46 L54 74 L46 74 Z',
+    warm:'M50 34 L54 46 L66 46 L56 54 L60 66 L50 58 L40 66 L44 54 L34 46 L46 46 Z',
+    rest:'M36 46 L64 46 L64 54 L36 54 Z',
+  }[type]||'M36 46 L64 46 L64 54 L36 54 Z';
+
+  const svg=`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+    <rect width='100' height='100' rx='14' fill='#16181b'/>
+    <circle cx='50' cy='20' r='9' fill='#e2e5e8'/>
+    <rect x='39' y='30' width='22' height='30' rx='11' fill='#d7dbe0'/>
+    <rect x='25' y='34' width='12' height='28' rx='6' fill='#d7dbe0'/>
+    <rect x='63' y='34' width='12' height='28' rx='6' fill='#d7dbe0'/>
+    <rect x='41' y='60' width='8' height='30' rx='4' fill='#cdd2d8'/>
+    <rect x='51' y='60' width='8' height='30' rx='4' fill='#cdd2d8'/>
+    <path d='${mark}' fill='${accent}' opacity='.9'/>
+  </svg>`;
+  return svgDataUri(svg);
+}
+
+const TYPE_THUMBS={
+  push:buildTypeThumb('push'),
+  pull:buildTypeThumb('pull'),
+  legs:buildTypeThumb('legs'),
+  combo:buildTypeThumb('combo'),
+  free:buildTypeThumb('free'),
+  warm:buildTypeThumb('warm'),
+  rest:buildTypeThumb('rest'),
+};
+
+function getTypeThumb(type){
+  return TYPE_THUMBS[type]||TYPE_THUMBS.push;
+}
 
 // Built-in exercise database
 // structure: {type: {muscle_group: [names]}}
@@ -689,7 +733,7 @@ function getExImg(name){
   const c=exercises.find(e=>e.name===name);
   if(c&&c.imageData) return c.imageData;
   if(c&&c.imageUrl) return c.imageUrl;
-  return null;
+  return getTypeThumb(getExType(name));
 }
 
 function getPlannedMeta(ex){
@@ -807,7 +851,7 @@ function excHTML(ex,di,i,inGroup){
     ondragend="dragEnd(event)"
     ${pending?'data-pending-super="true"':''}>
     <span class="drag-handle" onclick="event.stopPropagation()"></span>
-    <div class="exc-thumb">${img?`<img src="${img}" onerror="this.parentElement.innerHTML='<span class=&quot;thumb-ph&quot;></span>'">`:getTypeEmoji(getExType(ex.name))}</div>
+    <div class="exc-thumb">${img?`<img src="${img}" onerror="this.parentElement.innerHTML='${getTypeEmoji(getExType(ex.name))}'">`:getTypeEmoji(getExType(ex.name))}</div>
     <div class="exc-info${pending?' exc-pending':''}">
       <div class="exc-title-row">
         <div class="exc-name">${ex.name}</div>
@@ -824,7 +868,7 @@ function excHTML(ex,di,i,inGroup){
   </div>`;
 }
 function getTypeEmoji(t){
-  return '<span class="thumb-ph"></span>';
+  return `<img src="${getTypeThumb(t)}" alt="">`;
 }
 
 function removeFromDay(di,i){
@@ -962,7 +1006,7 @@ function renderAddOpts(){
       window._opts[idx]={name:e.name,type:e.type};
       html+=`<div class="opt-row${sel?' on':''}" id="opt${idx}" onclick="toggleOpt(${idx},event)">
         <div class="opt-check"></div>
-        <div class="opt-thumb">${img?`<img src="${img}" onerror="this.parentElement.innerHTML='<span class=&quot;thumb-ph&quot;></span>'">`:getTypeEmoji(e.type)}</div>
+        <div class="opt-thumb">${img?`<img src="${img}" onerror="this.parentElement.innerHTML='${getTypeEmoji(e.type)}'">`:getTypeEmoji(e.type)}</div>
         <span class="opt-name">${e.name}</span>
         <div class="opt-inputs" onclick="event.stopPropagation()">
           <input type="number" placeholder="s" value="${p?p.sets:''}" min="1" max="20" inputmode="numeric"
@@ -1415,7 +1459,7 @@ function renderMgmtEx(){
   document.getElementById('mgmt-ex-list').innerHTML=all.map(e=>{
     const img=e.imageData||e.imageUrl;
     return `<div class="mgmt-item" onclick="openExEditByName('${e.name.replace(/'/g,"\\'")}','${(e.type||'').replace(/'/g,"\\'")}','${(e.muscle||'').replace(/'/g,"\\'")}')">
-      <div class="mgmt-thumb">${img?`<img src="${img}">`:getTypeEmoji(e.type)}</div>
+      <div class="mgmt-thumb">${img?`<img src="${img}" onerror="this.parentElement.innerHTML='${getTypeEmoji(e.type)}'">`:getTypeEmoji(e.type)}</div>
       <div class="mgmt-info">
         <div class="mgmt-name">${e.name}</div>
         <div class="mgmt-sub">${TYPE_MAP[e.type]||e.type}${e.muscle?' · '+e.muscle:''}</div>
