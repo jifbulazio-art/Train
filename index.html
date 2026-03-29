@@ -385,6 +385,9 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 const SB='https://xyoilytttjxdgsailgic.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5b2lseXR0dGp4ZGdzYWlsZ2ljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3Mzc1NDIsImV4cCI6MjA5MDMxMzU0Mn0.d9_4us4IGKYcg_sGB2e-o-Ke2HHZN0hHXxf0cF-YZJk';
 const SH={'Content-Type':'application/json','apikey':SK,'Authorization':'Bearer '+SK,'Prefer':'resolution=merge-duplicates'};
+const IMG_MAX_SIDE=720;
+const IMG_QUALITY=0.82;
+const IMG_MAX_BYTES=380000;
 
 const DAYS=['Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo'];
 const DL=['L','M','X','J','V','S','D'];
@@ -536,7 +539,8 @@ async function flushSync({keepalive=false}={}){
       {id:'exercises',data:exercises,updated_at:new Date().toISOString()},
       {id:'routines',data:routines,updated_at:new Date().toISOString()},
     ]);
-    await fetch(SB+'/rest/v1/rutina',{method:'POST',headers:SH,body:payload,keepalive});
+    const resp=await fetch(SB+'/rest/v1/rutina',{method:'POST',headers:SH,body:payload,keepalive});
+    if(!resp.ok) throw 0;
     syncState.pending=false;
     localStorage.setItem(SYNC_PENDING_KEY,'0');
   }catch(e){
@@ -558,9 +562,10 @@ function sbSave(){
 
 async function sbEnsure(){
   try{
-    await fetch(SB+'/rest/v1/rutina',{method:'POST',headers:{...SH,'Prefer':'resolution=ignore-duplicates'},body:JSON.stringify([
+    const resp=await fetch(SB+'/rest/v1/rutina',{method:'POST',headers:{...SH,'Prefer':'resolution=ignore-duplicates'},body:JSON.stringify([
       {id:'week',data:{}},{id:'daycfg',data:{}},{id:'exercises',data:[]},{id:'routines',data:[]},
     ])});
+    if(!resp.ok) throw 0;
   }catch(_){}
 }
 
@@ -1188,15 +1193,52 @@ function openExEditByName(name,type='',muscle=''){
   else openExEdit(null,name,type,muscle);
 }
 
+function readFileAsDataURL(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=e=>resolve(e.target.result);
+    reader.onerror=()=>reject(new Error('file'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImage(src){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>resolve(img);
+    img.onerror=()=>reject(new Error('image'));
+    img.src=src;
+  });
+}
+
+async function compressImageDataURL(dataUrl,maxSide=IMG_MAX_SIDE,quality=IMG_QUALITY){
+  const img=await loadImage(dataUrl);
+  const scale=Math.min(1,maxSide/Math.max(img.width,img.height));
+  const w=Math.max(1,Math.round(img.width*scale));
+  const h=Math.max(1,Math.round(img.height*scale));
+  const canvas=document.createElement('canvas');
+  canvas.width=w;
+  canvas.height=h;
+  const ctx=canvas.getContext('2d');
+  ctx.drawImage(img,0,0,w,h);
+  let out=canvas.toDataURL('image/jpeg',quality);
+  if(out.length>IMG_MAX_BYTES){
+    out=canvas.toDataURL('image/jpeg',0.7);
+  }
+  return out;
+}
+
 function handleEEFile(input){
   const file=input.files[0];if(!file) return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    eeImgData=e.target.result;
-    document.getElementById('ee-img-preview').innerHTML=`<img src="${eeImgData}" style="width:100%;height:100%;object-fit:cover">`;
-    document.getElementById('ee-img-url').value='';
-  };
-  reader.readAsDataURL(file);
+  readFileAsDataURL(file)
+    .then(src=>compressImageDataURL(src))
+    .then(comp=>{
+      eeImgData=comp;
+      document.getElementById('ee-img-preview').innerHTML=`<img src="${eeImgData}" style="width:100%;height:100%;object-fit:cover">`;
+      document.getElementById('ee-img-url').value='';
+      if((eeImgData||'').length>IMG_MAX_BYTES) toast('imagen pesada, se comprimio para sincronizar',false);
+    })
+    .catch(()=>toast('no pude procesar la imagen',false));
 }
 
 function saveExercise(){
