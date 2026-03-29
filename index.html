@@ -70,7 +70,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .super-group-label{font-size:10px;font-family:'DM Mono',monospace;padding:5px 12px;letter-spacing:.07em}
 
 /* exercise card */
-.exc{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;background:linear-gradient(180deg,rgba(255,255,255,.01),rgba(255,255,255,0));cursor:pointer;position:relative;border-bottom:1px solid var(--b0)}
+.exc{display:flex;align-items:flex-start;gap:10px;padding:10px 11px;background:transparent;cursor:pointer;position:relative;border-bottom:1px solid var(--b0)}
 .exc:last-child{border-bottom:none}
 .exc.standalone{border-radius:var(--r);border:1px solid var(--b1);margin-bottom:4px}
 .exc:active{opacity:.75}
@@ -80,15 +80,15 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc-title-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .exc-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .exc-meta{display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--tx2);margin-top:4px;font-family:'DM Mono',monospace}
-.exc-plan{color:var(--tx);display:inline-block;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid var(--b1)}
-.exc-progress-row{display:flex;flex-wrap:wrap;gap:4px}
-.exc-progress-chip{padding:2px 7px;border-radius:999px;border:1px solid var(--b1);background:rgba(255,255,255,.02);color:var(--tx2);font-size:10px}
-.exc-progress-chip.done{border-color:rgba(78,207,122,.35);color:var(--legs);background:rgba(78,207,122,.08)}
+.exc-plan{color:var(--tx2)}
+.exc-progress-row{display:flex;flex-wrap:wrap;gap:6px}
+.exc-progress-chip{padding:0;border:none;background:transparent;color:var(--tx3);font-size:10px}
+.exc-progress-chip.done{color:var(--legs)}
 .exc-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;padding-top:1px}
-.exc-ss{background:var(--s2);border:1px solid var(--b1);color:var(--tx2);font-size:10px;font-family:'DM Mono',monospace;padding:6px 9px;border-radius:999px;line-height:1}
-.exc-ss.on{border-color:rgba(176,107,255,.35);color:#d9c3ff;background:rgba(176,107,255,.12)}
+.exc-ss{background:transparent;border:1px solid var(--b1);color:var(--tx2);font-size:10px;font-family:'DM Mono',monospace;padding:5px 8px;border-radius:7px;line-height:1}
+.exc-ss.on{border-color:rgba(176,107,255,.35);color:#d9c3ff;background:rgba(176,107,255,.08)}
 .exc-pending{box-shadow:inset 0 0 0 1px rgba(176,107,255,.35)}
-.exc-del{background:transparent;border:1px solid var(--b1);color:var(--tx3);font-size:15px;padding:4px 7px;line-height:1;border-radius:999px;flex-shrink:0}
+.exc-del{background:transparent;border:1px solid var(--b1);color:var(--tx3);font-size:15px;padding:4px 6px;line-height:1;border-radius:7px;flex-shrink:0}
 
 /* drag handle */
 .drag-handle{color:var(--tx3);font-size:16px;cursor:grab;padding:3px 4px;flex-shrink:0;touch-action:none}
@@ -112,9 +112,9 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 
 /* â”€â”€ ADD EXERCISES SHEET â”€â”€ */
 .search-row{position:relative}
-.search-row input{width:100%;padding:10px 14px 10px 36px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--rs);color:var(--tx);font-size:14px;outline:none}
+.search-row input{width:100%;padding:10px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--rs);color:var(--tx);font-size:14px;outline:none}
 .search-row input::placeholder{color:var(--tx3)}
-.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:15px;pointer-events:none}
+.search-icon{display:none}
 
 /* filter chips â€” wrap into multiple rows */
 .filter-row{display:flex;flex-wrap:wrap;gap:5px;padding:0}
@@ -172,7 +172,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 /* â”€â”€ EXERCISE MGMT VIEW â”€â”€ */
 .mgmt-section{margin-bottom:28px}
 .mgmt-section-title{font-size:12px;font-family:'DM Mono',monospace;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
-.mgmt-search{margin-bottom:10px}
+.mgmt-search{margin:12px 0 14px}
 .mgmt-search input{width:100%;padding:10px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none}
 .mgmt-search input::placeholder{color:var(--tx3)}
 .mgmt-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s1);border:1px solid var(--b0);border-radius:var(--rs);margin-bottom:6px;cursor:pointer}
@@ -245,7 +245,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 
 <!-- HISTORY VIEW -->
 <div class="view" id="view-hist">
-  <div class="hist-empty">El historial estarÃ¡ disponible prÃ³ximamente.<br>Por ahora registrÃ¡ tus entrenos desde la rutina semanal.</div>
+  <div class="hist-empty">El historial estara disponible proximamente.<br>Por ahora registra tus entrenos desde la rutina semanal.</div>
 </div>
 
 <!-- MGMT VIEW -->
@@ -258,7 +258,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 <!-- â•â• TYPE PICKER â•â• -->
 <div class="picker-overlay" id="type-picker" onclick="if(event.target===this)closePicker()">
   <div class="picker-sheet">
-    <div class="picker-title">TIPO DE DÃA</div>
+    <div class="picker-title">TIPO DE DIA</div>
     <div class="picker-grid" id="picker-grid"></div>
   </div>
 </div>
@@ -269,11 +269,11 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <span class="sheet-title">Agregar ejercicios</span>
-      <button class="sheet-close" onclick="closeSheet('add-sheet')">Ã—</button>
+      <button class="sheet-close" onclick="closeSheet('add-sheet')">x</button>
     </div>
     <div style="padding:10px 16px;border-bottom:1px solid var(--b0);flex-shrink:0;display:flex;flex-direction:column;gap:8px">
       <div class="search-row">
-        <span class="search-icon">âŒ•</span>
+        <span class="search-icon">Q</span>
         <input type="text" id="add-search" placeholder="Buscar ejercicio..." oninput="renderAddOpts()" autocomplete="off" autocorrect="off" spellcheck="false">
       </div>
       <div class="filter-row" id="add-filters"></div>
@@ -293,7 +293,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <span class="sheet-title" id="detail-title">Ejercicio</span>
-      <button class="sheet-close" onclick="closeSheet('detail-sheet')">Ã—</button>
+      <button class="sheet-close" onclick="closeSheet('detail-sheet')">x</button>
     </div>
     <div class="sheet-body" id="detail-body"></div>
   </div>
@@ -305,7 +305,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <span class="sheet-title" id="ex-edit-title">Ejercicio</span>
-      <button class="sheet-close" onclick="closeSheet('ex-edit-sheet')">Ã—</button>
+      <button class="sheet-close" onclick="closeSheet('ex-edit-sheet')">x</button>
     </div>
     <div class="sheet-body">
       <div class="form-field">
@@ -325,14 +325,14 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
       </div>
       <div class="form-field">
         <label class="form-label">GRUPO MUSCULAR</label>
-        <input class="form-input" type="text" id="ee-muscle" list="muscle-options" placeholder="Ej: Pecho, BÃ­ceps, CuÃ¡driceps...">
+        <input class="form-input" type="text" id="ee-muscle" list="muscle-options" placeholder="Ej: Pecho, Biceps, Cuadriceps...">
         <datalist id="muscle-options"></datalist>
       </div>
       <div class="form-field">
         <label class="form-label">IMAGEN</label>
         <div class="img-upload-area">
           <input type="url" id="ee-img-url" placeholder="Pegar URL de imagen..." oninput="previewEEImg()">
-          <button class="btn-outline" onclick="document.getElementById('ee-img-file').click()">ðŸ“</button>
+          <button class="btn-outline" onclick="document.getElementById('ee-img-file').click()">Subir</button>
           <input type="file" id="ee-img-file" accept="image/*" style="display:none" onchange="handleEEFile(this)">
         </div>
         <div class="img-preview" id="ee-img-preview"><span class="img-preview-ph">sin imagen</span></div>
@@ -351,12 +351,12 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <span class="sheet-title" id="re-title">Rutina</span>
-      <button class="sheet-close" onclick="closeSheet('routine-edit-sheet')">Ã—</button>
+      <button class="sheet-close" onclick="closeSheet('routine-edit-sheet')">x</button>
     </div>
     <div class="sheet-body">
       <div class="form-field">
         <label class="form-label">NOMBRE DE LA RUTINA</label>
-        <input class="form-input" type="text" id="re-name" placeholder="Ej: Push dÃ­a A">
+        <input class="form-input" type="text" id="re-name" placeholder="Ej: Push dia A">
       </div>
       <div class="form-field">
         <label class="form-label">TIPO</label>
@@ -384,7 +384,7 @@ const SB='https://xyoilytttjxdgsailgic.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5b2lseXR0dGp4ZGdzYWlsZ2ljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3Mzc1NDIsImV4cCI6MjA5MDMxMzU0Mn0.d9_4us4IGKYcg_sGB2e-o-Ke2HHZN0hHXxf0cF-YZJk';
 const SH={'Content-Type':'application/json','apikey':SK,'Authorization':'Bearer '+SK,'Prefer':'resolution=merge-duplicates'};
 
-const DAYS=['Lunes','Martes','MiÃ©rcoles','Jueves','Viernes','SÃ¡bado','Domingo'];
+const DAYS=['Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo'];
 const DL=['L','M','X','J','V','S','D'];
 const TYPES=[
   {id:'push',label:'Push',cls:'chip-push',color:'var(--push)'},
@@ -411,26 +411,26 @@ const DEF_DAY=[
 // structure: {type: {muscle_group: [names]}}
 const BUILTIN={
   warm:{
-    'Movilidad':['Rotaciones de hombro con banda','Dislocaciones con banda','Band pull-apart','Cat-cow','Rotaciones de cadera','CÃ­rculos de tobillo','Movilidad de muÃ±eca'],
-    'ActivaciÃ³n':['Hollow body hold','Arch body hold','Plancha frontal','Plancha lateral','Caminata de manos (inchworm)','Dead hang en barra','Scapular pull-up','Wall walk'],
-    'AerÃ³bico':['Jumping jacks','Toque de piso alternado','Sentadilla con salto','Burpee','Mountain climber','Skipping en el lugar','Trote en el lugar'],
+    'Movilidad':['Rotaciones de hombro con banda','Dislocaciones con banda','Band pull-apart','Cat-cow','Rotaciones de cadera','Circulos de tobillo','Movilidad de muneca'],
+    'Activacion':['Hollow body hold','Arch body hold','Plancha frontal','Plancha lateral','Caminata de manos (inchworm)','Dead hang en barra','Scapular pull-up','Wall walk'],
+    'Aerobico':['Jumping jacks','Toque de piso alternado','Sentadilla con salto','Burpee','Mountain climber','Skipping en el lugar','Trote en el lugar'],
   },
   push:{
-    'Pecho':['Push-up estÃ¡ndar','Push-up arquero','Push-up explosivo','Push-up declinado','Push-up inclinado','Pseudo planche push-up','Press de mancuernas plano','Press de mancuernas inclinado'],
+    'Pecho':['Push-up estandar','Push-up arquero','Push-up explosivo','Push-up declinado','Push-up inclinado','Pseudo planche push-up','Press de mancuernas plano','Press de mancuernas inclinado'],
     'Hombros':['Pike push-up','Pike push-up elevado','Press de hombros con mancuernas','Elevaciones laterales con mancuernas','Elevaciones frontales con mancuernas'],
-    'TrÃ­ceps':['Dips en paralelas bajas','ExtensiÃ³n de trÃ­ceps sobre cabeza','Kickback de trÃ­ceps','Australian push-up en barra baja'],
-    'Back lever':['Back lever â€” tucked','Back lever â€” advanced tucked','Back lever â€” one leg','Back lever â€” straddle','Back lever â€” full','Back lever pull-in / press','Back lever pike','Back lever (progresiones)'],
+    'Triceps':['Dips en paralelas bajas','Extension de triceps sobre cabeza','Kickback de triceps','Australian push-up en barra baja'],
+    'Back lever':['Back lever - tucked','Back lever - advanced tucked','Back lever - one leg','Back lever - straddle','Back lever - full','Back lever pull-in / press','Back lever pike','Back lever (progresiones)'],
   },
   pull:{
     'Barra baja':['Australian pull-up en barra baja','Remo invertido en barra baja','Archer pull-up australiano','Dead hang con pausa'],
-    'BÃ­ceps':['Curl de bÃ­ceps con mancuernas','Curl martillo','Curl concentrado','Curl 21s','Curl de muÃ±eca','Curl inverso'],
-    'Front lever':['Front lever â€” tucked','Front lever â€” advanced tucked','Front lever â€” one leg','Front lever â€” straddle','Front lever â€” full','Front lever row','Front lever pike','Front lever (progresiones)'],
+    'Biceps':['Curl de biceps con mancuernas','Curl martillo','Curl concentrado','Curl 21s','Curl de muneca','Curl inverso'],
+    'Front lever':['Front lever - tucked','Front lever - advanced tucked','Front lever - one leg','Front lever - straddle','Front lever - full','Front lever row','Front lever pike','Front lever (progresiones)'],
   },
   legs:{
-    'CuÃ¡driceps':['Sentadilla con peso corporal','Goblet squat','Sentadilla con mancuernas','Sentadilla bÃºlgara','Step-up con mancuernas','Pistol squat asistido','Pistol squat libre'],
-    'Isquiotibiales':['Peso muerto con mancuernas','Peso muerto a una pierna','Nordic curl en barra baja','Puente de glÃºteo'],
-    'GlÃºteos':['Hip thrust corporal','Hip thrust con mancuerna','Zancada estÃ¡tica','Zancada caminando','Zancada lateral'],
-    'Pantorrillas':['ElevaciÃ³n de pantorrillas de pie','ElevaciÃ³n de pantorrillas a una pierna','ElevaciÃ³n de pantorrillas sentado'],
+    'Cuadriceps':['Sentadilla con peso corporal','Goblet squat','Sentadilla con mancuernas','Sentadilla bulgara','Step-up con mancuernas','Pistol squat asistido','Pistol squat libre'],
+    'Isquiotibiales':['Peso muerto con mancuernas','Peso muerto a una pierna','Nordic curl en barra baja','Puente de gluteo'],
+    'Gluteos':['Hip thrust corporal','Hip thrust con mancuerna','Zancada estatica','Zancada caminando','Zancada lateral'],
+    'Pantorrillas':['Elevacion de pantorrillas de pie','Elevacion de pantorrillas a una pierna','Elevacion de pantorrillas sentado'],
   },
   combo:{
     'Skills':['Front lever (progresiones)','Back lever (progresiones)','Front lever row','Back lever pull-in / press','L-sit en paralelas bajas','Tuck planche en paralelas','Planche lean','Muscle-up'],
@@ -439,7 +439,7 @@ const BUILTIN={
   free:{
     'Handstand':['Handstand contra pared','Handstand hold libre','Handstand push-up contra pared','Pike push-up elevado'],
     'Core':['L-sit en paralelas bajas','L-sit en barra baja','Dragon flag','Hollow body rocks','Tuck to hollow','Ab wheel','Planche lean'],
-    'Movilidad':['Stretching de hombros con banda','Paloma (cadera)','Sentadilla profunda con pausa','FlexiÃ³n de columna'],
+    'Movilidad':['Stretching de hombros con banda','Paloma (cadera)','Sentadilla profunda con pausa','Flexion de columna'],
   },
 };
 
@@ -619,7 +619,7 @@ function renderDay(){
   document.getElementById('day-content').innerHTML=`
     <div class="dh">
       <div class="dh-title">${DAYS[di]}</div>
-      <button class="chip chip-run${cfg.run?'':' off'}" onclick="toggleRun(${di})">${cfg.run?'ðŸƒ Trote':'+ Trote'}</button>
+      <button class="chip chip-run${cfg.run?'':' off'}" onclick="toggleRun(${di})">${cfg.run?'Trote':'+ Trote'}</button>
       <button class="chip ${cfg.typeCfg.cls}" onclick="openTypePicker(${di})">${cfg.typeCfg.label}</button>
     </div>
     <div class="ex-list" id="exlist-${di}">${buildExListHTML(di,exs)}</div>
@@ -733,8 +733,8 @@ function isPendingSuper(di,i){
 function getSupersetButtonLabel(ex,di,i){
   if(isPendingSuper(di,i)) return 'Cancelar';
   if(pendingSuperLink) return 'Unir';
-  if(ex.superGroup) return '-SS';
-  return '+SS';
+  if(ex.superGroup) return 'SS-';
+  return 'SS+';
 }
 
 function supersetAction(di,i){
@@ -775,7 +775,7 @@ function supersetAction(di,i){
   }
 
   pendingSuperLink={di,i};
-  toast('ElegÃ­ otro ejercicio para unirlo en superserie');
+  toast('Elegi otro ejercicio para unirlo en superserie');
   renderDay();
 }
 
@@ -799,8 +799,8 @@ function excHTML(ex,di,i,inGroup){
     ondrop="dragDrop(event,${di},${i})"
     ondragend="dragEnd(event)"
     ${pending?'data-pending-super="true"':''}>
-    <span class="drag-handle" onclick="event.stopPropagation()">?</span>
-    <div class="exc-thumb">${img?`<img src="${img}" onerror="this.parentElement.innerHTML='??'">`:getTypeEmoji(getExType(ex.name))}</div>
+    <span class="drag-handle" onclick="event.stopPropagation()">::</span>
+    <div class="exc-thumb">${img?`<img src="${img}" onerror="this.parentElement.innerHTML='IMG'">`:getTypeEmoji(getExType(ex.name))}</div>
     <div class="exc-info${pending?' exc-pending':''}">
       <div class="exc-title-row">
         <div class="exc-name">${ex.name}</div>
@@ -817,12 +817,12 @@ function excHTML(ex,di,i,inGroup){
   </div>`;
 }
 function getTypeEmoji(t){
-  const m={push:'ðŸ’ª',pull:'ðŸ‹ï¸',legs:'ðŸ¦µ',combo:'âš¡',free:'ðŸ¤¸',warm:'ðŸ”¥',rest:'ðŸ˜´'};
-  return m[t]||'ðŸ’ª';
+  const m={push:'PU',pull:'PL',legs:'PI',combo:'CO',free:'FR',warm:'WU',rest:'RE'};
+  return m[t]||'EX';
 }
 
 function removeFromDay(di,i){
-  if(!confirm('Â¿Eliminar?'))return;
+  if(!confirm('Eliminar?'))return;
   weekData[di].splice(i,1);
   normalizeSupersets(di);
   pendingSuperLink=null;
@@ -948,7 +948,7 @@ function renderAddOpts(){
 
   sortedKeys.forEach(key=>{
     const g=grouped[key];
-    html+=`<div class="opts-grp-label">${TYPE_MAP[g.type]||g.type}${g.muscle?' â€” '+g.muscle:''}</div>`;
+    html+=`<div class="opts-grp-label">${TYPE_MAP[g.type]||g.type}${g.muscle?' - '+g.muscle:''}</div>`;
     g.items.forEach(e=>{
       const p=pending.find(x=>x.name===e.name);
       const sel=!!p;
@@ -961,7 +961,7 @@ function renderAddOpts(){
         <div class="opt-inputs" onclick="event.stopPropagation()">
           <input type="number" placeholder="s" value="${p?p.sets:''}" min="1" max="20" inputmode="numeric"
             oninput="updPend(${idx},'sets',this.value)">
-          <span class="sep">Ã—</span>
+          <span class="sep">x</span>
           <input class="ri" type="text" placeholder="reps" value="${p?p.reps:''}"
             oninput="updPend(${idx},'reps',this.value)">
           <select onchange="updPend(${idx},'unit',this.value)">
@@ -1060,7 +1060,7 @@ function openDetail(di,i){
   const detailImgHtml = img
     ? `<img src="${img}" onerror="this.parentElement.innerHTML='&lt;span class=&quot;detail-img-ph&quot;&gt;${ex.name}&lt;/span&gt;'">`
     : `<span class="detail-img-ph">${ex.name}</span>`;
-  const detailMeta = `${TYPE_MAP[getExType(ex.name)]||''}${getPlannedMeta(ex)?` Â· ${getPlannedMeta(ex)}`:''}`;
+  const detailMeta = `${TYPE_MAP[getExType(ex.name)]||''}${getPlannedMeta(ex)?` - ${getPlannedMeta(ex)}`:''}`;
 
   document.getElementById('detail-body').innerHTML=`
     <div class="detail-img">${detailImgHtml}</div>
@@ -1094,7 +1094,7 @@ function renderDetailSets(){
         <option value="seg"${s.wunit==='seg'?' selected':''}>seg</option>
         <option value="cant"${s.wunit==='cant'?' selected':''}>cant</option>
       </select>
-      ${detailSets.length>1?`<button class="set-del" onclick="detailSets.splice(${i},1);renderDetailSets()">Ã—</button>`:'<span style="width:22px"></span>'}
+      ${detailSets.length>1?`<button class="set-del" onclick="detailSets.splice(${i},1);renderDetailSets()">x</button>`:'<span style="width:22px"></span>'}
     </div>`).join('');
 }
 
@@ -1165,7 +1165,7 @@ function openExEdit(id=null,prefillName='',prefillType='push',prefillMuscle='',r
 function previewEEImg(){
   const url=document.getElementById('ee-img-url').value.trim();
   const p=document.getElementById('ee-img-preview');
-  if(url) p.innerHTML=`<img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<span class=img-preview-ph>URL invÃ¡lida</span>'">`;
+  if(url) p.innerHTML=`<img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<span class=img-preview-ph>URL invalida</span>'">`;
   else p.innerHTML='<span class="img-preview-ph">sin imagen</span>';
   eeImgData=null;
 }
@@ -1200,7 +1200,7 @@ function handleEEFile(input){
 
 function saveExercise(){
   const name=document.getElementById('ee-name').value.trim();
-  if(!name){toast('IngresÃ¡ un nombre',false);return;}
+  if(!name){toast('Ingresa un nombre',false);return;}
   const type=document.getElementById('ee-type').value;
   const muscle=document.getElementById('ee-muscle').value.trim();
   const rawImageUrl=document.getElementById('ee-img-url').value.trim();
@@ -1251,7 +1251,7 @@ function saveExercise(){
 }
 
 function deleteExercise(){
-  if(!eeCtx.id||!confirm('Â¿Eliminar ejercicio?')) return;
+  if(!eeCtx.id||!confirm('Eliminar ejercicio?')) return;
   exercises=exercises.filter(e=>e.id!==eeCtx.id);
   sbSave();closeSheet('ex-edit-sheet');renderMgmt();
 }
@@ -1276,11 +1276,11 @@ function renderREList(){
         <div class="exc-thumb" style="width:36px;height:36px;border-radius:6px">${getTypeEmoji(ex.type||getExType(ex.name))}</div>
         <div class="mgmt-info">
           <div class="mgmt-name">${ex.name}</div>
-          <div class="mgmt-sub">${ex.sets?ex.sets+' series':''}${ex.reps?' Ã— '+ex.reps:''}${ex.unit==='seg'?' seg':''}</div>
+          <div class="mgmt-sub">${ex.sets?ex.sets+' series':''}${ex.reps?' x '+ex.reps:''}${ex.unit==='seg'?' seg':''}</div>
         </div>
-        <button style="background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer" onclick="rePending.splice(${i},1);renderREList()">Ã—</button>
+        <button style="background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer" onclick="rePending.splice(${i},1);renderREList()">x</button>
       </div>`).join(''):
-    '<div style="color:var(--tx3);font-size:13px;text-align:center;padding:16px">Sin ejercicios todavÃ­a</div>';
+    '<div style="color:var(--tx3);font-size:13px;text-align:center;padding:16px">Sin ejercicios todavia</div>';
 }
 
 function openAddToRoutine(){
@@ -1296,7 +1296,7 @@ function openAddToRoutine(){
 
 function saveRoutine(){
   const name=document.getElementById('re-name').value.trim();
-  if(!name){toast('IngresÃ¡ un nombre',false);return;}
+  if(!name){toast('Ingresa un nombre',false);return;}
   const type=document.getElementById('re-type').value;
   if(reCtx.id){
     const r=routines.find(x=>x.id===reCtx.id);
@@ -1308,14 +1308,14 @@ function saveRoutine(){
 }
 
 function deleteRoutine(){
-  if(!reCtx.id||!confirm('Â¿Eliminar rutina?')) return;
+  if(!reCtx.id||!confirm('Eliminar rutina?')) return;
   routines=routines.filter(r=>r.id!==reCtx.id);
   sbSave();closeSheet('routine-edit-sheet');renderMgmt();
 }
 
 function applyRoutine(routineId){
   const r=routines.find(x=>x.id===routineId);if(!r) return;
-  if(!confirm(`Â¿Aplicar rutina "${r.name}" al ${DAYS[curDay]}? ReemplazarÃ¡ los ejercicios actuales.`)) return;
+  if(!confirm(`Aplicar rutina "${r.name}" al ${DAYS[curDay]}? Reemplazara los ejercicios actuales.`)) return;
   weekData[curDay]=(r.items||[]).map(ex=>({...ex,logs:[]}));
   dayCfg[curDay].type=r.type||'push';
   sbSave();renderDayRow();renderDay();closeSheet('routine-picker-sheet');
@@ -1377,7 +1377,7 @@ function renderMgmtEx(){
         <div class="mgmt-name">${e.name}</div>
         <div class="mgmt-sub">${TYPE_MAP[e.type]||e.type}${e.muscle?' · '+e.muscle:''}</div>
       </div>
-      <span class="mgmt-arrow">›</span>
+      <span class="mgmt-arrow">></span>
     </div>`;
   }).join('')||'<div style="color:var(--tx3);font-size:13px;padding:12px">Sin resultados</div>';
 }
@@ -1390,7 +1390,7 @@ function renderMgmtRoutines(){
     routines.map(r=>`
       <div class="routine-card" onclick="openRoutineEdit('${r.id}')">
         <div class="rc-name">${r.name}</div>
-        <div class="rc-sub">${TYPE_MAP[r.type]||r.type} Â· ${(r.items||[]).length} ejercicios</div>
+        <div class="rc-sub">${TYPE_MAP[r.type]||r.type} - ${(r.items||[]).length} ejercicios</div>
       </div>`).join(''):
     '<div style="color:var(--tx3);font-size:13px;padding:4px">Sin rutinas guardadas</div>';
 }
