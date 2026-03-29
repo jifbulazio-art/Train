@@ -413,44 +413,80 @@ const DEF_DAY=[
   {type:'combo',run:false},{type:'free',run:true},{type:'rest',run:false},{type:'rest',run:false}
 ];
 
-function svgDataUri(svg){
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-}
-
-function buildTypeThumb(type){
-  const accent=TYPE_ACCENT[type]||'#6da8ff';
-  const mark={
-    push:'M30 34 L42 34 L50 50 L42 66 L30 66 L38 50 Z M58 34 L70 34 L62 50 L70 66 L58 66 L50 50 Z',
-    pull:'M34 42 L66 42 L62 56 L38 56 Z M30 58 L42 58 L44 70 L32 70 Z M56 58 L68 58 L66 70 L54 70 Z',
-    legs:'M40 58 L48 58 L48 82 L40 82 Z M52 58 L60 58 L60 82 L52 82 Z',
-    combo:'M34 46 L46 46 L46 58 L34 58 Z M54 46 L66 46 L66 58 L54 58 Z M44 60 L56 60 L56 80 L44 80 Z',
-    free:'M36 36 L64 36 L64 44 L36 44 Z M46 46 L54 46 L54 74 L46 74 Z',
-    warm:'M50 34 L54 46 L66 46 L56 54 L60 66 L50 58 L40 66 L44 54 L34 46 L46 46 Z',
-    rest:'M36 46 L64 46 L64 54 L36 54 Z',
-  }[type]||'M36 46 L64 46 L64 54 L36 54 Z';
-
-  const svg=`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-    <rect width='100' height='100' rx='14' fill='#16181b'/>
-    <circle cx='50' cy='20' r='9' fill='#e2e5e8'/>
-    <rect x='39' y='30' width='22' height='30' rx='11' fill='#d7dbe0'/>
-    <rect x='25' y='34' width='12' height='28' rx='6' fill='#d7dbe0'/>
-    <rect x='63' y='34' width='12' height='28' rx='6' fill='#d7dbe0'/>
-    <rect x='41' y='60' width='8' height='30' rx='4' fill='#cdd2d8'/>
-    <rect x='51' y='60' width='8' height='30' rx='4' fill='#cdd2d8'/>
-    <path d='${mark}' fill='${accent}' opacity='.9'/>
-  </svg>`;
-  return svgDataUri(svg);
-}
-
+const SL_BASE='https://static.strengthlevel.com/images/exercises';
 const TYPE_THUMBS={
-  push:buildTypeThumb('push'),
-  pull:buildTypeThumb('pull'),
-  legs:buildTypeThumb('legs'),
-  combo:buildTypeThumb('combo'),
-  free:buildTypeThumb('free'),
-  warm:buildTypeThumb('warm'),
-  rest:buildTypeThumb('rest'),
+  push:`${SL_BASE}/bench-press/bench-press-800.jpg`,
+  pull:`${SL_BASE}/pull-ups/pull-ups-800.jpg`,
+  legs:`${SL_BASE}/squat/squat-800.jpg`,
+  combo:`${SL_BASE}/deadlift/deadlift-800.jpg`,
+  free:`${SL_BASE}/push-ups/push-ups-800.jpg`,
+  warm:`${SL_BASE}/plank/plank-800.jpg`,
+  rest:`${SL_BASE}/plank/plank-800.jpg`,
 };
+
+const EXERCISE_SLUG_OVERRIDES={
+  'kickback de triceps':'dumbbell-tricep-kickback',
+  'extension de triceps sobre cabeza':'dumbbell-tricep-extension',
+  'press de mancuernas plano':'dumbbell-bench-press',
+  'press de mancuernas inclinado':'incline-dumbbell-bench-press',
+  'press de hombros con mancuernas':'dumbbell-shoulder-press',
+  'elevaciones laterales con mancuernas':'dumbbell-lateral-raise',
+  'elevaciones frontales con mancuernas':'dumbbell-front-raise',
+  'curl de biceps con mancuernas':'dumbbell-curl',
+  'curl martillo':'hammer-curl',
+  'curl concentrado':'concentration-curl',
+  'remo invertido en barra baja':'inverted-row',
+  'australian pull-up en barra baja':'inverted-row',
+  'sentadilla con peso corporal':'bodyweight-squat',
+  'sentadilla con mancuernas':'dumbbell-squat',
+  'sentadilla bulgara':'bulgarian-split-squat',
+  'peso muerto con mancuernas':'dumbbell-deadlift',
+  'peso muerto a una pierna':'single-leg-deadlift',
+  'hip thrust corporal':'hip-thrust',
+  'hip thrust con mancuerna':'dumbbell-hip-thrust',
+  'elevacion de pantorrillas de pie':'standing-calf-raise',
+  'elevacion de pantorrillas sentado':'seated-calf-raise',
+  'zancada estatica':'lunge',
+  'zancada caminando':'walking-lunge',
+  'push-up estandar':'push-ups',
+  'push-up declinado':'decline-push-up',
+  'push-up inclinado':'incline-push-up',
+  'pike push-up':'pike-push-up',
+  'dips en paralelas bajas':'dips',
+  'pull ups':'pull-ups',
+  'plancha frontal':'plank',
+  'plancha lateral':'side-plank',
+  'burpee':'burpee',
+  'mountain climber':'mountain-climber',
+};
+
+function normalizeExerciseKey(name=''){
+  return name.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[+]/g,' plus ')
+    .replace(/[()]/g,' ')
+    .replace(/[^a-z0-9\s-]/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
+function slugifyExerciseName(name=''){
+  const key=normalizeExerciseKey(name);
+  if(EXERCISE_SLUG_OVERRIDES[key]) return EXERCISE_SLUG_OVERRIDES[key];
+  if(key.includes('push-up')||key.includes('push up')) return 'push-ups';
+  if(key.includes('pull-up')||key.includes('pull up')) return 'pull-ups';
+  if(key.includes('squat')||key.includes('sentadilla')) return 'squat';
+  if(key.includes('deadlift')||key.includes('peso muerto')) return 'deadlift';
+  if(key.includes('curl')) return 'dumbbell-curl';
+  if(key.includes('row')||key.includes('remo')) return 'bent-over-row';
+  if(key.includes('press')) return 'bench-press';
+  return key.replace(/\s+/g,'-');
+}
+
+function getStrengthLevelThumb(name,type){
+  const slug=slugifyExerciseName(name);
+  return `${SL_BASE}/${slug}/${slug}-800.jpg`;
+}
 
 function getTypeThumb(type){
   return TYPE_THUMBS[type]||TYPE_THUMBS.push;
@@ -733,7 +769,8 @@ function getExImg(name){
   const c=exercises.find(e=>e.name===name);
   if(c&&c.imageData) return c.imageData;
   if(c&&c.imageUrl) return c.imageUrl;
-  return getTypeThumb(getExType(name));
+  const t=getExType(name);
+  return getStrengthLevelThumb(name,t);
 }
 
 function getPlannedMeta(ex){
@@ -956,13 +993,14 @@ function getAllExercises(){
     Object.entries(groups).forEach(([muscle,names])=>{
       names.forEach(name=>{
         const custom=exercises.find(e=>e.name===name);
-        result.push({name,type,muscle,imageUrl:custom?.imageUrl||null,imageData:custom?.imageData||null});
+        result.push({name,type,muscle,imageUrl:custom?.imageUrl||getStrengthLevelThumb(name,type),imageData:custom?.imageData||null});
       });
     });
   });
   exercises.forEach(ex=>{
     if(!result.find(r=>r.name===ex.name)){
-      result.push({name:ex.name,type:ex.type||'free',muscle:ex.muscle||'',imageUrl:ex.imageUrl||null,imageData:ex.imageData||null});
+      const type=ex.type||'free';
+      result.push({name:ex.name,type,muscle:ex.muscle||'',imageUrl:ex.imageUrl||getStrengthLevelThumb(ex.name,type),imageData:ex.imageData||null});
     }
   });
   return result;
