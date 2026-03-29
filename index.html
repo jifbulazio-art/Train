@@ -414,53 +414,9 @@ const DEF_DAY=[
   {type:'combo',run:false},{type:'free',run:true},{type:'rest',run:false},{type:'rest',run:false}
 ];
 
-const SL_BASE='https://static.strengthlevel.com/images/exercises';
-const TYPE_THUMBS={
-  push:`${SL_BASE}/bench-press/bench-press-800.jpg`,
-  pull:`${SL_BASE}/pull-ups/pull-ups-800.jpg`,
-  legs:`${SL_BASE}/squat/squat-800.jpg`,
-  combo:`${SL_BASE}/deadlift/deadlift-800.jpg`,
-  free:`${SL_BASE}/push-ups/push-ups-800.jpg`,
-  warm:`${SL_BASE}/plank/plank-800.jpg`,
-  rest:`${SL_BASE}/plank/plank-800.jpg`,
-};
-
-const EXERCISE_SLUG_OVERRIDES={
-  'kickback de triceps':'dumbbell-tricep-kickback',
-  'extension de triceps sobre cabeza':'dumbbell-tricep-extension',
-  'press de mancuernas plano':'dumbbell-bench-press',
-  'press de mancuernas inclinado':'incline-dumbbell-bench-press',
-  'press de hombros con mancuernas':'dumbbell-shoulder-press',
-  'elevaciones laterales con mancuernas':'dumbbell-lateral-raise',
-  'elevaciones frontales con mancuernas':'dumbbell-front-raise',
-  'curl de biceps con mancuernas':'dumbbell-curl',
-  'curl martillo':'hammer-curl',
-  'curl concentrado':'concentration-curl',
-  'remo invertido en barra baja':'inverted-row',
-  'australian pull-up en barra baja':'inverted-row',
-  'sentadilla con peso corporal':'bodyweight-squat',
-  'sentadilla con mancuernas':'dumbbell-squat',
-  'sentadilla bulgara':'bulgarian-split-squat',
-  'peso muerto con mancuernas':'dumbbell-deadlift',
-  'peso muerto a una pierna':'single-leg-deadlift',
-  'hip thrust corporal':'hip-thrust',
-  'hip thrust con mancuerna':'dumbbell-hip-thrust',
-  'elevacion de pantorrillas de pie':'standing-calf-raise',
-  'elevacion de pantorrillas sentado':'seated-calf-raise',
-  'zancada estatica':'lunge',
-  'zancada caminando':'walking-lunge',
-  'push-up estandar':'push-ups',
-  'push-up declinado':'decline-push-up',
-  'push-up inclinado':'incline-push-up',
-  'pike push-up':'pike-push-up',
-  'dips en paralelas bajas':'dips',
-  'pull ups':'pull-ups',
-  'plancha frontal':'plank',
-  'plancha lateral':'side-plank',
-  'burpee':'burpee',
-  'mountain climber':'mountain-climber',
-  'scapular pull-up':'pull-ups',
-  'wall walk':'pike-push-up',
+const TRUSTED_EXERCISE_LINKS={
+  'kickback de triceps':'https://static.strengthlevel.com/images/exercises/dumbbell-tricep-kickback/dumbbell-tricep-kickback-800.jpg',
+  'extension de triceps sobre cabeza':'https://static.strengthlevel.com/images/exercises/dumbbell-tricep-extension/dumbbell-tricep-extension-800.jpg',
 };
 
 function normalizeExerciseKey(name=''){
@@ -475,24 +431,16 @@ function normalizeExerciseKey(name=''){
 
 function slugifyExerciseName(name=''){
   const key=normalizeExerciseKey(name);
-  if(EXERCISE_SLUG_OVERRIDES[key]) return EXERCISE_SLUG_OVERRIDES[key];
-  if(key.includes('push-up')||key.includes('push up')) return 'push-ups';
-  if(key.includes('pull-up')||key.includes('pull up')) return 'pull-ups';
-  if(key.includes('squat')||key.includes('sentadilla')) return 'squat';
-  if(key.includes('deadlift')||key.includes('peso muerto')) return 'deadlift';
-  if(key.includes('curl')) return 'dumbbell-curl';
-  if(key.includes('row')||key.includes('remo')) return 'bent-over-row';
-  if(key.includes('press')) return 'bench-press';
   return key.replace(/\s+/g,'-');
 }
 
 function getStrengthLevelThumb(name,type){
-  const slug=slugifyExerciseName(name);
-  return `${SL_BASE}/${slug}/${slug}-800.jpg`;
+  const key=normalizeExerciseKey(name);
+  return TRUSTED_EXERCISE_LINKS[key]||null;
 }
 
 function getTypeThumb(type){
-  return TYPE_THUMBS[type]||TYPE_THUMBS.push;
+  return null;
 }
 
 // Built-in exercise database
@@ -772,8 +720,7 @@ function getExImg(name){
   const c=exercises.find(e=>e.name===name);
   if(c&&c.imageData) return c.imageData;
   if(c&&c.imageUrl) return c.imageUrl;
-  const t=getExType(name);
-  return getStrengthLevelThumb(name,t);
+  return getStrengthLevelThumb(name,getExType(name));
 }
 
 function getPlannedMeta(ex){
@@ -891,7 +838,7 @@ function excHTML(ex,di,i,inGroup){
     ondragend="dragEnd(event)"
     ${pending?'data-pending-super="true"':''}>
     <span class="drag-handle" onclick="event.stopPropagation()"></span>
-    <div class="exc-thumb">${img?`<img src="${img}" onerror="this.onerror=null;this.src='${getTypeThumb(getExType(ex.name))}'">`:getTypeEmoji(getExType(ex.name))}</div>
+    <div class="exc-thumb">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(getExType(ex.name))}</div>
     <div class="exc-info${pending?' exc-pending':''}">
       <div class="exc-title-row">
         <div class="exc-name">${ex.name}</div>
@@ -908,7 +855,7 @@ function excHTML(ex,di,i,inGroup){
   </div>`;
 }
 function getTypeEmoji(t){
-  return `<img src="${getTypeThumb(t)}" alt="">`;
+  return '<span class="thumb-ph"></span>';
 }
 
 function removeFromDay(di,i){
@@ -1047,7 +994,7 @@ function renderAddOpts(){
       window._opts[idx]={name:e.name,type:e.type};
       html+=`<div class="opt-row${sel?' on':''}" id="opt${idx}" onclick="toggleOpt(${idx},event)">
         <div class="opt-check"></div>
-        <div class="opt-thumb">${img?`<img src="${img}" onerror="this.onerror=null;this.src='${getTypeThumb(e.type)}'">`:getTypeEmoji(e.type)}</div>
+        <div class="opt-thumb">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(e.type)}</div>
         <span class="opt-name">${e.name}</span>
         <div class="opt-inputs" onclick="event.stopPropagation()">
           <input type="number" placeholder="s" value="${p?p.sets:''}" min="1" max="20" inputmode="numeric"
@@ -1235,20 +1182,19 @@ function openExEdit(id=null,prefillName='',prefillType='push',prefillMuscle='',r
   refreshMuscleOptions();
   if(id){
     const ex=exercises.find(e=>e.id===id)||{};
-    const fallbackLink=getStrengthLevelThumb(ex.name||prefillName,ex.type||prefillType||'push');
     document.getElementById('ee-name').value=ex.name||'';
     document.getElementById('ee-type').value=ex.type||'push';
     refreshMuscleOptions(ex.muscle||'');
-    document.getElementById('ee-img-url').value=ex.imageUrl||fallbackLink||'';
+    document.getElementById('ee-img-url').value=ex.imageUrl||'';
     const preview=document.getElementById('ee-img-preview');
-    const img=ex.imageData||ex.imageUrl||fallbackLink;
+    const img=ex.imageData||ex.imageUrl;
     preview.innerHTML=img?`<img src="${img}" style="width:100%;height:100%;object-fit:cover">`:
       '<span class="img-preview-ph">sin imagen</span>';
   } else {
     document.getElementById('ee-name').value=prefillName;
     document.getElementById('ee-type').value=prefillType||'push';
     refreshMuscleOptions(prefillMuscle||'');
-    const resolved=prefillImageUrl||getStrengthLevelThumb(prefillName,prefillType||'push');
+    const resolved=prefillImageUrl||'';
     document.getElementById('ee-img-url').value=resolved||'';
     document.getElementById('ee-img-preview').innerHTML=resolved
       ? `<img src="${resolved}" style="width:100%;height:100%;object-fit:cover">`
@@ -1279,7 +1225,7 @@ function openExEditByName(name,type='',muscle='',imageUrl=''){
   eeReturnToAdd=false;
   const existing=exercises.find(e=>e.name.toLowerCase()===name.toLowerCase());
   if(existing) openExEdit(existing.id);
-  else openExEdit(null,name,type,muscle,false,imageUrl||getStrengthLevelThumb(name,type||'push'));
+  else openExEdit(null,name,type,muscle,false,imageUrl||'');
 }
 
 function readFileAsDataURL(file){
@@ -1538,18 +1484,18 @@ function renderMgmtEx(){
   });
 
   document.getElementById('mgmt-ex-list').innerHTML=all.map(e=>{
-    const img=e.imageData||e.imageUrl||getStrengthLevelThumb(e.name,e.type);
-    const link=(e.imageUrl||getStrengthLevelThumb(e.name,e.type));
+    const img=e.imageData||e.imageUrl||null;
+    const link=e.imageUrl||getStrengthLevelThumb(e.name,e.type)||'';
     const safeName=(e.name||'').replace(/'/g,"\\'");
     const safeType=(e.type||'').replace(/'/g,"\\'");
     const safeMuscle=(e.muscle||'').replace(/'/g,"\\'");
     const safeLink=(link||'').replace(/'/g,"\\'");
     return `<div class="mgmt-item" onclick="openExEditByName('${safeName}','${safeType}','${safeMuscle}','${safeLink}')">
-      <div class="mgmt-thumb">${img?`<img src="${img}" onerror="this.onerror=null;this.src='${getTypeThumb(e.type)}'">`:getTypeEmoji(e.type)}</div>
+      <div class="mgmt-thumb">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(e.type)}</div>
       <div class="mgmt-info">
         <div class="mgmt-name">${e.name}</div>
         <div class="mgmt-sub">${TYPE_MAP[e.type]||e.type}${e.muscle?' - '+e.muscle:''}</div>
-        <div class="mgmt-link">${link}</div>
+        ${link?`<div class="mgmt-link">${link}</div>`:''}
       </div>
       <span class="mgmt-arrow">></span>
     </div>`;
