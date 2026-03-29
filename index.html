@@ -464,6 +464,10 @@ let rePending=[];   // exercises in the routine being edited
 // drag state
 let dragSrc=null,dragSrcDay=null,dragSrcIdx=null;
 let pendingSuperLink=null;
+const SYNC_PENDING_KEY='rs_pending';
+const SYNC_IDLE_MS=2500;
+const SYNC_RETRY_MS=12000;
+const syncState={pending:false,inFlight:false,timer:null,lastToastAt:0};
 
 // ══ SUPABASE ═════════════════════════════════════════════════════════════════
 function toast(msg,ok=true){
@@ -476,37 +480,70 @@ function toast(msg,ok=true){
 async function sbLoad(){
   lsLoad();
   try{
-    toast('sincronizando...');
     const ctl=new AbortController();
-    const to=setTimeout(()=>ctl.abort(),2500);
+    const to=setTimeout(()=>ctl.abort(),8000);
     const r=await fetch(SB+'/rest/v1/rutina?select=id,data',{headers:SH,signal:ctl.signal});
     clearTimeout(to);
     if(!r.ok) throw 0;
     const rows=await r.json();
+    const canHydrateRemote=!syncState.pending;
     rows.forEach(row=>{
-      if(row.id==='week' && (!Object.keys(weekData||{}).length)) weekData=row.data||{};
-      if(row.id==='daycfg' && (!Object.keys(dayCfg||{}).length)) dayCfg=row.data||{};
-      if(row.id==='exercises' && (!(exercises||[]).length)) exercises=row.data||[];
-      if(row.id==='routines' && (!(routines||[]).length)) routines=row.data||[];
+      if(!canHydrateRemote) return;
+      if(row.id==='week') weekData=row.data||{};
+      if(row.id==='daycfg') dayCfg=row.data||{};
+      if(row.id==='exercises') exercises=row.data||[];
+      if(row.id==='routines') routines=row.data||[];
     });
     for(let i=0;i<7;i++) if(!dayCfg[i]) dayCfg[i]={...DEF_DAY[i]};
-    toast('listo ✓');
+  syncState.pending=localStorage.getItem(SYNC_PENDING_KEY)==='1';
+    if(syncState.pending) scheduleSync(700);
   }catch(e){
-    toast('sin conexión, usando local',false);
+    showSyncFallbackToast();
   }
 }
 
-async function sbSave(){
+function showSyncFallbackToast(){
+  const now=Date.now();
+  if(now-syncState.lastToastAt<12000) return;
+  syncState.lastToastAt=now;
+  toast('sin conexion, usando local',false);
+}
+
+function scheduleSync(delay=SYNC_IDLE_MS){
+  if(syncState.timer) clearTimeout(syncState.timer);
+  syncState.timer=setTimeout(()=>flushSync(),delay);
+}
+
+async function flushSync({keepalive=false}={}){
+  if(!syncState.pending || syncState.inFlight) return;
+  syncState.inFlight=true;
+  if(syncState.timer){clearTimeout(syncState.timer);syncState.timer=null;}
   lsSave();
   try{
-    await fetch(SB+'/rest/v1/rutina',{method:'POST',headers:SH,body:JSON.stringify([
+    const payload=JSON.stringify([
       {id:'week',data:weekData,updated_at:new Date().toISOString()},
       {id:'daycfg',data:dayCfg,updated_at:new Date().toISOString()},
       {id:'exercises',data:exercises,updated_at:new Date().toISOString()},
       {id:'routines',data:routines,updated_at:new Date().toISOString()},
-    ])});
-    toast('guardado ✓');
-  }catch(e){toast('solo guardado local',false);}
+    ]);
+    await fetch(SB+'/rest/v1/rutina',{method:'POST',headers:SH,body:payload,keepalive});
+    syncState.pending=false;
+    localStorage.setItem(SYNC_PENDING_KEY,'0');
+  }catch(e){
+    syncState.pending=true;
+    localStorage.setItem(SYNC_PENDING_KEY,'1');
+    scheduleSync(SYNC_RETRY_MS);
+    showSyncFallbackToast();
+  }finally{
+    syncState.inFlight=false;
+  }
+}
+
+function sbSave(){
+  lsSave();
+  syncState.pending=true;
+  localStorage.setItem(SYNC_PENDING_KEY,'1');
+  scheduleSync();
 }
 
 async function sbEnsure(){
@@ -535,6 +572,7 @@ function lsLoad(){
     if(r) routines=JSON.parse(r);
   }catch(_){}
   for(let i=0;i<7;i++) if(!dayCfg[i]) dayCfg[i]={...DEF_DAY[i]};
+  syncState.pending=localStorage.getItem(SYNC_PENDING_KEY)==='1';
 }
 
 function today(){return new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});}
@@ -1344,12 +1382,21 @@ function closeSheet(id){document.getElementById(id).classList.remove('on');}
   lsLoad();
   renderDayRow();
   renderDay();
+
   sbLoad().then(()=>{
     renderDayRow();
     renderDay();
   });
+
   sbEnsure();
+  if(syncState.pending) scheduleSync(1200);
+
+  window.addEventListener('online',()=>{ if(syncState.pending) scheduleSync(700); });
+  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden' && syncState.pending) flushSync({keepalive:true}); });
+  window.addEventListener('pagehide',()=>{ if(syncState.pending) flushSync({keepalive:true}); });
 })();
 </script>
 </body>
 </html>
+
+
