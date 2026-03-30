@@ -432,6 +432,90 @@ const DEF_DAY=[
   {type:'combo',run:false},{type:'free',run:true},{type:'rest',run:false},{type:'rest',run:false}
 ];
 
+const NAME_STOPWORDS=new Set(['a','al','and','con','da','das','de','del','des','do','dos','e','el','en','for','la','las','los','of','or','para','por','the','to','y']);
+
+function titleCaseEs(text=''){
+  const words=text.trim().split(/\s+/).filter(Boolean);
+  return words.map((w,i)=>{
+    const low=w.toLowerCase();
+    if(i>0 && NAME_STOPWORDS.has(low)) return low;
+    if(/^[A-Z0-9]{2,}$/.test(w)) return w;
+    return low.replace(/(^|[-/])([a-záéíóúüñ])/g,(m,p1,p2)=>p1+p2.toUpperCase());
+  }).join(' ');
+}
+
+function normalizeExerciseName(name=''){
+  let n=(name||'').replace(/\s+/g,' ').trim();
+  if(!n) return n;
+
+  const lower=n.toLowerCase();
+  const hasPush=/\bpush[\s-]*ups?\b/i.test(lower) || /\bpush[\s-]*up\b/i.test(lower);
+  const hasPull=/\bpull[\s-]*ups?\b/i.test(lower) || /\bpull[\s-]*up\b/i.test(lower);
+
+  if(hasPush){
+    const rest=n.replace(/\bpush[\s-]*ups?\b/ig,'').replace(/\bpush[\s-]*up\b/ig,'').replace(/\s+/g,' ').trim();
+    n=`Push Ups${rest?` ${titleCaseEs(rest)}`:''}`;
+  }else if(hasPull){
+    const rest=n.replace(/\bpull[\s-]*ups?\b/ig,'').replace(/\bpull[\s-]*up\b/ig,'').replace(/\s+/g,' ').trim();
+    n=`Pull Ups${rest?` ${titleCaseEs(rest)}`:''}`;
+  }else{
+    n=titleCaseEs(n);
+  }
+  return n.replace(/\s+/g,' ').trim();
+}
+
+function normalizeAllExerciseNames(){
+  let changed=false;
+
+  Object.keys(BUILTIN).forEach(type=>{
+    Object.keys(BUILTIN[type]).forEach(muscle=>{
+      BUILTIN[type][muscle]=BUILTIN[type][muscle].map(n=>{
+        const nn=normalizeExerciseName(n);
+        if(nn!==n) changed=true;
+        return nn;
+      });
+    });
+  });
+
+  const renameMap={};
+  exercises.forEach(ex=>{
+    const old=ex.name||'';
+    const nn=normalizeExerciseName(old);
+    if(nn && nn!==old){
+      renameMap[old]=nn;
+      ex.name=nn;
+      changed=true;
+    }
+    if(ex.replaceOf){
+      const ro=normalizeExerciseName(ex.replaceOf);
+      if(ro!==ex.replaceOf){ex.replaceOf=ro;changed=true;}
+    }
+  });
+
+  exercises.forEach(ex=>{
+    if(ex.hidden && ex.name){
+      const nn=normalizeExerciseName(ex.name);
+      if(nn!==ex.name){ex.name=nn;changed=true;}
+    }
+  });
+
+  Object.keys(weekData).forEach(di=>{
+    (weekData[di]||[]).forEach(ex=>{
+      const nn=normalizeExerciseName(ex.name||'');
+      if(nn && nn!==ex.name){ex.name=nn;changed=true;}
+    });
+  });
+
+  routines.forEach(r=>{
+    (r.items||[]).forEach(ex=>{
+      const nn=normalizeExerciseName(ex.name||'');
+      if(nn && nn!==ex.name){ex.name=nn;changed=true;}
+    });
+  });
+
+  return changed;
+}
+
 const TRUSTED_EXERCISE_LINKS={
   'kickback de triceps':'https://static.strengthlevel.com/images/exercises/dumbbell-tricep-kickback/dumbbell-tricep-kickback-800.jpg',
   'extension de triceps sobre cabeza':'https://static.strengthlevel.com/images/exercises/dumbbell-tricep-extension/dumbbell-tricep-extension-800.jpg',
@@ -1646,10 +1730,12 @@ function closeSheet(id){document.getElementById(id).classList.remove('on');}
 // â•â• INIT â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 (async()=>{
   lsLoad();
+  if(normalizeAllExerciseNames()) lsSave();
   renderDayRow();
   renderDay();
 
   sbLoad().then(()=>{
+    if(normalizeAllExerciseNames()) sbSave();
     renderDayRow();
     renderDay();
   });
