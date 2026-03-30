@@ -613,7 +613,6 @@ let pendingSuperLink=null;
 const SYNC_PENDING_KEY='rs_pending';
 const SYNC_IDLE_MS=8000;
 const SYNC_RETRY_MS=20000;
-const SYNC_ENSURED_KEY='rs_ensured';
 const syncState={pending:false,inFlight:false,timer:null,lastToastAt:0,lastRemote:{week:'',daycfg:'',exercises:'',routines:''}};
 
 // â•â• SUPABASE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -633,18 +632,35 @@ async function sbLoad(){
     clearTimeout(to);
     if(!r.ok) throw 0;
     const rows=await r.json();
-    const canHydrateRemote=!syncState.pending;
+    const localSnapshot=serializeSyncState();
+    const localPending=localStorage.getItem(SYNC_PENDING_KEY)==='1';
+    const remoteData={week:{},daycfg:{},exercises:[],routines:[]};
+    const seen=new Set();
     rows.forEach(row=>{
-      if(!canHydrateRemote) return;
-      if(row.id==='week') weekData=row.data||{};
-      if(row.id==='daycfg') dayCfg=row.data||{};
-      if(row.id==='exercises') exercises=row.data||[];
-      if(row.id==='routines') routines=row.data||[];
+      if(row.id==='week'){ remoteData.week=row.data||{}; seen.add('week'); }
+      if(row.id==='daycfg'){ remoteData.daycfg=row.data||{}; seen.add('daycfg'); }
+      if(row.id==='exercises'){ remoteData.exercises=row.data||[]; seen.add('exercises'); }
+      if(row.id==='routines'){ remoteData.routines=row.data||[]; seen.add('routines'); }
     });
-    for(let i=0;i<7;i++) if(!dayCfg[i]) dayCfg[i]={...DEF_DAY[i]};
-    syncState.pending=localStorage.getItem(SYNC_PENDING_KEY)==='1';
-    if(!syncState.pending) snapshotRemoteFromCurrent();
-    if(syncState.pending) scheduleSync(700);
+    const remoteMissing=['week','daycfg','exercises','routines'].some(id=>!seen.has(id));
+    const keepLocalAndRestoreRemote=!localPending && remoteMissing && hasMeaningfulLocalData(localSnapshot);
+
+    if(!localPending && !keepLocalAndRestoreRemote){
+      weekData=remoteData.week;
+      dayCfg=remoteData.daycfg;
+      exercises=remoteData.exercises;
+      routines=remoteData.routines;
+      for(let i=0;i<7;i++) if(!dayCfg[i]) dayCfg[i]={...DEF_DAY[i]};
+      snapshotRemoteFromData(remoteData);
+      syncState.pending=false;
+      localStorage.setItem(SYNC_PENDING_KEY,'0');
+      return;
+    }
+
+    snapshotRemoteFromData(remoteData);
+    syncState.pending=true;
+    localStorage.setItem(SYNC_PENDING_KEY,'1');
+    scheduleSync(700);
   }catch(e){
     showSyncFallbackToast();
   }
@@ -657,17 +673,33 @@ function showSyncFallbackToast(){
   toast('sin conexion, usando local',false);
 }
 
-function serializeSyncState(){
+function serializeStateParts(parts={}){
+  const normalizedDayCfg=(parts.daycfg&&Object.keys(parts.daycfg).length)
+    ? parts.daycfg
+    : Object.fromEntries(Array.from({length:7},(_,i)=>[i,{...DEF_DAY[i]}]));
   return {
-    week:JSON.stringify(weekData||{}),
-    daycfg:JSON.stringify(dayCfg||{}),
-    exercises:JSON.stringify(exercises||[]),
-    routines:JSON.stringify(routines||[]),
+    week:JSON.stringify(parts.week||{}),
+    daycfg:JSON.stringify(normalizedDayCfg),
+    exercises:JSON.stringify(parts.exercises||[]),
+    routines:JSON.stringify(parts.routines||[]),
   };
 }
 
+function serializeSyncState(){
+  return serializeStateParts({week:weekData,daycfg:dayCfg,exercises,routines});
+}
+
+function hasMeaningfulLocalData(snapshot){
+  const empty=serializeStateParts({week:{},daycfg:{},exercises:[],routines:[]});
+  return snapshot.week!==empty.week || snapshot.exercises!==empty.exercises || snapshot.routines!==empty.routines;
+}
+
+function snapshotRemoteFromData(parts){
+  syncState.lastRemote=serializeStateParts(parts);
+}
+
 function snapshotRemoteFromCurrent(){
-  syncState.lastRemote=serializeSyncState();
+  snapshotRemoteFromData({week:weekData,daycfg:dayCfg,exercises,routines});
 }
 
 function scheduleSync(delay=SYNC_IDLE_MS){
@@ -716,13 +748,11 @@ function sbSave(){
 }
 
 async function sbEnsure(){
-  if(localStorage.getItem(SYNC_ENSURED_KEY)==='1') return;
   try{
     const resp=await fetch(SB+'/rest/v1/rutina',{method:'POST',headers:{...SH,'Prefer':'resolution=ignore-duplicates'},body:JSON.stringify([
       {id:'week',data:{}},{id:'daycfg',data:{}},{id:'exercises',data:[]},{id:'routines',data:[]},
     ])});
     if(!resp.ok) throw 0;
-    localStorage.setItem(SYNC_ENSURED_KEY,'1');
   }catch(_){}
 }
 
@@ -745,7 +775,6 @@ function lsLoad(){
   }catch(_){}
   for(let i=0;i<7;i++) if(!dayCfg[i]) dayCfg[i]={...DEF_DAY[i]};
   syncState.pending=localStorage.getItem(SYNC_PENDING_KEY)==='1';
-  if(!syncState.pending) snapshotRemoteFromCurrent();
 }
 
 function today(){return new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});}
