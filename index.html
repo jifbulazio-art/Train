@@ -611,9 +611,10 @@ let rePending=[];   // exercises in the routine being edited
 let dragSrc=null,dragSrcDay=null,dragSrcIdx=null;
 let pendingSuperLink=null;
 const SYNC_PENDING_KEY='rs_pending';
-const SYNC_IDLE_MS=2500;
-const SYNC_RETRY_MS=12000;
-const syncState={pending:false,inFlight:false,timer:null,lastToastAt:0};
+const SYNC_IDLE_MS=8000;
+const SYNC_RETRY_MS=20000;
+const SYNC_ENSURED_KEY='rs_ensured';
+const syncState={pending:false,inFlight:false,timer:null,lastToastAt:0,lastRemote:{week:'',daycfg:'',exercises:'',routines:''}};
 
 // â•â• SUPABASE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function toast(msg,ok=true){
@@ -641,7 +642,8 @@ async function sbLoad(){
       if(row.id==='routines') routines=row.data||[];
     });
     for(let i=0;i<7;i++) if(!dayCfg[i]) dayCfg[i]={...DEF_DAY[i]};
-  syncState.pending=localStorage.getItem(SYNC_PENDING_KEY)==='1';
+    syncState.pending=localStorage.getItem(SYNC_PENDING_KEY)==='1';
+    if(!syncState.pending) snapshotRemoteFromCurrent();
     if(syncState.pending) scheduleSync(700);
   }catch(e){
     showSyncFallbackToast();
@@ -655,6 +657,19 @@ function showSyncFallbackToast(){
   toast('sin conexion, usando local',false);
 }
 
+function serializeSyncState(){
+  return {
+    week:JSON.stringify(weekData||{}),
+    daycfg:JSON.stringify(dayCfg||{}),
+    exercises:JSON.stringify(exercises||[]),
+    routines:JSON.stringify(routines||[]),
+  };
+}
+
+function snapshotRemoteFromCurrent(){
+  syncState.lastRemote=serializeSyncState();
+}
+
 function scheduleSync(delay=SYNC_IDLE_MS){
   if(syncState.timer) clearTimeout(syncState.timer);
   syncState.timer=setTimeout(()=>flushSync(),delay);
@@ -666,14 +681,21 @@ async function flushSync({keepalive=false}={}){
   if(syncState.timer){clearTimeout(syncState.timer);syncState.timer=null;}
   lsSave();
   try{
-    const payload=JSON.stringify([
-      {id:'week',data:weekData,updated_at:new Date().toISOString()},
-      {id:'daycfg',data:dayCfg,updated_at:new Date().toISOString()},
-      {id:'exercises',data:exercises,updated_at:new Date().toISOString()},
-      {id:'routines',data:routines,updated_at:new Date().toISOString()},
-    ]);
+    const serialized=serializeSyncState();
+    const changedIds=['week','daycfg','exercises','routines'].filter(id=>serialized[id]!==syncState.lastRemote[id]);
+    if(!changedIds.length){
+      syncState.pending=false;
+      localStorage.setItem(SYNC_PENDING_KEY,'0');
+      return;
+    }
+    const payload=JSON.stringify(changedIds.map(id=>({
+      id,
+      data:JSON.parse(serialized[id]),
+      updated_at:new Date().toISOString()
+    })));
     const resp=await fetch(SB+'/rest/v1/rutina',{method:'POST',headers:SH,body:payload,keepalive});
     if(!resp.ok) throw 0;
+    changedIds.forEach(id=>{syncState.lastRemote[id]=serialized[id];});
     syncState.pending=false;
     localStorage.setItem(SYNC_PENDING_KEY,'0');
   }catch(e){
@@ -694,11 +716,13 @@ function sbSave(){
 }
 
 async function sbEnsure(){
+  if(localStorage.getItem(SYNC_ENSURED_KEY)==='1') return;
   try{
     const resp=await fetch(SB+'/rest/v1/rutina',{method:'POST',headers:{...SH,'Prefer':'resolution=ignore-duplicates'},body:JSON.stringify([
       {id:'week',data:{}},{id:'daycfg',data:{}},{id:'exercises',data:[]},{id:'routines',data:[]},
     ])});
     if(!resp.ok) throw 0;
+    localStorage.setItem(SYNC_ENSURED_KEY,'1');
   }catch(_){}
 }
 
@@ -721,6 +745,7 @@ function lsLoad(){
   }catch(_){}
   for(let i=0;i<7;i++) if(!dayCfg[i]) dayCfg[i]={...DEF_DAY[i]};
   syncState.pending=localStorage.getItem(SYNC_PENDING_KEY)==='1';
+  if(!syncState.pending) snapshotRemoteFromCurrent();
 }
 
 function today(){return new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});}
