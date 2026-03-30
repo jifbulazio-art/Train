@@ -1097,7 +1097,7 @@ function getAllExercises(){
     const type=ex.type||'free';
     result.push({name:ex.name,type,muscle:ex.muscle||'',imageUrl:ex.imageUrl||getStrengthLevelThumb(ex.name,type),imageData:ex.imageData||null});
   });
-  return result;
+  return result.sort((a,b)=>(a.name||'').localeCompare((b.name||''),'es',{sensitivity:'base'}));
 }
 
 function renderAddOpts(){
