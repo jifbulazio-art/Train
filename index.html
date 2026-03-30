@@ -515,7 +515,7 @@ let detailCtx={dayIdx:null,exIdx:null};
 let detailSets=[];
 
 // edit exercise state
-let eeCtx={id:null};
+let eeCtx={id:null,sourceName:null,sourceType:null,sourceMuscle:null};
 let eeImgData=null;
 let eeReturnToAdd=false;
 
@@ -729,7 +729,7 @@ function buildExListHTML(di,exs){
 
 function getExType(name){
   // check custom exercises first
-  const c=exercises.find(e=>e.name===name);
+  const c=exercises.find(e=>!e.hidden && e.name===name);
   if(c) return c.type;
   // check builtin
   for(const [type,groups] of Object.entries(BUILTIN)){
@@ -961,21 +961,57 @@ function renderAddFilters(){
 function setAddFilter(f){addFilter=f;document.getElementById('add-search').value='';renderAddFilters();renderAddOpts();}
 
 function getAllExercises(){
-  // merge builtin + custom, custom overrides builtin image
   const result=[];
+  const consumedCustomIds=new Set();
+  const hiddenNames=new Set(exercises.filter(e=>e.hidden).map(e=>e.name));
+  const exactByName={};
+  const replaceBySource={};
+
+  exercises.forEach(ex=>{
+    if(ex.hidden) return;
+    if(ex.replaceOf) replaceBySource[ex.replaceOf]=ex;
+    else exactByName[ex.name]=ex;
+  });
+
   Object.entries(BUILTIN).forEach(([type,groups])=>{
     Object.entries(groups).forEach(([muscle,names])=>{
       names.forEach(name=>{
-        const custom=exercises.find(e=>e.name===name);
-        result.push({name,type,muscle,imageUrl:custom?.imageUrl||getStrengthLevelThumb(name,type),imageData:custom?.imageData||null});
+        if(hiddenNames.has(name)) return;
+        const replaced=replaceBySource[name];
+        if(replaced){
+          consumedCustomIds.add(replaced.id);
+          result.push({
+            name:replaced.name,
+            type:replaced.type||type,
+            muscle:replaced.muscle||muscle,
+            imageUrl:replaced.imageUrl||getStrengthLevelThumb(replaced.name,replaced.type||type),
+            imageData:replaced.imageData||null,
+          });
+          return;
+        }
+        const custom=exactByName[name];
+        if(custom){
+          consumedCustomIds.add(custom.id);
+          result.push({
+            name:custom.name,
+            type:custom.type||type,
+            muscle:custom.muscle||muscle,
+            imageUrl:custom.imageUrl||getStrengthLevelThumb(custom.name,custom.type||type),
+            imageData:custom.imageData||null,
+          });
+          return;
+        }
+        result.push({name,type,muscle,imageUrl:getStrengthLevelThumb(name,type),imageData:null});
       });
     });
   });
+
   exercises.forEach(ex=>{
-    if(!result.find(r=>r.name===ex.name)){
-      const type=ex.type||'free';
-      result.push({name:ex.name,type,muscle:ex.muscle||'',imageUrl:ex.imageUrl||getStrengthLevelThumb(ex.name,type),imageData:ex.imageData||null});
-    }
+    if(ex.hidden) return;
+    if(consumedCustomIds.has(ex.id)) return;
+    if(result.find(r=>r.name===ex.name)) return;
+    const type=ex.type||'free';
+    result.push({name:ex.name,type,muscle:ex.muscle||'',imageUrl:ex.imageUrl||getStrengthLevelThumb(ex.name,type),imageData:ex.imageData||null});
   });
   return result;
 }
@@ -1199,10 +1235,10 @@ function separateFromSuper(di,i){
 // â•â• TYPE PICKER (day) already defined above â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 // â•â• EXERCISE EDIT â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-function openExEdit(id=null,prefillName='',prefillType='push',prefillMuscle='',returnToAdd=false,prefillImageUrl=''){
-  eeCtx={id};eeImgData=null;eeReturnToAdd=returnToAdd;
+function openExEdit(id=null,prefillName='',prefillType='push',prefillMuscle='',returnToAdd=false,prefillImageUrl='',sourceName='',sourceType='',sourceMuscle=''){
+  eeCtx={id,sourceName:sourceName||null,sourceType:sourceType||null,sourceMuscle:sourceMuscle||null};eeImgData=null;eeReturnToAdd=returnToAdd;
   document.getElementById('ex-edit-title').textContent=id?'Editar ejercicio':'Nuevo ejercicio';
-  document.getElementById('ee-delete-btn').style.display=id?'block':'none';
+  document.getElementById('ee-delete-btn').style.display=(id||eeCtx.sourceName)?'block':'none';
   refreshMuscleOptions();
   if(id){
     const ex=exercises.find(e=>e.id===id)||{};
@@ -1280,9 +1316,9 @@ function refreshMuscleOptions(selected=''){
 
 function openExEditByName(name,type='',muscle='',imageUrl=''){
   eeReturnToAdd=false;
-  const existing=exercises.find(e=>e.name.toLowerCase()===name.toLowerCase());
+  const existing=exercises.find(e=>!e.hidden && e.name.toLowerCase()===name.toLowerCase());
   if(existing) openExEdit(existing.id);
-  else openExEdit(null,name,type,muscle,false,imageUrl||'');
+  else openExEdit(null,name,type,muscle,false,imageUrl||'',name,type,muscle);
 }
 
 function readFileAsDataURL(file){
@@ -1354,7 +1390,7 @@ function saveExercise(){
       Object.assign(ex,{name,type,muscle,imageUrl,imageData});
     }
   } else {
-    const existing=exercises.find(e=>e.name.toLowerCase()===name.toLowerCase());
+    const existing=exercises.find(e=>!e.hidden && e.name.toLowerCase()===name.toLowerCase());
     if(existing){
       if(!rawImageUrl && !eeImgData){
         imageUrl=existing.imageUrl||null;
@@ -1362,9 +1398,11 @@ function saveExercise(){
       } else if(rawImageUrl){
         imageData=null;
       }
-      Object.assign(existing,{name,type,muscle,imageUrl,imageData});
+      Object.assign(existing,{name,type,muscle,imageUrl,imageData,replaceOf:existing.replaceOf||null,hidden:false});
     } else {
-      exercises.push({id:'ex_'+Date.now(),name,type,muscle,imageUrl,imageData});
+      const src=eeCtx.sourceName||null;
+      const replaceOf=(src && src!==name)?src:null;
+      exercises.push({id:'ex_'+Date.now(),name,type,muscle,imageUrl,imageData,replaceOf,hidden:false});
     }
   }
   refreshMuscleOptions();
@@ -1386,9 +1424,24 @@ function saveExercise(){
 }
 
 function deleteExercise(){
-  if(!eeCtx.id||!confirm('Eliminar ejercicio?')) return;
-  exercises=exercises.filter(e=>e.id!==eeCtx.id);
-  sbSave();closeSheet('ex-edit-sheet');renderMgmt();
+  if(!confirm('Eliminar ejercicio?')) return;
+  if(eeCtx.id){
+    exercises=exercises.filter(e=>e.id!==eeCtx.id);
+  }else if(eeCtx.sourceName){
+    const sourceName=eeCtx.sourceName;
+    const srcType=eeCtx.sourceType||'free';
+    const srcMuscle=eeCtx.sourceMuscle||'';
+    const existingHidden=exercises.find(e=>e.hidden && e.name===sourceName);
+    if(existingHidden){
+      Object.assign(existingHidden,{hidden:true,type:srcType,muscle:srcMuscle,imageUrl:null,imageData:null,replaceOf:null});
+    }else{
+      exercises.push({id:'ex_'+Date.now(),name:sourceName,type:srcType,muscle:srcMuscle,imageUrl:null,imageData:null,hidden:true,replaceOf:null});
+    }
+    exercises=exercises.filter(e=>e.replaceOf!==sourceName);
+  }else{
+    return;
+  }
+  sbSave();closeSheet('ex-edit-sheet');renderMgmt();renderDay();
 }
 
 // â•â• ROUTINE EDIT â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
