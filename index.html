@@ -841,6 +841,8 @@ let pendingSuperLink=null;
 const SYNC_PENDING_KEY='rs_pending';
 const SYNC_IDLE_MS=8000;
 const SYNC_RETRY_MS=20000;
+const SYNC_ENSURED_KEY='rs_ensured';
+const SYNC_LOCAL_EDIT_KEY='rs_last_edit_at';
 const syncState={pending:false,inFlight:false,timer:null,lastToastAt:0,lastRemote:{week:'',daycfg:'',exercises:'',routines:''}};
 
 // â•â• SUPABASE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -856,7 +858,7 @@ async function sbLoad(){
   try{
     const ctl=new AbortController();
     const to=setTimeout(()=>ctl.abort(),8000);
-    const r=await fetch(SB+'/rest/v1/rutina?select=id,data',{headers:SH,signal:ctl.signal});
+    const r=await fetch(SB+'/rest/v1/rutina?select=id,data,updated_at',{headers:SH,signal:ctl.signal});
     clearTimeout(to);
     if(!r.ok) throw 0;
     const rows=await r.json();
@@ -864,16 +866,21 @@ async function sbLoad(){
     const localPending=localStorage.getItem(SYNC_PENDING_KEY)==='1';
     const remoteData={week:{},daycfg:{},exercises:[],routines:[]};
     const seen=new Set();
+    let remoteMaxMs=0;
     rows.forEach(row=>{
       if(row.id==='week'){ remoteData.week=row.data||{}; seen.add('week'); }
       if(row.id==='daycfg'){ remoteData.daycfg=row.data||{}; seen.add('daycfg'); }
       if(row.id==='exercises'){ remoteData.exercises=row.data||[]; seen.add('exercises'); }
       if(row.id==='routines'){ remoteData.routines=row.data||[]; seen.add('routines'); }
+      const ms=Date.parse(row.updated_at||'');
+      if(Number.isFinite(ms)) remoteMaxMs=Math.max(remoteMaxMs,ms);
     });
     const remoteMissing=['week','daycfg','exercises','routines'].some(id=>!seen.has(id));
     const keepLocalAndRestoreRemote=!localPending && remoteMissing && hasMeaningfulLocalData(localSnapshot);
+    const localEditMs=parseInt(localStorage.getItem(SYNC_LOCAL_EDIT_KEY)||'0',10)||0;
+    const shouldKeepLocalPending=localPending && localEditMs>remoteMaxMs;
 
-    if(!localPending && !keepLocalAndRestoreRemote){
+    if(!keepLocalAndRestoreRemote && !shouldKeepLocalPending){
       weekData=remoteData.week;
       dayCfg=remoteData.daycfg;
       exercises=remoteData.exercises;
@@ -972,6 +979,7 @@ function sbSave(){
   lsSave();
   syncState.pending=true;
   localStorage.setItem(SYNC_PENDING_KEY,'1');
+  localStorage.setItem(SYNC_LOCAL_EDIT_KEY,String(Date.now()));
   scheduleSync();
 }
 
