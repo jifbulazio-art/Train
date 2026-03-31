@@ -578,20 +578,145 @@ function normalizeAllExerciseNames(){
 }
 
 const TRUSTED_EXERCISE_LINKS={
+'ab wheel':'https://static.strengthlevel.com/images/exercises/ab-wheel/ab-wheel-800.jpg',
+'arnold press':'https://static.strengthlevel.com/images/exercises/arnold-press/arnold-press-800.jpg',
+'assisted dip machine':'https://static.strengthlevel.com/images/exercises/assisted-dip/assisted-dip-800.jpg',
+'assisted pull-up machine':'https://static.strengthlevel.com/images/exercises/assisted-pull-up/assisted-pull-up-800.jpg',
+'back squat con barra':'https://static.strengthlevel.com/images/exercises/barbell-squat/barbell-squat-800.jpg',
+'bayesian curl':'https://static.strengthlevel.com/images/exercises/bayesian-cable-curl/bayesian-cable-curl-800.jpg',
+'belt squat machine':'https://static.strengthlevel.com/images/exercises/belt-squat/belt-squat-800.jpg',
+'burpee':'https://static.strengthlevel.com/images/exercises/burpee/burpee-800.jpg',
+'butt kicks':'https://static.strengthlevel.com/images/exercises/butt-kicks/butt-kicks-800.jpg',
+'cable crunch':'https://static.strengthlevel.com/images/exercises/cable-crunch/cable-crunch-800.jpg',
+'cable curl':'https://static.strengthlevel.com/images/exercises/cable-curl/cable-curl-800.jpg',
+'cable fly':'https://static.strengthlevel.com/images/exercises/cable-fly/cable-fly-800.jpg',
+'cable front raise':'https://static.strengthlevel.com/images/exercises/cable-front-raise/cable-front-raise-800.jpg',
+'cable hammer curl':'https://static.strengthlevel.com/images/exercises/cable-hammer-curl/cable-hammer-curl-800.jpg',
+'cable hip adduction':'https://static.strengthlevel.com/images/exercises/cable-hip-adduction/cable-hip-adduction-800.jpg',
+'cable kickback':'https://static.strengthlevel.com/images/exercises/cable-kickback/cable-kickback-800.jpg',
+'cable lateral raise':'https://static.strengthlevel.com/images/exercises/cable-lateral-raise/cable-lateral-raise-800.jpg',
+'cable pullover':'https://static.strengthlevel.com/images/exercises/cable-pullover/cable-pullover-800.jpg',
+'cable tricep extension':'https://static.strengthlevel.com/images/exercises/cable-tricep-extension/cable-tricep-extension-800.jpg',
+'cable tricep pushdown':'https://static.strengthlevel.com/images/exercises/tricep-pushdown/tricep-pushdown-800.jpg',
+'calf raise en prensa':'https://static.strengthlevel.com/images/exercises/leg-press-calf-raise/leg-press-calf-raise-800.jpg',
+'cat-cow':'https://static.strengthlevel.com/images/exercises/cat-cow-stretch/cat-cow-stretch-800.jpg',
+'chest press machine':'https://static.strengthlevel.com/images/exercises/chest-press/chest-press-800.jpg',
+'chin-up':'https://static.strengthlevel.com/images/exercises/chin-up/chin-up-800.jpg',
+'close grip lat pulldown':'https://static.strengthlevel.com/images/exercises/close-grip-lat-pulldown/close-grip-lat-pulldown-800.jpg',
+'close grip seated cable row':'https://static.strengthlevel.com/images/exercises/close-grip-seated-cable-row/close-grip-seated-cable-row-800.jpg',
+'cossack squat':'https://static.strengthlevel.com/images/exercises/cossack-squat/cossack-squat-800.jpg',
+'crow stand':'https://static.strengthlevel.com/images/exercises/crow-pose/crow-pose-800.jpg',
+'curl de biceps con mancuernas':'https://static.strengthlevel.com/images/exercises/dumbbell-curl/dumbbell-curl-800.jpg',
+'curl concentrado':'https://static.strengthlevel.com/images/exercises/concentration-curl/concentration-curl-800.jpg',
+'curl femoral acostado':'https://static.strengthlevel.com/images/exercises/lying-leg-curl/lying-leg-curl-800.jpg',
+'curl femoral sentado':'https://static.strengthlevel.com/images/exercises/seated-leg-curl/seated-leg-curl-800.jpg',
+'curl inclinado con mancuernas':'https://static.strengthlevel.com/images/exercises/incline-dumbbell-curl/incline-dumbbell-curl-800.jpg',
+'curl inverso':'https://static.strengthlevel.com/images/exercises/reverse-curl/reverse-curl-800.jpg',
+'curl martillo':'https://static.strengthlevel.com/images/exercises/hammer-curl/hammer-curl-800.jpg',
+'dead hang con pausa':'https://static.strengthlevel.com/images/exercises/dead-hang/dead-hang-800.jpg',
+'diamond push-up':'https://static.strengthlevel.com/images/exercises/diamond-push-up/diamond-push-up-800.jpg',
+'dips en paralelas':'https://static.strengthlevel.com/images/exercises/dip/dip-800.jpg',
+'donkey calf raise':'https://static.strengthlevel.com/images/exercises/donkey-calf-raise/donkey-calf-raise-800.jpg',
+'dragon flag':'https://static.strengthlevel.com/images/exercises/dragon-flag/dragon-flag-800.jpg',
+'elevacion de pantorrillas a una pierna':'https://static.strengthlevel.com/images/exercises/single-leg-calf-raise/single-leg-calf-raise-800.jpg',
+'elevacion de pantorrillas de pie':'https://static.strengthlevel.com/images/exercises/standing-calf-raise/standing-calf-raise-800.jpg',
+'elevacion de pantorrillas sentado':'https://static.strengthlevel.com/images/exercises/seated-calf-raise/seated-calf-raise-800.jpg',
+'elevaciones frontales con mancuernas':'https://static.strengthlevel.com/images/exercises/dumbbell-front-raise/dumbbell-front-raise-800.jpg',
+'elevaciones laterales con mancuernas':'https://static.strengthlevel.com/images/exercises/dumbbell-lateral-raise/dumbbell-lateral-raise-800.jpg',
+'elevaciones posteriores con mancuernas':'https://static.strengthlevel.com/images/exercises/dumbbell-rear-delt-raise/dumbbell-rear-delt-raise-800.jpg',
+'extension de cuadriceps':'https://static.strengthlevel.com/images/exercises/leg-extension/leg-extension-800.jpg',
 'kickback de triceps':'https://static.strengthlevel.com/images/exercises/dumbbell-tricep-kickback/dumbbell-tricep-kickback-800.jpg',
 'extension de triceps sobre cabeza':'https://static.strengthlevel.com/images/exercises/dumbbell-tricep-extension/dumbbell-tricep-extension-800.jpg',
+'extension de triceps en polea con cuerda':'https://static.strengthlevel.com/images/exercises/tricep-rope-pushdown/tricep-rope-pushdown-800.jpg',
+'face pull':'https://static.strengthlevel.com/images/exercises/face-pull/face-pull-800.jpg',
+'fondos en banco':'https://static.strengthlevel.com/images/exercises/bench-dip/bench-dip-800.jpg',
+'front squat con barra':'https://static.strengthlevel.com/images/exercises/front-squat/front-squat-800.jpg',
+'glute bridge':'https://static.strengthlevel.com/images/exercises/glute-bridge/glute-bridge-800.jpg',
+'glute drive machine':'https://static.strengthlevel.com/images/exercises/hip-thrust-machine/hip-thrust-machine-800.jpg',
+'goblet squat':'https://static.strengthlevel.com/images/exercises/goblet-squat/goblet-squat-800.jpg',
+'good morning':'https://static.strengthlevel.com/images/exercises/good-morning/good-morning-800.jpg',
+'hack squat':'https://static.strengthlevel.com/images/exercises/hack-squat/hack-squat-800.jpg',
+'hanging knee raise':'https://static.strengthlevel.com/images/exercises/hanging-knee-raise/hanging-knee-raise-800.jpg',
+'hanging leg raise':'https://static.strengthlevel.com/images/exercises/hanging-leg-raise/hanging-leg-raise-800.jpg',
+'high knees':'https://static.strengthlevel.com/images/exercises/high-knees/high-knees-800.jpg',
+'hip abduction machine':'https://static.strengthlevel.com/images/exercises/hip-abduction/hip-abduction-800.jpg',
+'hip adduction machine':'https://static.strengthlevel.com/images/exercises/hip-adduction/hip-adduction-800.jpg',
+'hip thrust con barra':'https://static.strengthlevel.com/images/exercises/barbell-hip-thrust/barbell-hip-thrust-800.jpg',
+'incline chest press machine':'https://static.strengthlevel.com/images/exercises/incline-chest-press-machine/incline-chest-press-machine-800.jpg',
+'jump rope':'https://static.strengthlevel.com/images/exercises/jump-rope/jump-rope-800.jpg',
+'jumping jacks':'https://static.strengthlevel.com/images/exercises/jumping-jacks/jumping-jacks-800.jpg',
+'lat pulldown':'https://static.strengthlevel.com/images/exercises/lat-pulldown/lat-pulldown-800.jpg',
+'leg press':'https://static.strengthlevel.com/images/exercises/leg-press/leg-press-800.jpg',
+'lying leg curl':'https://static.strengthlevel.com/images/exercises/lying-leg-curl/lying-leg-curl-800.jpg',
+'machine fly':'https://static.strengthlevel.com/images/exercises/pec-deck-fly/pec-deck-fly-800.jpg',
+'machine preacher curl':'https://static.strengthlevel.com/images/exercises/preacher-curl-machine/preacher-curl-machine-800.jpg',
+'mountain climber':'https://static.strengthlevel.com/images/exercises/mountain-climber/mountain-climber-800.jpg',
+'neutral grip pull-up':'https://static.strengthlevel.com/images/exercises/neutral-grip-pull-up/neutral-grip-pull-up-800.jpg',
+'overhead cable tricep extension':'https://static.strengthlevel.com/images/exercises/overhead-cable-tricep-extension/overhead-cable-tricep-extension-800.jpg',
+'pec deck':'https://static.strengthlevel.com/images/exercises/pec-deck-fly/pec-deck-fly-800.jpg',
+'pistol squat asistido':'https://static.strengthlevel.com/images/exercises/pistol-squat/pistol-squat-800.jpg',
+'pistol squat libre':'https://static.strengthlevel.com/images/exercises/pistol-squat/pistol-squat-800.jpg',
+'plancha frontal':'https://static.strengthlevel.com/images/exercises/plank/plank-800.jpg',
+'plancha lateral':'https://static.strengthlevel.com/images/exercises/side-plank/side-plank-800.jpg',
+'preacher curl':'https://static.strengthlevel.com/images/exercises/preacher-curl/preacher-curl-800.jpg',
+'press banca con barra':'https://static.strengthlevel.com/images/exercises/bench-press/bench-press-800.jpg',
+'press banca inclinado con barra':'https://static.strengthlevel.com/images/exercises/incline-bench-press/incline-bench-press-800.jpg',
+'press de hombros con mancuernas':'https://static.strengthlevel.com/images/exercises/dumbbell-shoulder-press/dumbbell-shoulder-press-800.jpg',
+'press de mancuernas inclinado':'https://static.strengthlevel.com/images/exercises/incline-dumbbell-bench-press/incline-dumbbell-bench-press-800.jpg',
+'press de mancuernas plano':'https://static.strengthlevel.com/images/exercises/dumbbell-bench-press/dumbbell-bench-press-800.jpg',
+'press en maquina de pecho':'https://static.strengthlevel.com/images/exercises/chest-press-machine/chest-press-machine-800.jpg',
+'press frances con barra':'https://static.strengthlevel.com/images/exercises/skullcrusher/skullcrusher-800.jpg',
+'press militar con barra':'https://static.strengthlevel.com/images/exercises/overhead-press/overhead-press-800.jpg',
+'pressdown de triceps en polea':'https://static.strengthlevel.com/images/exercises/tricep-pushdown/tricep-pushdown-800.jpg',
+'pull-up':'https://static.strengthlevel.com/images/exercises/pull-up/pull-up-800.jpg',
+'push-up declinado':'https://static.strengthlevel.com/images/exercises/decline-push-up/decline-push-up-800.jpg',
+'push-up diamante':'https://static.strengthlevel.com/images/exercises/diamond-push-up/diamond-push-up-800.jpg',
+'push-up estandar':'https://static.strengthlevel.com/images/exercises/push-up/push-up-800.jpg',
+'rear delt machine':'https://static.strengthlevel.com/images/exercises/rear-delt-machine-fly/rear-delt-machine-fly-800.jpg',
+'remo con barra':'https://static.strengthlevel.com/images/exercises/barbell-row/barbell-row-800.jpg',
+'remo con mancuerna a una mano':'https://static.strengthlevel.com/images/exercises/one-arm-dumbbell-row/one-arm-dumbbell-row-800.jpg',
+'remo invertido en barra baja':'https://static.strengthlevel.com/images/exercises/inverted-row/inverted-row-800.jpg',
+'remo sentado en polea':'https://static.strengthlevel.com/images/exercises/seated-cable-row/seated-cable-row-800.jpg',
+'reverse pec deck':'https://static.strengthlevel.com/images/exercises/reverse-pec-deck/reverse-pec-deck-800.jpg',
+'russian twist':'https://static.strengthlevel.com/images/exercises/russian-twist/russian-twist-800.jpg',
+'scapular pull-up':'https://static.strengthlevel.com/images/exercises/scapular-pull-up/scapular-pull-up-800.jpg',
+'seated calf raise':'https://static.strengthlevel.com/images/exercises/seated-calf-raise/seated-calf-raise-800.jpg',
 'seated cable row':'https://static.strengthlevel.com/images/exercises/seated-cable-row/seated-cable-row-800.jpg',
+'seated chest press':'https://static.strengthlevel.com/images/exercises/seated-chest-press/seated-chest-press-800.jpg',
 'seated dip machine':'https://static.strengthlevel.com/images/exercises/seated-dip-machine/seated-dip-machine-800.jpg',
+'seated leg curl':'https://static.strengthlevel.com/images/exercises/seated-leg-curl/seated-leg-curl-800.jpg',
+'seated leg extension':'https://static.strengthlevel.com/images/exercises/leg-extension/leg-extension-800.jpg',
+'single leg press':'https://static.strengthlevel.com/images/exercises/single-leg-press/single-leg-press-800.jpg',
+'sissy squat':'https://static.strengthlevel.com/images/exercises/sissy-squat/sissy-squat-800.jpg',
+'skipping en el lugar':'https://static.strengthlevel.com/images/exercises/jog-in-place/jog-in-place-800.jpg',
 'smith machine bench press':'https://static.strengthlevel.com/images/exercises/smith-machine-bench-press/smith-machine-bench-press-800.jpg',
-'cable crunch':'https://static.strengthlevel.com/images/exercises/cable-crunch/cable-crunch-800.jpg',
+'smith machine lunge':'https://static.strengthlevel.com/images/exercises/smith-machine-lunge/smith-machine-lunge-800.jpg',
+'smith machine shoulder press':'https://static.strengthlevel.com/images/exercises/smith-machine-shoulder-press/smith-machine-shoulder-press-800.jpg',
+'smith machine squat':'https://static.strengthlevel.com/images/exercises/smith-machine-squat/smith-machine-squat-800.jpg',
+'spider curl':'https://static.strengthlevel.com/images/exercises/spider-curl/spider-curl-800.jpg',
+'standing calf raise machine':'https://static.strengthlevel.com/images/exercises/standing-calf-raise-machine/standing-calf-raise-machine-800.jpg',
+'standing leg curl':'https://static.strengthlevel.com/images/exercises/standing-leg-curl/standing-leg-curl-800.jpg',
+'step-up con mancuernas':'https://static.strengthlevel.com/images/exercises/dumbbell-step-up/dumbbell-step-up-800.jpg',
+'straight arm pulldown':'https://static.strengthlevel.com/images/exercises/straight-arm-pulldown/straight-arm-pulldown-800.jpg',
+'toes to bar':'https://static.strengthlevel.com/images/exercises/toes-to-bar/toes-to-bar-800.jpg',
+'toes to bar estricto':'https://static.strengthlevel.com/images/exercises/toes-to-bar/toes-to-bar-800.jpg',
+'tricep pushdown':'https://static.strengthlevel.com/images/exercises/tricep-pushdown/tricep-pushdown-800.jpg',
+'v-up':'https://static.strengthlevel.com/images/exercises/v-up/v-up-800.jpg',
+'wide grip lat pulldown':'https://static.strengthlevel.com/images/exercises/wide-grip-lat-pulldown/wide-grip-lat-pulldown-800.jpg',
+'wide grip seated cable row':'https://static.strengthlevel.com/images/exercises/wide-grip-seated-cable-row/wide-grip-seated-cable-row-800.jpg',
+'zancada caminando':'https://static.strengthlevel.com/images/exercises/walking-lunge/walking-lunge-800.jpg',
+'zancada estatica':'https://static.strengthlevel.com/images/exercises/split-squat/split-squat-800.jpg',
 };
 
 function normalizeExerciseKey(name=''){
   return name.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[-_]/g,' ')
     .replace(/[+]/g,' plus ')
     .replace(/[()]/g,' ')
-    .replace(/[^a-z0-9\s-]/g,' ')
+    .replace(/[^a-z0-9\s]/g,' ')
+    .replace(/\bpush\s+ups?\b/g,'push up')
+    .replace(/\bpull\s+ups?\b/g,'pull up')
     .replace(/\s+/g,' ')
     .trim();
 }
@@ -601,9 +726,22 @@ function slugifyExerciseName(name=''){
   return key.replace(/\s+/g,'-');
 }
 
+let trustedExerciseLinksIndex=null;
+function getTrustedExerciseLinksIndex(){
+  if(trustedExerciseLinksIndex) return trustedExerciseLinksIndex;
+  const idx={};
+  Object.entries(TRUSTED_EXERCISE_LINKS).forEach(([rawKey,url])=>{
+    const norm=normalizeExerciseKey(rawKey);
+    if(norm && url) idx[norm]=url;
+  });
+  trustedExerciseLinksIndex=idx;
+  return trustedExerciseLinksIndex;
+}
+
 function getStrengthLevelThumb(name,type){
   const key=normalizeExerciseKey(name);
-  return TRUSTED_EXERCISE_LINKS[key]||null;
+  const idx=getTrustedExerciseLinksIndex();
+  return idx[key]||null;
 }
 
 function getTypeThumb(type){
@@ -1329,7 +1467,7 @@ function renderAddOpts(){
       window._opts[idx]={name:e.name,type:e.type};
       html+=`<div class="opt-row${sel?' on':''}" id="opt${idx}" onclick="toggleOpt(${idx},event)">
         <div class="opt-check"></div>
-        <div class="opt-thumb">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(e.type)}</div>
+        <div class="opt-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom(decodeURIComponent('${encodeURIComponent(img||'')}'))">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(e.type)}</div>
         <span class="opt-name">${e.name}</span>
         <div class="opt-inputs" onclick="event.stopPropagation()">
           <input type="number" placeholder="s" value="${p?p.sets:''}" min="1" max="20" inputmode="numeric"
@@ -1937,7 +2075,7 @@ function renderMgmtEx(){
   });
 
   document.getElementById('mgmt-ex-list').innerHTML=all.map(e=>{
-    const img=e.imageData||e.imageUrl||null;
+    const img=e.imageData||e.imageUrl||getStrengthLevelThumb(e.name,e.type)||null;
     const link=e.imageUrl||getStrengthLevelThumb(e.name,e.type)||'';
     const safeName=(e.name||'').replace(/'/g,"\\'");
     const safeType=(e.type||'').replace(/'/g,"\\'");
@@ -1974,7 +2112,7 @@ function renderMgmtEx(){
   document.getElementById('mgmt-context-filter-row').innerHTML=buildFilterRow(CONTEXT_FILTERS,mgmtContextFilter,contextCounts,'setMgmtContextFilter');
 
   document.getElementById('mgmt-ex-list').innerHTML=all.map(e=>{
-    const img=e.imageData||e.imageUrl||null;
+    const img=e.imageData||e.imageUrl||getStrengthLevelThumb(e.name,e.type)||null;
     const link=e.imageUrl||getStrengthLevelThumb(e.name,e.type)||'';
     const safeName=(e.name||'').replace(/'/g,"\\'");
     const safeType=(e.type||'').replace(/'/g,"\\'");
@@ -1982,7 +2120,7 @@ function renderMgmtEx(){
     const safeLink=(link||'').replace(/'/g,"\\'");
     const contextLabel=(CONTEXT_FILTERS.find(f=>f.id===getExerciseContext(e))||{}).label||'';
     return `<div class="mgmt-item" onclick="openExEditByName('${safeName}','${safeType}','${safeMuscle}','${safeLink}','${getExerciseContext(e)}')">
-      <div class="mgmt-thumb">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(e.type)}</div>
+      <div class="mgmt-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,"\\'")}')">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(e.type)}</div>
       <div class="mgmt-info">
         <div class="mgmt-name">${e.name}</div>
         <div class="mgmt-sub">${TYPE_MAP[e.type]||e.type}${getMuscleLabel(e)?' - '+getMuscleLabel(e):''}${contextLabel?' - '+contextLabel:''}</div>
