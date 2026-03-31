@@ -207,9 +207,19 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .form-input::placeholder{color:var(--tx3)}
 .form-select{padding:10px 13px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--rs);color:var(--tx);font-size:14px;outline:none;width:100%}
 .form-select option{background:var(--s2)}
-.field-link{background:none;border:none;color:var(--tx2);font-size:12px;font-family:'DM Mono',monospace;padding:0;text-align:left}
-.field-link:hover{text-decoration:underline}
-.field-link-wrap{margin-top:-2px}
+.field-link{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--s2);border:1px solid var(--b1);color:var(--tx2);
+  font-size:11px;font-family:'DM Mono',monospace;padding:9px 12px;
+  border-radius:999px;text-align:left
+}
+.field-link::before{
+  content:'+';display:inline-flex;align-items:center;justify-content:center;
+  width:18px;height:18px;border-radius:50%;background:var(--s3);color:var(--tx);
+  font-size:13px;line-height:1
+}
+.field-link.open::before{content:'-'}
+.field-link-wrap{margin-top:-2px;display:flex}
 .img-upload-area{display:flex;gap:8px}
 .img-upload-area input{flex:1;padding:10px 13px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none}
 .img-upload-area input::placeholder{color:var(--tx3)}
@@ -1516,7 +1526,8 @@ function toggleSecondaryMuscle(forceOpen=null){
   const btn=document.getElementById('ee-muscle-secondary-toggle');
   const shouldOpen=forceOpen===null ? wrap.style.display==='none' : !!forceOpen;
   wrap.style.display=shouldOpen?'flex':'none';
-  btn.textContent=shouldOpen?'− Quitar segundo grupo muscular':'+ Agregar segundo grupo muscular';
+  btn.classList.toggle('open',shouldOpen);
+  btn.textContent=shouldOpen?'Quitar segundo grupo muscular':'Agregar segundo grupo muscular';
   if(!shouldOpen) document.getElementById('ee-muscle-secondary').value='';
 }
 
