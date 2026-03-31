@@ -1083,7 +1083,7 @@ function excHTML(ex,di,i,inGroup){
     ondragend="dragEnd(event)"
     ${pending?'data-pending-super="true"':''}>
     <span class="drag-handle" onclick="event.stopPropagation()"></span>
-    <div class="exc-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,\"\\\\'\")}')">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(getExType(ex.name))}</div>
+    <div class="exc-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,"\\'")}')">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(getExType(ex.name))}</div>
     <div class="exc-info${pending?' exc-pending':''}">
       <div class="exc-title-row">
         <div class="exc-name">${ex.name}</div>
@@ -1422,7 +1422,7 @@ function openDetail(di,i){
   const img=getExImg(ex.name);
   const hasSG=!!ex.superGroup;
   const detailImgHtml = img
-    ? `<img src="${img}" onclick="event.stopPropagation();openImageZoom('${img.replace(/'/g,\"\\\\'\")}')" onerror="this.parentElement.innerHTML='&lt;span class=&quot;detail-img-ph&quot;&gt;${ex.name}&lt;/span&gt;'">`
+    ? `<img src="${img}" onclick="event.stopPropagation();openImageZoom('${img.replace(/'/g,"\\'")}')" onerror="this.parentElement.innerHTML='&lt;span class=&quot;detail-img-ph&quot;&gt;${ex.name}&lt;/span&gt;'">`
     : `<span class="detail-img-ph">${ex.name}</span>`;
   const detailMeta = `${TYPE_MAP[getExType(ex.name)]||''}${getPlannedMeta(ex)?` - ${getPlannedMeta(ex)}`:''}`;
 
@@ -1914,7 +1914,7 @@ function renderMgmtEx(){
     const safeMuscle=(e.muscle||'').replace(/'/g,"\\'");
     const safeLink=(link||'').replace(/'/g,"\\'");
     return `<div class="mgmt-item" onclick="openExEditByName('${safeName}','${safeType}','${safeMuscle}','${safeLink}','${getExerciseContext(e)}')">
-      <div class="mgmt-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,\"\\\\'\")}')">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(e.type)}</div>
+      <div class="mgmt-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,"\\'")}')">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(e.type)}</div>
       <div class="mgmt-info">
         <div class="mgmt-name">${e.name}</div>
         <div class="mgmt-sub">${TYPE_MAP[e.type]||e.type}${e.muscle?' - '+e.muscle:''}</div>
