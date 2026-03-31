@@ -841,9 +841,10 @@ let pendingSuperLink=null;
 const SYNC_PENDING_KEY='rs_pending';
 const SYNC_IDLE_MS=8000;
 const SYNC_RETRY_MS=20000;
+const SYNC_PULL_MS=45000;
 const SYNC_ENSURED_KEY='rs_ensured';
 const SYNC_LOCAL_EDIT_KEY='rs_last_edit_at';
-const syncState={pending:false,inFlight:false,timer:null,lastToastAt:0,lastRemote:{week:'',daycfg:'',exercises:'',routines:''}};
+const syncState={pending:false,inFlight:false,loading:false,timer:null,pullTimer:null,lastPullAt:0,lastToastAt:0,lastRemote:{week:'',daycfg:'',exercises:'',routines:''}};
 
 // â•â• SUPABASE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function toast(msg,ok=true){
@@ -854,6 +855,8 @@ function toast(msg,ok=true){
 }
 
 async function sbLoad(){
+  if(syncState.loading) return;
+  syncState.loading=true;
   lsLoad();
   try{
     const ctl=new AbortController();
@@ -898,6 +901,8 @@ async function sbLoad(){
     scheduleSync(700);
   }catch(e){
     showSyncFallbackToast();
+  }finally{
+    syncState.loading=false;
   }
 }
 
@@ -981,6 +986,18 @@ function sbSave(){
   localStorage.setItem(SYNC_PENDING_KEY,'1');
   localStorage.setItem(SYNC_LOCAL_EDIT_KEY,String(Date.now()));
   scheduleSync();
+}
+
+function refreshFromRemote({force=false}={}){
+  const now=Date.now();
+  if(!force && now-syncState.lastPullAt<SYNC_PULL_MS) return;
+  syncState.lastPullAt=now;
+  sbLoad().then(()=>{
+    if(normalizeAllExerciseNames()) sbSave();
+    renderDayRow();
+    renderDay();
+    if(document.getElementById('view-mgmt')?.classList.contains('on')) renderMgmt();
+  });
 }
 
 async function sbEnsure(){
@@ -2173,17 +2190,22 @@ function closeImageZoom(){
   renderDayRow();
   renderDay();
 
-  sbLoad().then(()=>{
-    if(normalizeAllExerciseNames()) sbSave();
-    renderDayRow();
-    renderDay();
-  });
+  refreshFromRemote({force:true});
 
   sbEnsure();
   if(syncState.pending) scheduleSync(1200);
+  syncState.pullTimer=setInterval(()=>{
+    if(document.visibilityState==='visible') refreshFromRemote();
+  },SYNC_PULL_MS);
 
-  window.addEventListener('online',()=>{ if(syncState.pending) scheduleSync(700); });
-  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden' && syncState.pending) flushSync({keepalive:true}); });
+  window.addEventListener('online',()=>{
+    refreshFromRemote({force:true});
+    if(syncState.pending) scheduleSync(700);
+  });
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='hidden' && syncState.pending) flushSync({keepalive:true});
+    if(document.visibilityState==='visible') refreshFromRemote({force:true});
+  });
   window.addEventListener('pagehide',()=>{ if(syncState.pending) flushSync({keepalive:true}); });
 })();
 </script>
