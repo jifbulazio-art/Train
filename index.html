@@ -808,7 +808,7 @@ const CONTEXT_FILTERS=[
 ];
 
 // â•â• STATE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-let curDay=Math.min(Math.max((new Date().getDay()||1)-1,0),6);
+let curDay=0;
 let weekData={};    // {0..6: [{name,sets,reps,unit,superGroup,logs:[]}]}
 let dayCfg={};      // {0..6: {type,run}}
 let exercises=[];   // [{id,name,type,muscle,muscleSecondary,modality,imageUrl,imageData}]
@@ -2111,7 +2111,6 @@ function renderMgmtEx(){
       <div class="mgmt-info">
         <div class="mgmt-name">${e.name}</div>
         <div class="mgmt-sub">${TYPE_MAP[e.type]||e.type}${e.muscle?' - '+e.muscle:''}</div>
-        ${link?`<div class="mgmt-link">${link}</div>`:''}
       </div>
       <span class="mgmt-arrow">></span>
     </div>`;
@@ -2149,7 +2148,6 @@ function renderMgmtEx(){
       <div class="mgmt-info">
         <div class="mgmt-name">${e.name}</div>
         <div class="mgmt-sub">${TYPE_MAP[e.type]||e.type}${getMuscleLabel(e)?' - '+getMuscleLabel(e):''}${contextLabel?' - '+contextLabel:''}</div>
-        ${link?`<div class="mgmt-link">${link}</div>`:''}
       </div>
       <span class="mgmt-arrow">></span>
     </div>`;
