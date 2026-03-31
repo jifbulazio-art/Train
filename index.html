@@ -43,8 +43,8 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 /* â”€â”€ VIEWS â”€â”€ */
 .view{display:none;flex:1;overflow-y:auto;padding:12px 16px 90px}
 .view.on{display:block}
-.sticky-top{position:sticky;top:0;z-index:8;background:linear-gradient(180deg,var(--bg) 0%,var(--bg) 82%,rgba(14,14,15,.94) 100%)}
-.sticky-gap{padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--b0)}
+.sticky-top{position:sticky;top:-12px;z-index:8;background:var(--bg);padding-top:12px}
+.sticky-gap{padding-bottom:12px;margin-bottom:12px}
 
 /* â”€â”€ DAY HEADER â”€â”€ */
 .dh{display:flex;align-items:center;gap:8px;margin-bottom:14px}
@@ -192,7 +192,8 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .mgmt-search{margin:12px 0 18px}
 .mgmt-search input{width:100%;padding:10px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none}
 .mgmt-search input::placeholder{color:var(--tx3)}
-.mgmt-search.sticky-gap{margin-top:0;margin-bottom:12px}
+.mgmt-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.mgmt-search.sticky-gap{margin-top:0;margin-bottom:0}
 .mgmt-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s1);border:1px solid var(--b0);border-radius:var(--rs);margin-bottom:6px;cursor:pointer}
 .mgmt-item:active{opacity:.75}
 .mgmt-thumb{width:40px;height:40px;border-radius:7px;background:var(--s2);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px}
@@ -1847,13 +1848,15 @@ function renderMgmt(){
   const el=document.getElementById('mgmt-content');
   el.innerHTML=`
     <div class="mgmt-section">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div class="mgmt-section-title" style="margin:0">EJERCICIOS</div>
-        <button class="btn-outline" onclick="openExEdit(null)">+ Nuevo</button>
+      <div class="sticky-top sticky-gap">
+        <div class="mgmt-head">
+          <div class="mgmt-section-title" style="margin:0">EJERCICIOS</div>
+          <button class="btn-outline" onclick="openExEdit(null)">+ Nuevo</button>
+        </div>
+        <label class="mgmt-search">
+          <input type="search" id="mgmt-search" placeholder="Buscar ejercicio..." oninput="setMgmtSearch(this.value)">
+        </label>
       </div>
-      <label class="mgmt-search sticky-top sticky-gap">
-        <input type="search" id="mgmt-search" placeholder="Buscar ejercicio..." oninput="setMgmtSearch(this.value)">
-      </label>
       <div class="filter-block" style="margin-top:8px">
         <div class="filter-title">Grupo</div>
         <div class="filter-row" style="margin-bottom:10px" id="mgmt-filter-row"></div>
