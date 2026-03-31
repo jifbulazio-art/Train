@@ -577,6 +577,39 @@ function normalizeAllExerciseNames(){
   return changed;
 }
 
+function inferExerciseContext(ex){
+  const name=(ex.name||'').toLowerCase();
+  const muscle=(ex.muscle||'').toLowerCase();
+  const type=(ex.type||'').toLowerCase();
+
+  if(muscle.includes('aerobico') || /jump|burpee|mountain climber|skipping|trote|high knees|jump rope|butt kicks/.test(name)) return 'aerobico';
+  if(muscle.includes('movilidad') || /stretch|movilidad|rotacion|rotaciones|circulos|cat-cow|paloma|jefferson|cossack|pass-through|thorac/.test(name)) return 'movilidad';
+  if(/polea|maquina|machine|pec deck|cable|crossover|pulldown|pull-down|remo sentado|seated row|machine row|assisted|leg extension|extension de cuadriceps|leg curl|curl femoral|standing leg curl|hip abduction|hip adduction|abduccion|adduction|glute drive|seated calf raise|standing calf raise|machine calf raise|hack squat|pendulum squat|belt squat|smith machine|rear delt machine|reverse pec deck|chest press|shoulder press/.test(name)) return 'gym';
+  if(/mancuerna|mancuernas|dumbbell|kettlebell|goblet|arnold|peso muerto|back squat|front squat|press militar con barra|press banca con barra|remo con barra|pullover/.test(name)) return 'peso-libre';
+  if(type==='free' || type==='combo' || /push-up|push up|pull-up|pull up|chin-up|chin up|dead hang|front lever|back lever|handstand|planche|l-sit|dragon flag|muscle-up|muscle up|skin the cat|toes to bar|wall walk|dips|australian|scapular|crow stand/.test(name)) return 'calistenia';
+  return 'peso-libre';
+}
+
+function normalizeAllExerciseModalities(){
+  let changed=false;
+  exercises.forEach(ex=>{
+    if(ex.hidden) return;
+    const current=(ex.modality||'').trim();
+    if(!current) return;
+    const inferred=inferExerciseContext({...ex,modality:''});
+    if(current==='peso-libre' && inferred==='calistenia'){
+      ex.modality='calistenia';
+      changed=true;
+      return;
+    }
+    if(current==='calistenia' && (inferred==='peso-libre' || inferred==='gym')){
+      ex.modality=inferred;
+      changed=true;
+    }
+  });
+  return changed;
+}
+
 const TRUSTED_EXERCISE_LINKS={
 'ab wheel':'https://static.strengthlevel.com/images/exercises/ab-wheel/ab-wheel-800.jpg',
 'arnold press':'https://static.strengthlevel.com/images/exercises/arnold-press/arnold-press-800.jpg',
@@ -993,7 +1026,9 @@ function refreshFromRemote({force=false}={}){
   if(!force && now-syncState.lastPullAt<SYNC_PULL_MS) return;
   syncState.lastPullAt=now;
   sbLoad().then(()=>{
-    if(normalizeAllExerciseNames()) sbSave();
+    const namesChanged=normalizeAllExerciseNames();
+    const modalitiesChanged=normalizeAllExerciseModalities();
+    if(namesChanged || modalitiesChanged) sbSave();
     renderDayRow();
     renderDay();
     if(document.getElementById('view-mgmt')?.classList.contains('on')) renderMgmt();
@@ -1415,17 +1450,12 @@ function getAllExercises(){
 }
 
 function getExerciseContext(ex){
-  if(ex.modality) return ex.modality;
-  const name=(ex.name||'').toLowerCase();
-  const muscle=(ex.muscle||'').toLowerCase();
-  const type=(ex.type||'').toLowerCase();
-
-  if(muscle.includes('aerobico') || /jump|burpee|mountain climber|skipping|trote|high knees|jump rope|butt kicks/.test(name)) return 'aerobico';
-  if(muscle.includes('movilidad') || /stretch|movilidad|rotacion|rotaciones|circulos|cat-cow|paloma|jefferson|cossack|pass-through|thorac/.test(name)) return 'movilidad';
-  if(/polea|maquina|machine|pec deck|cable|crossover|pulldown|pull-down|remo sentado|seated row|machine row|assisted|leg extension|extension de cuadriceps|leg curl|curl femoral|standing leg curl|hip abduction|hip adduction|abduccion|adduction|glute drive|seated calf raise|standing calf raise|machine calf raise|hack squat|pendulum squat|belt squat|smith machine|rear delt machine|reverse pec deck|chest press|shoulder press/.test(name)) return 'gym';
-  if(/mancuerna|mancuernas|dumbbell|kettlebell|goblet|arnold|peso muerto|back squat|front squat|press militar con barra|press banca con barra|remo con barra|pullover/.test(name)) return 'peso-libre';
-  if(type==='free' || type==='combo' || /push-up|pull-up|chin-up|dead hang|front lever|back lever|handstand|planche|l-sit|dragon flag|muscle-up|skin the cat|toes to bar|wall walk|dips|australian|scapular|crow stand/.test(name)) return 'calistenia';
-  return 'peso-libre';
+  const inferred=inferExerciseContext(ex);
+  if(!ex.modality) return inferred;
+  const manual=(ex.modality||'').trim();
+  if(manual==='peso-libre' && inferred==='calistenia') return 'calistenia';
+  if(manual==='calistenia' && (inferred==='peso-libre' || inferred==='gym')) return inferred;
+  return manual;
 }
 
 function getMuscleLabel(ex){
@@ -2184,7 +2214,9 @@ function closeImageZoom(){
 // â•â• INIT â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 (async()=>{
   lsLoad();
-  if(normalizeAllExerciseNames()) lsSave();
+  const bootNamesChanged=normalizeAllExerciseNames();
+  const bootModalitiesChanged=normalizeAllExerciseModalities();
+  if(bootNamesChanged || bootModalitiesChanged) lsSave();
   renderDayRow();
   renderDay();
 
