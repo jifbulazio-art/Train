@@ -381,6 +381,22 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
           <option value="movilidad">Movilidad</option>
         </select>
       </div>
+      <div class="field-link-wrap">
+        <button class="field-link" type="button" id="ee-modality-secondary-toggle" onclick="toggleSecondaryModality()">
+          + Agregar segunda modalidad
+        </button>
+      </div>
+      <div class="form-field" id="ee-modality-secondary-wrap" style="display:none">
+        <label class="form-label">SEGUNDA MODALIDAD</label>
+        <select class="form-select" id="ee-modality-secondary">
+          <option value="">Sin segunda modalidad</option>
+          <option value="calistenia">Calistenia</option>
+          <option value="peso-libre">Peso libre</option>
+          <option value="gym">Gym</option>
+          <option value="aerobico">Aerobico</option>
+          <option value="movilidad">Movilidad</option>
+        </select>
+      </div>
       <div class="form-field">
         <label class="form-label">GRUPO MUSCULAR</label>
         <select class="form-select" id="ee-muscle"></select>
@@ -586,7 +602,7 @@ function inferExerciseContext(ex){
   if(muscle.includes('movilidad') || /stretch|movilidad|rotacion|rotaciones|circulos|cat-cow|paloma|jefferson|cossack|pass-through|thorac/.test(name)) return 'movilidad';
   if(/polea|maquina|machine|pec deck|cable|crossover|pulldown|pull-down|remo sentado|seated row|machine row|assisted|leg extension|extension de cuadriceps|leg curl|curl femoral|standing leg curl|hip abduction|hip adduction|abduccion|adduction|glute drive|seated calf raise|standing calf raise|machine calf raise|hack squat|pendulum squat|belt squat|smith machine|rear delt machine|reverse pec deck|chest press|shoulder press/.test(name)) return 'gym';
   if(/mancuerna|mancuernas|dumbbell|kettlebell|goblet|arnold|peso muerto|back squat|front squat|press militar con barra|press banca con barra|remo con barra|pullover/.test(name)) return 'peso-libre';
-  if(type==='free' || type==='combo' || /push-up|push up|pull-up|pull up|chin-up|chin up|dead hang|front lever|back lever|handstand|planche|l-sit|dragon flag|muscle-up|muscle up|skin the cat|toes to bar|wall walk|dips|australian|scapular|crow stand/.test(name)) return 'calistenia';
+  if(type==='free' || type==='combo' || /push-up|push up|pull-up|pull up|chin-up|chin up|dead hang|front lever|back lever|handstand|planche|plancha|plank|l-sit|dragon flag|muscle-up|muscle up|skin the cat|toes to bar|wall walk|dips|australian|scapular|crow stand/.test(name)) return 'calistenia';
   return 'peso-libre';
 }
 
@@ -595,15 +611,24 @@ function normalizeAllExerciseModalities(){
   exercises.forEach(ex=>{
     if(ex.hidden) return;
     const current=(ex.modality||'').trim();
-    if(!current) return;
-    const inferred=inferExerciseContext({...ex,modality:''});
-    if(current==='peso-libre' && inferred==='calistenia'){
-      ex.modality='calistenia';
-      changed=true;
+    const secondary=(ex.modalitySecondary||'').trim();
+    if(!current){
+      if(secondary){
+        ex.modalitySecondary='';
+        changed=true;
+      }
       return;
     }
-    if(current==='calistenia' && (inferred==='peso-libre' || inferred==='gym')){
-      ex.modality=inferred;
+    const inferred=inferExerciseContext({...ex,modality:''});
+    let next=current;
+    if(current==='peso-libre' && inferred==='calistenia') next='calistenia';
+    if(current==='calistenia' && (inferred==='peso-libre' || inferred==='gym')) next=inferred;
+    if(next!==ex.modality){
+      ex.modality=next;
+      changed=true;
+    }
+    if(secondary && secondary===next){
+      ex.modalitySecondary='';
       changed=true;
     }
   });
@@ -844,7 +869,7 @@ const CONTEXT_FILTERS=[
 let curDay=0;
 let weekData={};    // {0..6: [{name,sets,reps,unit,superGroup,logs:[]}]}
 let dayCfg={};      // {0..6: {type,run}}
-let exercises=[];   // [{id,name,type,muscle,muscleSecondary,modality,imageUrl,imageData}]
+let exercises=[];   // [{id,name,type,muscle,muscleSecondary,modality,modalitySecondary,imageUrl,imageData}]
 let routines=[];    // [{id,name,type,items:[{name,sets,reps,unit,superGroup}]}]
 
 // add modal state
@@ -1415,6 +1440,7 @@ function getAllExercises(){
             muscle:replaced.muscle||muscle,
             muscleSecondary:replaced.muscleSecondary||'',
             modality:replaced.modality||'',
+            modalitySecondary:replaced.modalitySecondary||'',
             imageUrl:replaced.imageUrl||getStrengthLevelThumb(replaced.name,replaced.type||type),
             imageData:replaced.imageData||null,
           });
@@ -1429,12 +1455,13 @@ function getAllExercises(){
             muscle:custom.muscle||muscle,
             muscleSecondary:custom.muscleSecondary||'',
             modality:custom.modality||'',
+            modalitySecondary:custom.modalitySecondary||'',
             imageUrl:custom.imageUrl||getStrengthLevelThumb(custom.name,custom.type||type),
             imageData:custom.imageData||null,
           });
           return;
         }
-        result.push({name,type,muscle,muscleSecondary:'',modality:'',imageUrl:getStrengthLevelThumb(name,type),imageData:null});
+        result.push({name,type,muscle,muscleSecondary:'',modality:'',modalitySecondary:'',imageUrl:getStrengthLevelThumb(name,type),imageData:null});
       });
     });
   });
@@ -1444,7 +1471,7 @@ function getAllExercises(){
     if(consumedCustomIds.has(ex.id)) return;
     if(result.find(r=>r.name===ex.name)) return;
     const type=ex.type||'free';
-    result.push({name:ex.name,type,muscle:ex.muscle||'',muscleSecondary:ex.muscleSecondary||'',modality:ex.modality||'',imageUrl:ex.imageUrl||getStrengthLevelThumb(ex.name,type),imageData:ex.imageData||null});
+    result.push({name:ex.name,type,muscle:ex.muscle||'',muscleSecondary:ex.muscleSecondary||'',modality:ex.modality||'',modalitySecondary:ex.modalitySecondary||'',imageUrl:ex.imageUrl||getStrengthLevelThumb(ex.name,type),imageData:ex.imageData||null});
   });
   return result.sort((a,b)=>(a.name||'').localeCompare((b.name||''),'es',{sensitivity:'base'}));
 }
@@ -1458,6 +1485,18 @@ function getExerciseContext(ex){
   return manual;
 }
 
+function getExerciseContexts(ex){
+  const primary=getExerciseContext(ex);
+  const secondary=(ex.modalitySecondary||'').trim();
+  if(!secondary || secondary===primary) return [primary];
+  return [primary,secondary];
+}
+
+function getExerciseContextLabel(ex){
+  const labels=getExerciseContexts(ex).map(id=>(CONTEXT_FILTERS.find(f=>f.id===id)||{}).label||id).filter(Boolean);
+  return labels.join(' + ');
+}
+
 function getMuscleLabel(ex){
   const primary=(ex.muscle||'').trim();
   const secondary=(ex.muscleSecondary||'').trim();
@@ -1469,9 +1508,9 @@ function filterExercises(list,{query='',typeFilter='',contextFilter=''}={}){
   const q=(query||'').trim().toLowerCase();
   return list.filter(e=>{
     const typeOk=!typeFilter || e.type===typeFilter;
-    const context=getExerciseContext(e);
-    const contextOk=!contextFilter || context===contextFilter;
-    const text=`${e.name} ${e.muscle||''} ${e.muscleSecondary||''} ${TYPE_MAP[e.type]||e.type} ${context}`.toLowerCase();
+    const contexts=getExerciseContexts(e);
+    const contextOk=!contextFilter || contexts.includes(contextFilter);
+    const text=`${e.name} ${e.muscle||''} ${e.muscleSecondary||''} ${TYPE_MAP[e.type]||e.type} ${contexts.join(' ')}`.toLowerCase();
     const searchOk=!q || text.includes(q);
     return typeOk&&contextOk&&searchOk;
   });
@@ -1732,6 +1771,8 @@ function openExEdit(id=null,prefillName='',prefillType='push',prefillMuscle='',r
     document.getElementById('ee-name').value=ex.name||'';
     document.getElementById('ee-type').value=ex.type||'push';
     document.getElementById('ee-modality').value=ex.modality||'';
+    document.getElementById('ee-modality-secondary').value=ex.modalitySecondary||'';
+    toggleSecondaryModality(!!(ex.modalitySecondary||''));
     refreshMuscleOptions(ex.muscle||'',ex.muscleSecondary||'');
     document.getElementById('ee-img-url').value=ex.imageUrl||'';
     const preview=document.getElementById('ee-img-preview');
@@ -1742,6 +1783,8 @@ function openExEdit(id=null,prefillName='',prefillType='push',prefillMuscle='',r
     document.getElementById('ee-name').value=prefillName;
     document.getElementById('ee-type').value=prefillType||'push';
     document.getElementById('ee-modality').value=prefillModality||sourceModality||'';
+    document.getElementById('ee-modality-secondary').value='';
+    toggleSecondaryModality(false);
     refreshMuscleOptions(prefillMuscle||'','');
     const resolved=prefillImageUrl||'';
     document.getElementById('ee-img-url').value=resolved||'';
@@ -1768,6 +1811,16 @@ function toggleSecondaryMuscle(forceOpen=null){
   btn.classList.toggle('open',shouldOpen);
   btn.textContent=shouldOpen?'Quitar segundo grupo muscular':'Agregar segundo grupo muscular';
   if(!shouldOpen) document.getElementById('ee-muscle-secondary').value='';
+}
+
+function toggleSecondaryModality(forceOpen=null){
+  const wrap=document.getElementById('ee-modality-secondary-wrap');
+  const btn=document.getElementById('ee-modality-secondary-toggle');
+  const shouldOpen=forceOpen===null ? wrap.style.display==='none' : !!forceOpen;
+  wrap.style.display=shouldOpen?'flex':'none';
+  btn.classList.toggle('open',shouldOpen);
+  btn.textContent=shouldOpen?'Quitar segunda modalidad':'Agregar segunda modalidad';
+  if(!shouldOpen) document.getElementById('ee-modality-secondary').value='';
 }
 
 function refreshMuscleOptions(selected='',selectedSecondary=''){
@@ -1879,6 +1932,8 @@ function saveExercise(){
   if(!name){toast('Ingresa un nombre',false);return;}
   const type=document.getElementById('ee-type').value;
   const modality=document.getElementById('ee-modality').value;
+  const rawModalitySecondary=document.getElementById('ee-modality-secondary').value;
+  const modalitySecondary=(rawModalitySecondary && rawModalitySecondary!==modality)?rawModalitySecondary:'';
   const muscle=document.getElementById('ee-muscle').value.trim();
   const rawSecondary=document.getElementById('ee-muscle-secondary').value.trim();
   const muscleSecondary=(rawSecondary && rawSecondary!==muscle)? rawSecondary : '';
@@ -1895,7 +1950,7 @@ function saveExercise(){
       } else if(rawImageUrl){
         imageData=null;
       }
-      Object.assign(ex,{name,type,muscle,muscleSecondary,modality,imageUrl,imageData});
+      Object.assign(ex,{name,type,muscle,muscleSecondary,modality,modalitySecondary,imageUrl,imageData});
     }
   } else {
     const existing=exercises.find(e=>!e.hidden && e.name.toLowerCase()===name.toLowerCase());
@@ -1906,11 +1961,11 @@ function saveExercise(){
       } else if(rawImageUrl){
         imageData=null;
       }
-      Object.assign(existing,{name,type,muscle,muscleSecondary,modality,imageUrl,imageData,replaceOf:existing.replaceOf||null,hidden:false});
+      Object.assign(existing,{name,type,muscle,muscleSecondary,modality,modalitySecondary,imageUrl,imageData,replaceOf:existing.replaceOf||null,hidden:false});
     } else {
       const src=eeCtx.sourceName||null;
       const replaceOf=(src && src!==name)?src:null;
-      exercises.push({id:'ex_'+Date.now(),name,type,muscle,muscleSecondary,modality,imageUrl,imageData,replaceOf,hidden:false});
+      exercises.push({id:'ex_'+Date.now(),name,type,muscle,muscleSecondary,modality,modalitySecondary,imageUrl,imageData,replaceOf,hidden:false});
     }
   }
   refreshMuscleOptions();
@@ -1942,9 +1997,9 @@ function deleteExercise(){
     const srcModality=eeCtx.sourceModality||'';
     const existingHidden=exercises.find(e=>e.hidden && e.name===sourceName);
     if(existingHidden){
-      Object.assign(existingHidden,{hidden:true,type:srcType,muscle:srcMuscle,modality:srcModality,imageUrl:null,imageData:null,replaceOf:null});
+      Object.assign(existingHidden,{hidden:true,type:srcType,muscle:srcMuscle,modality:srcModality,modalitySecondary:'',imageUrl:null,imageData:null,replaceOf:null});
     }else{
-      exercises.push({id:'ex_'+Date.now(),name:sourceName,type:srcType,muscle:srcMuscle,modality:srcModality,imageUrl:null,imageData:null,hidden:true,replaceOf:null});
+      exercises.push({id:'ex_'+Date.now(),name:sourceName,type:srcType,muscle:srcMuscle,modality:srcModality,modalitySecondary:'',imageUrl:null,imageData:null,hidden:true,replaceOf:null});
     }
     exercises=exercises.filter(e=>e.replaceOf!==sourceName);
   }else{
@@ -2172,7 +2227,7 @@ function renderMgmtEx(){
     const safeType=(e.type||'').replace(/'/g,"\\'");
     const safeMuscle=(e.muscle||'').replace(/'/g,"\\'");
     const safeLink=(link||'').replace(/'/g,"\\'");
-    const contextLabel=(CONTEXT_FILTERS.find(f=>f.id===getExerciseContext(e))||{}).label||'';
+    const contextLabel=getExerciseContextLabel(e);
     return `<div class="mgmt-item" onclick="openExEditByName('${safeName}','${safeType}','${safeMuscle}','${safeLink}','${getExerciseContext(e)}')">
       <div class="mgmt-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,"\\'")}')">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(e.type)}</div>
       <div class="mgmt-info">
