@@ -43,6 +43,8 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 /* â”€â”€ VIEWS â”€â”€ */
 .view{display:none;flex:1;overflow-y:auto;padding:12px 16px 90px}
 .view.on{display:block}
+.sticky-top{position:sticky;top:0;z-index:8;background:linear-gradient(180deg,var(--bg) 0%,var(--bg) 82%,rgba(14,14,15,.94) 100%)}
+.sticky-gap{padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--b0)}
 
 /* â”€â”€ DAY HEADER â”€â”€ */
 .dh{display:flex;align-items:center;gap:8px;margin-bottom:14px}
@@ -190,6 +192,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .mgmt-search{margin:12px 0 18px}
 .mgmt-search input{width:100%;padding:10px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none}
 .mgmt-search input::placeholder{color:var(--tx3)}
+.mgmt-search.sticky-gap{margin-top:0;margin-bottom:12px}
 .mgmt-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s1);border:1px solid var(--b0);border-radius:var(--rs);margin-bottom:6px;cursor:pointer}
 .mgmt-item:active{opacity:.75}
 .mgmt-thumb{width:40px;height:40px;border-radius:7px;background:var(--s2);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px}
@@ -897,10 +900,12 @@ function getCfg(di){
 function renderDay(){
   const di=curDay,cfg=getCfg(di),exs=weekData[di]||[];
   document.getElementById('day-content').innerHTML=`
-    <div class="dh">
+    <div class="sticky-top sticky-gap">
+      <div class="dh" style="margin-bottom:0">
       <div class="dh-title">${DAYS[di]}</div>
       <button class="chip chip-run${cfg.run?'':' off'}" onclick="toggleRun(${di})">${cfg.run?'Trote':'+ Trote'}</button>
       <button class="chip ${cfg.typeCfg.cls}" onclick="openTypePicker(${di})">${cfg.typeCfg.label}</button>
+      </div>
     </div>
     <div class="ex-list" id="exlist-${di}">${buildExListHTML(di,exs)}</div>
     <div class="week-actions">
@@ -1846,7 +1851,7 @@ function renderMgmt(){
         <div class="mgmt-section-title" style="margin:0">EJERCICIOS</div>
         <button class="btn-outline" onclick="openExEdit(null)">+ Nuevo</button>
       </div>
-      <label class="mgmt-search">
+      <label class="mgmt-search sticky-top sticky-gap">
         <input type="search" id="mgmt-search" placeholder="Buscar ejercicio..." oninput="setMgmtSearch(this.value)">
       </label>
       <div class="filter-block" style="margin-top:8px">
