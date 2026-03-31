@@ -1494,13 +1494,13 @@ function getExerciseContexts(ex){
 
 function getExerciseContextLabel(ex){
   const labels=getExerciseContexts(ex).map(id=>(CONTEXT_FILTERS.find(f=>f.id===id)||{}).label||id).filter(Boolean);
-  return labels.join(' + ');
+  return labels.join(' / ');
 }
 
 function getMuscleLabel(ex){
   const primary=(ex.muscle||'').trim();
   const secondary=(ex.muscleSecondary||'').trim();
-  if(primary && secondary && primary!==secondary) return `${primary} + ${secondary}`;
+  if(primary && secondary && primary!==secondary) return `${primary} / ${secondary}`;
   return primary||secondary||'';
 }
 
