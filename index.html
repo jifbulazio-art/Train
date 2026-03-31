@@ -439,7 +439,7 @@ const TYPES=[
 ];
 const TYPE_MAP={push:'Push',pull:'Pull',legs:'Piernas',combo:'Push+Pull',free:'Libre/Core',warm:'Calentamiento',rest:'Descanso'};
 const TYPE_ACCENT={push:'#6da8ff',pull:'#4ecf7a',legs:'#ffb347',combo:'#b06bff',free:'#f5c518',warm:'#9aa0a6',rest:'#7b8088'};
-const BASE_MUSCLE_OPTIONS=['Pecho','Espalda','Hombros','Biceps','Triceps','Core','Cuadriceps','Isquiotibiales','Gluteos','Pantorrillas','Movilidad','Activacion','Aerobico'];
+const BASE_MUSCLE_OPTIONS=['Pecho','Espalda','Hombros','Biceps','Triceps','Core','Cuadriceps','Isquiotibiales','Gluteos','Pantorrillas'];
 const SC=[ // super colors
   {b:'rgba(74,158,255,.28)',bg:'rgba(74,158,255,.05)',l:'rgba(74,158,255,.75)'},
   {b:'rgba(232,93,58,.28)',bg:'rgba(232,93,58,.05)',l:'rgba(232,93,58,.75)'},
@@ -569,21 +569,21 @@ function getTypeThumb(type){
 // structure: {type: {muscle_group: [names]}}
 const BUILTIN={
   warm:{
-    'Movilidad':['Rotaciones de hombro con banda','Dislocaciones con banda','Band pull-apart','Cat-cow','Rotaciones de cadera','Circulos de tobillo','Movilidad de muneca','Rotaciones toracicas','Leg swings frontales','Leg swings laterales','World greatest stretch','Scap circles'],
-    'Activacion':['Hollow body hold','Arch body hold','Plancha frontal','Plancha lateral','Caminata de manos (inchworm)','Dead hang en barra','Scapular pull-up','Wall walk','Scapular push-up','Glute bridge hold','Bird dog','Face pull con banda'],
-    'Aerobico':['Jumping jacks','Toque de piso alternado','Sentadilla con salto','Burpee','Mountain climber','Skipping en el lugar','Trote en el lugar','High knees','Jump rope','Butt kicks'],
+    '':['Rotaciones de hombro con banda','Dislocaciones con banda','Band pull-apart','Cat-cow','Rotaciones de cadera','Circulos de tobillo','Movilidad de muneca','Rotaciones toracicas','Leg swings frontales','Leg swings laterales','World greatest stretch','Scap circles','Jumping jacks','Toque de piso alternado','Sentadilla con salto','Burpee','Mountain climber','Skipping en el lugar','Trote en el lugar','High knees','Jump rope','Butt kicks'],
+    'Core':['Hollow body hold','Arch body hold','Plancha frontal','Plancha lateral'],
+    'Espalda':['Dead hang en barra','Scapular pull-up','Face pull con banda'],
+    'Hombros':['Wall walk','Scapular push-up'],
+    'Gluteos':['Glute bridge hold','Bird dog'],
   },
   push:{
     'Pecho':['Push-up estandar','Push-up arquero','Push-up explosivo','Push-up declinado','Push-up inclinado','Pseudo planche push-up','Press de mancuernas plano','Press de mancuernas inclinado','Push-up diamante','Push-up con pausa','Dips en paralelas','Press banca con barra','Press banca inclinado con barra','Aperturas con mancuernas','Press en maquina de pecho','Cruce de poleas'],
     'Hombros':['Pike push-up','Pike push-up elevado','Press de hombros con mancuernas','Elevaciones laterales con mancuernas','Elevaciones frontales con mancuernas','Press militar con barra','Arnold press','Face pull','Elevaciones posteriores con mancuernas','Handstand push-up contra pared'],
     'Triceps':['Dips en paralelas bajas','Extension de triceps sobre cabeza','Kickback de triceps','Australian push-up en barra baja','Press frances con barra','Pressdown de triceps en polea','Fondos en banco','Extension de triceps en polea con cuerda'],
-    'Back lever':['Back lever - tucked','Back lever - advanced tucked','Back lever - one leg','Back lever - straddle','Back lever - full','Back lever pull-in / press','Back lever pike','Back lever (progresiones)'],
+    'Espalda':['Back lever - tucked','Back lever - advanced tucked','Back lever - one leg','Back lever - straddle','Back lever - full','Back lever pull-in / press','Back lever pike','Back lever (progresiones)'],
   },
   pull:{
-    'Barra baja':['Australian pull-up en barra baja','Remo invertido en barra baja','Archer pull-up australiano','Dead hang con pausa','Australian chin-up','Remo invertido supino'],
-    'Espalda':['Pull-up','Chin-up','Neutral grip pull-up','Lat pulldown','Remo sentado en polea','Remo con mancuerna a una mano','Remo con barra','Pullover con mancuerna','Pulldown con brazos rectos','Chest supported row'],
+    'Espalda':['Australian pull-up en barra baja','Remo invertido en barra baja','Archer pull-up australiano','Dead hang con pausa','Australian chin-up','Remo invertido supino','Pull-up','Chin-up','Neutral grip pull-up','Lat pulldown','Remo sentado en polea','Remo con mancuerna a una mano','Remo con barra','Pullover con mancuerna','Pulldown con brazos rectos','Chest supported row','Front lever - tucked','Front lever - advanced tucked','Front lever - one leg','Front lever - straddle','Front lever - full','Front lever row','Front lever pike','Front lever (progresiones)'],
     'Biceps':['Curl de biceps con mancuernas','Curl martillo','Curl concentrado','Curl 21s','Curl de muneca','Curl inverso','Curl inclinado con mancuernas','Preacher curl','Spider curl','Cable curl'],
-    'Front lever':['Front lever - tucked','Front lever - advanced tucked','Front lever - one leg','Front lever - straddle','Front lever - full','Front lever row','Front lever pike','Front lever (progresiones)'],
   },
   legs:{
     'Cuadriceps':['Sentadilla con peso corporal','Goblet squat','Sentadilla con mancuernas','Sentadilla bulgara','Step-up con mancuernas','Pistol squat asistido','Pistol squat libre','Back squat con barra','Front squat con barra','Leg press','Hack squat','Extension de cuadriceps','Sissy squat'],
@@ -592,13 +592,15 @@ const BUILTIN={
     'Pantorrillas':['Elevacion de pantorrillas de pie','Elevacion de pantorrillas a una pierna','Elevacion de pantorrillas sentado','Donkey calf raise','Calf raise en prensa'],
   },
   combo:{
-    'Skills':['Front lever (progresiones)','Back lever (progresiones)','Front lever row','Back lever pull-in / press','L-sit en paralelas bajas','Tuck planche en paralelas','Planche lean','Muscle-up','Skin the cat','Toes to bar','Bar muscle-up'],
-    'Supersets':['Archer push-up + archer pull-up','Australian pull-up + push-up','Dips + remo en barra baja','Press mancuernas + curl','Elevaciones laterales + curl'],
+    'Espalda':['Front lever (progresiones)','Back lever (progresiones)','Front lever row','Back lever pull-in / press','Muscle-up','Skin the cat','Bar muscle-up'],
+    'Core':['L-sit en paralelas bajas','Toes to bar'],
+    'Hombros':['Tuck planche en paralelas','Planche lean'],
+    '':['Archer push-up + archer pull-up','Australian pull-up + push-up','Dips + remo en barra baja','Press mancuernas + curl','Elevaciones laterales + curl'],
   },
   free:{
     'Handstand':['Handstand contra pared','Handstand hold libre','Handstand push-up contra pared','Pike push-up elevado','Wall-facing handstand','Crow stand'],
     'Core':['L-sit en paralelas bajas','L-sit en barra baja','Dragon flag','Hollow body rocks','Tuck to hollow','Ab wheel','Planche lean','Hanging knee raise','Hanging leg raise','Toes to bar estricto','V-up','Russian twist'],
-    'Movilidad':['Stretching de hombros con banda','Paloma (cadera)','Sentadilla profunda con pausa','Flexion de columna','Pancake stretch','Jefferson curl','Cossack squat','Shoulder pass-through'],
+    '':['Stretching de hombros con banda','Paloma (cadera)','Sentadilla profunda con pausa','Flexion de columna','Pancake stretch','Jefferson curl','Cossack squat','Shoulder pass-through'],
   },
 };
 
@@ -1506,10 +1508,6 @@ function refreshMuscleOptions(selected=''){
       'isquiotibiales':'Isquiotibiales',
       'gluteos':'Gluteos',
       'pantorrillas':'Pantorrillas',
-      'movilidad':'Movilidad',
-      'activacion':'Activacion',
-      'aerobico':'Aerobico',
-      'barra baja':'Espalda',
     };
     return map[k]||v;
   };
