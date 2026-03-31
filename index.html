@@ -266,7 +266,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 <!-- â•â• TYPE PICKER â•â• -->
 <div class="picker-overlay" id="type-picker" onclick="if(event.target===this)closePicker()">
   <div class="picker-sheet">
-    <div class="picker-title">TIPO DE DIA</div>
+    <div class="picker-title">GRUPO DEL DIA</div>
     <div class="picker-grid" id="picker-grid"></div>
   </div>
 </div>
@@ -285,11 +285,11 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
         <input type="text" id="add-search" placeholder="Buscar ejercicio..." oninput="renderAddOpts()" autocomplete="off" autocorrect="off" spellcheck="false">
       </div>
       <div class="filter-block">
-        <div class="filter-title">Tipo</div>
+        <div class="filter-title">Grupo</div>
         <div class="filter-row" id="add-filters"></div>
       </div>
       <div class="filter-block">
-        <div class="filter-title">Contexto</div>
+        <div class="filter-title">Modalidad</div>
         <div class="filter-row" id="add-context-filters"></div>
       </div>
     </div>
@@ -328,7 +328,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
         <input class="form-input" type="text" id="ee-name" placeholder="Nombre del ejercicio">
       </div>
       <div class="form-field">
-        <label class="form-label">TIPO</label>
+        <label class="form-label">GRUPO</label>
         <select class="form-select" id="ee-type">
           <option value="warm">Calentamiento / Warm up</option>
           <option value="push">Push</option>
@@ -336,6 +336,17 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
           <option value="legs">Piernas</option>
           <option value="combo">Push + Pull</option>
           <option value="free">Vertical / Core</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label">MODALIDAD</label>
+        <select class="form-select" id="ee-modality">
+          <option value="">Auto detectar</option>
+          <option value="calistenia">Calistenia</option>
+          <option value="peso-libre">Peso libre</option>
+          <option value="gym">Gym</option>
+          <option value="aerobico">Aerobico</option>
+          <option value="movilidad">Movilidad</option>
         </select>
       </div>
       <div class="form-field">
@@ -373,7 +384,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
         <input class="form-input" type="text" id="re-name" placeholder="Ej: Push dia A">
       </div>
       <div class="form-field">
-        <label class="form-label">TIPO</label>
+        <label class="form-label">GRUPO</label>
         <select class="form-select" id="re-type">
           <option value="push">Push</option>
           <option value="pull">Pull</option>
@@ -614,7 +625,7 @@ const CONTEXT_FILTERS=[
 let curDay=Math.min(Math.max((new Date().getDay()||1)-1,0),6);
 let weekData={};    // {0..6: [{name,sets,reps,unit,superGroup,logs:[]}]}
 let dayCfg={};      // {0..6: {type,run}}
-let exercises=[];   // [{id,name,type,muscle,imageUrl,imageData}]
+let exercises=[];   // [{id,name,type,muscle,modality,imageUrl,imageData}]
 let routines=[];    // [{id,name,type,items:[{name,sets,reps,unit,superGroup}]}]
 
 // add modal state
@@ -629,7 +640,7 @@ let detailCtx={dayIdx:null,exIdx:null};
 let detailSets=[];
 
 // edit exercise state
-let eeCtx={id:null,sourceName:null,sourceType:null,sourceMuscle:null};
+let eeCtx={id:null,sourceName:null,sourceType:null,sourceMuscle:null,sourceModality:null};
 let eeImgData=null;
 let eeReturnToAdd=false;
 
@@ -1153,6 +1164,7 @@ function getAllExercises(){
             name:replaced.name,
             type:replaced.type||type,
             muscle:replaced.muscle||muscle,
+            modality:replaced.modality||'',
             imageUrl:replaced.imageUrl||getStrengthLevelThumb(replaced.name,replaced.type||type),
             imageData:replaced.imageData||null,
           });
@@ -1165,12 +1177,13 @@ function getAllExercises(){
             name:custom.name,
             type:custom.type||type,
             muscle:custom.muscle||muscle,
+            modality:custom.modality||'',
             imageUrl:custom.imageUrl||getStrengthLevelThumb(custom.name,custom.type||type),
             imageData:custom.imageData||null,
           });
           return;
         }
-        result.push({name,type,muscle,imageUrl:getStrengthLevelThumb(name,type),imageData:null});
+        result.push({name,type,muscle,modality:'',imageUrl:getStrengthLevelThumb(name,type),imageData:null});
       });
     });
   });
@@ -1180,12 +1193,13 @@ function getAllExercises(){
     if(consumedCustomIds.has(ex.id)) return;
     if(result.find(r=>r.name===ex.name)) return;
     const type=ex.type||'free';
-    result.push({name:ex.name,type,muscle:ex.muscle||'',imageUrl:ex.imageUrl||getStrengthLevelThumb(ex.name,type),imageData:ex.imageData||null});
+    result.push({name:ex.name,type,muscle:ex.muscle||'',modality:ex.modality||'',imageUrl:ex.imageUrl||getStrengthLevelThumb(ex.name,type),imageData:ex.imageData||null});
   });
   return result.sort((a,b)=>(a.name||'').localeCompare((b.name||''),'es',{sensitivity:'base'}));
 }
 
 function getExerciseContext(ex){
+  if(ex.modality) return ex.modality;
   const name=(ex.name||'').toLowerCase();
   const muscle=(ex.muscle||'').toLowerCase();
   const type=(ex.type||'').toLowerCase();
@@ -1435,8 +1449,8 @@ function separateFromSuper(di,i){
 // â•â• TYPE PICKER (day) already defined above â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 // â•â• EXERCISE EDIT â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-function openExEdit(id=null,prefillName='',prefillType='push',prefillMuscle='',returnToAdd=false,prefillImageUrl='',sourceName='',sourceType='',sourceMuscle=''){
-  eeCtx={id,sourceName:sourceName||null,sourceType:sourceType||null,sourceMuscle:sourceMuscle||null};eeImgData=null;eeReturnToAdd=returnToAdd;
+function openExEdit(id=null,prefillName='',prefillType='push',prefillMuscle='',returnToAdd=false,prefillImageUrl='',sourceName='',sourceType='',sourceMuscle='',prefillModality='',sourceModality=''){
+  eeCtx={id,sourceName:sourceName||null,sourceType:sourceType||null,sourceMuscle:sourceMuscle||null,sourceModality:sourceModality||null};eeImgData=null;eeReturnToAdd=returnToAdd;
   document.getElementById('ex-edit-title').textContent=id?'Editar ejercicio':'Nuevo ejercicio';
   document.getElementById('ee-delete-btn').style.display=(id||eeCtx.sourceName)?'block':'none';
   refreshMuscleOptions();
@@ -1444,6 +1458,7 @@ function openExEdit(id=null,prefillName='',prefillType='push',prefillMuscle='',r
     const ex=exercises.find(e=>e.id===id)||{};
     document.getElementById('ee-name').value=ex.name||'';
     document.getElementById('ee-type').value=ex.type||'push';
+    document.getElementById('ee-modality').value=ex.modality||'';
     refreshMuscleOptions(ex.muscle||'');
     document.getElementById('ee-img-url').value=ex.imageUrl||'';
     const preview=document.getElementById('ee-img-preview');
@@ -1453,6 +1468,7 @@ function openExEdit(id=null,prefillName='',prefillType='push',prefillMuscle='',r
   } else {
     document.getElementById('ee-name').value=prefillName;
     document.getElementById('ee-type').value=prefillType||'push';
+    document.getElementById('ee-modality').value=prefillModality||sourceModality||'';
     refreshMuscleOptions(prefillMuscle||'');
     const resolved=prefillImageUrl||'';
     document.getElementById('ee-img-url').value=resolved||'';
@@ -1514,11 +1530,11 @@ function refreshMuscleOptions(selected=''){
   if(current) sel.value=canonicalize(current);
 }
 
-function openExEditByName(name,type='',muscle='',imageUrl=''){
+function openExEditByName(name,type='',muscle='',imageUrl='',modality=''){
   eeReturnToAdd=false;
   const existing=exercises.find(e=>!e.hidden && e.name.toLowerCase()===name.toLowerCase());
   if(existing) openExEdit(existing.id);
-  else openExEdit(null,name,type,muscle,false,imageUrl||'',name,type,muscle);
+  else openExEdit(null,name,type,muscle,false,imageUrl||'',name,type,muscle,modality,'');
 }
 
 function readFileAsDataURL(file){
@@ -1573,6 +1589,7 @@ function saveExercise(){
   const name=document.getElementById('ee-name').value.trim();
   if(!name){toast('Ingresa un nombre',false);return;}
   const type=document.getElementById('ee-type').value;
+  const modality=document.getElementById('ee-modality').value;
   const muscle=document.getElementById('ee-muscle').value.trim();
   const rawImageUrl=document.getElementById('ee-img-url').value.trim();
   let imageUrl=rawImageUrl||null;
@@ -1587,7 +1604,7 @@ function saveExercise(){
       } else if(rawImageUrl){
         imageData=null;
       }
-      Object.assign(ex,{name,type,muscle,imageUrl,imageData});
+      Object.assign(ex,{name,type,muscle,modality,imageUrl,imageData});
     }
   } else {
     const existing=exercises.find(e=>!e.hidden && e.name.toLowerCase()===name.toLowerCase());
@@ -1598,11 +1615,11 @@ function saveExercise(){
       } else if(rawImageUrl){
         imageData=null;
       }
-      Object.assign(existing,{name,type,muscle,imageUrl,imageData,replaceOf:existing.replaceOf||null,hidden:false});
+      Object.assign(existing,{name,type,muscle,modality,imageUrl,imageData,replaceOf:existing.replaceOf||null,hidden:false});
     } else {
       const src=eeCtx.sourceName||null;
       const replaceOf=(src && src!==name)?src:null;
-      exercises.push({id:'ex_'+Date.now(),name,type,muscle,imageUrl,imageData,replaceOf,hidden:false});
+      exercises.push({id:'ex_'+Date.now(),name,type,muscle,modality,imageUrl,imageData,replaceOf,hidden:false});
     }
   }
   refreshMuscleOptions();
@@ -1631,11 +1648,12 @@ function deleteExercise(){
     const sourceName=eeCtx.sourceName;
     const srcType=eeCtx.sourceType||'free';
     const srcMuscle=eeCtx.sourceMuscle||'';
+    const srcModality=eeCtx.sourceModality||'';
     const existingHidden=exercises.find(e=>e.hidden && e.name===sourceName);
     if(existingHidden){
-      Object.assign(existingHidden,{hidden:true,type:srcType,muscle:srcMuscle,imageUrl:null,imageData:null,replaceOf:null});
+      Object.assign(existingHidden,{hidden:true,type:srcType,muscle:srcMuscle,modality:srcModality,imageUrl:null,imageData:null,replaceOf:null});
     }else{
-      exercises.push({id:'ex_'+Date.now(),name:sourceName,type:srcType,muscle:srcMuscle,imageUrl:null,imageData:null,hidden:true,replaceOf:null});
+      exercises.push({id:'ex_'+Date.now(),name:sourceName,type:srcType,muscle:srcMuscle,modality:srcModality,imageUrl:null,imageData:null,hidden:true,replaceOf:null});
     }
     exercises=exercises.filter(e=>e.replaceOf!==sourceName);
   }else{
@@ -1740,11 +1758,11 @@ function renderMgmt(){
         <input type="search" id="mgmt-search" placeholder="Buscar ejercicio..." oninput="setMgmtSearch(this.value)">
       </label>
       <div class="filter-block" style="margin-top:8px">
-        <div class="filter-title">Tipo</div>
+        <div class="filter-title">Grupo</div>
         <div class="filter-row" style="margin-bottom:10px" id="mgmt-filter-row"></div>
       </div>
       <div class="filter-block" style="margin-bottom:14px">
-        <div class="filter-title">Contexto</div>
+        <div class="filter-title">Modalidad</div>
         <div class="filter-row" id="mgmt-context-filter-row"></div>
       </div>
       <div id="mgmt-ex-list"></div>
@@ -1825,7 +1843,7 @@ function renderMgmtEx(){
     const safeType=(e.type||'').replace(/'/g,"\\'");
     const safeMuscle=(e.muscle||'').replace(/'/g,"\\'");
     const safeLink=(link||'').replace(/'/g,"\\'");
-    return `<div class="mgmt-item" onclick="openExEditByName('${safeName}','${safeType}','${safeMuscle}','${safeLink}')">
+    return `<div class="mgmt-item" onclick="openExEditByName('${safeName}','${safeType}','${safeMuscle}','${safeLink}','${getExerciseContext(e)}')">
       <div class="mgmt-thumb">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(e.type)}</div>
       <div class="mgmt-info">
         <div class="mgmt-name">${e.name}</div>
@@ -1863,7 +1881,7 @@ function renderMgmtEx(){
     const safeMuscle=(e.muscle||'').replace(/'/g,"\\'");
     const safeLink=(link||'').replace(/'/g,"\\'");
     const contextLabel=(CONTEXT_FILTERS.find(f=>f.id===getExerciseContext(e))||{}).label||'';
-    return `<div class="mgmt-item" onclick="openExEditByName('${safeName}','${safeType}','${safeMuscle}','${safeLink}')">
+    return `<div class="mgmt-item" onclick="openExEditByName('${safeName}','${safeType}','${safeMuscle}','${safeLink}','${getExerciseContext(e)}')">
       <div class="mgmt-thumb">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(e.type)}</div>
       <div class="mgmt-info">
         <div class="mgmt-name">${e.name}</div>
