@@ -165,6 +165,8 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .detail-ex-name{font-size:18px;font-weight:600;letter-spacing:-.02em}
 .detail-ex-sub{font-size:12px;color:var(--tx2);font-family:'DM Mono',monospace;margin-top:2px}
 .sets-title{font-size:11px;font-family:'DM Mono',monospace;color:var(--tx3);letter-spacing:.07em}
+.plan-grid{display:grid;grid-template-columns:80px 1fr 72px;gap:8px}
+.plan-grid input,.plan-grid select{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:9px 8px;color:var(--tx);font-size:13px;outline:none;min-width:0}
 .set-row{display:flex;align-items:center;gap:6px}
 .set-num{font-size:11px;font-family:'DM Mono',monospace;color:var(--tx3);width:32px;text-align:right;flex-shrink:0}
 .set-row input{flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:8px 5px;color:var(--tx);font-size:13px;outline:none;text-align:center;min-width:0}
@@ -680,6 +682,7 @@ window._opts=[];
 // detail modal state
 let detailCtx={dayIdx:null,exIdx:null};
 let detailSets=[];
+let detailPlan={sets:'',reps:'',unit:'rep'};
 
 // edit exercise state
 let eeCtx={id:null,sourceName:null,sourceType:null,sourceMuscle:null,sourceModality:null};
@@ -1406,6 +1409,11 @@ function openCreateFromSearch(q){
 function openDetail(di,i){
   const ex=(weekData[di]||[])[i];if(!ex) return;
   detailCtx={dayIdx:di,exIdx:i};
+  detailPlan={
+    sets:(parseInt(ex.sets||0,10)||'').toString(),
+    reps:(ex.reps||'').toString(),
+    unit:ex.unit||'rep'
+  };
   const snapshot=getLatestSetSnapshot(ex);
   const targetSets=Math.min(Math.max(parseInt(ex.sets||0,10)||1,1),5);
   if(snapshot&&snapshot.sets&&snapshot.sets.length){
@@ -1431,6 +1439,16 @@ function openDetail(di,i){
     <div>
       <div class="detail-ex-name">${ex.name}</div>
       <div class="detail-ex-sub">${detailMeta}</div>
+    </div>
+    <div class="sets-title">BASE OBJETIVO</div>
+    <div class="plan-grid">
+      <input type="number" min="1" max="20" inputmode="numeric" placeholder="sets" value="${detailPlan.sets}" oninput="detailPlan.sets=this.value">
+      <input type="text" placeholder="reps o segundos" value="${detailPlan.reps}" oninput="detailPlan.reps=this.value">
+      <select onchange="detailPlan.unit=this.value">
+        <option value="rep"${detailPlan.unit==='rep'?' selected':''}>reps</option>
+        <option value="seg"${detailPlan.unit==='seg'?' selected':''}>seg</option>
+        <option value="cant"${detailPlan.unit==='cant'?' selected':''}>cant</option>
+      </select>
     </div>
     <div class="sets-title">SETS</div>
     <div id="detail-sets-list"></div>
@@ -1472,14 +1490,18 @@ function addDetailSet(){
 function saveDetail(){
   const{dayIdx,exIdx}=detailCtx;
   const ex=(weekData[dayIdx]||[])[exIdx];if(!ex) return;
+  const plannedSets=Math.min(Math.max(parseInt(detailPlan.sets||0,10)||1,1),20);
+  const plannedReps=(detailPlan.reps||'').toString().trim();
+  const plannedUnit=detailPlan.unit||'rep';
   const cleaned=detailSets.slice(0,5).map(s=>({
     val:(s.val??'').toString().trim(),
-    unit:s.unit||ex.unit||'rep',
+    unit:s.unit||plannedUnit,
     weight:(s.weight??'').toString().trim(),
     wunit:s.wunit||'kg'
   }));
-  ex.sets=cleaned.length;
-  ex.unit=cleaned[0]?.unit||ex.unit||'rep';
+  ex.sets=plannedSets;
+  ex.reps=plannedReps;
+  ex.unit=plannedUnit;
   if(!ex.logs) ex.logs=[];
   const todayIdx=ex.logs.findIndex(l=>l.date===today());
   const payload={date:today(),sets:cleaned};
