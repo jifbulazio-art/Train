@@ -207,6 +207,9 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .form-input::placeholder{color:var(--tx3)}
 .form-select{padding:10px 13px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--rs);color:var(--tx);font-size:14px;outline:none;width:100%}
 .form-select option{background:var(--s2)}
+.field-link{background:none;border:none;color:var(--tx2);font-size:12px;font-family:'DM Mono',monospace;padding:0;text-align:left}
+.field-link:hover{text-decoration:underline}
+.field-link-wrap{margin-top:-2px}
 .img-upload-area{display:flex;gap:8px}
 .img-upload-area input{flex:1;padding:10px 13px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none}
 .img-upload-area input::placeholder{color:var(--tx3)}
@@ -352,6 +355,15 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
       <div class="form-field">
         <label class="form-label">GRUPO MUSCULAR</label>
         <select class="form-select" id="ee-muscle"></select>
+      </div>
+      <div class="field-link-wrap">
+        <button class="field-link" type="button" id="ee-muscle-secondary-toggle" onclick="toggleSecondaryMuscle()">
+          + Agregar segundo grupo muscular
+        </button>
+      </div>
+      <div class="form-field" id="ee-muscle-secondary-wrap" style="display:none">
+        <label class="form-label">SEGUNDO GRUPO MUSCULAR</label>
+        <select class="form-select" id="ee-muscle-secondary"></select>
       </div>
       <div class="form-field">
         <label class="form-label">IMAGEN</label>
@@ -627,7 +639,7 @@ const CONTEXT_FILTERS=[
 let curDay=Math.min(Math.max((new Date().getDay()||1)-1,0),6);
 let weekData={};    // {0..6: [{name,sets,reps,unit,superGroup,logs:[]}]}
 let dayCfg={};      // {0..6: {type,run}}
-let exercises=[];   // [{id,name,type,muscle,modality,imageUrl,imageData}]
+let exercises=[];   // [{id,name,type,muscle,muscleSecondary,modality,imageUrl,imageData}]
 let routines=[];    // [{id,name,type,items:[{name,sets,reps,unit,superGroup}]}]
 
 // add modal state
@@ -1166,6 +1178,7 @@ function getAllExercises(){
             name:replaced.name,
             type:replaced.type||type,
             muscle:replaced.muscle||muscle,
+            muscleSecondary:replaced.muscleSecondary||'',
             modality:replaced.modality||'',
             imageUrl:replaced.imageUrl||getStrengthLevelThumb(replaced.name,replaced.type||type),
             imageData:replaced.imageData||null,
@@ -1179,13 +1192,14 @@ function getAllExercises(){
             name:custom.name,
             type:custom.type||type,
             muscle:custom.muscle||muscle,
+            muscleSecondary:custom.muscleSecondary||'',
             modality:custom.modality||'',
             imageUrl:custom.imageUrl||getStrengthLevelThumb(custom.name,custom.type||type),
             imageData:custom.imageData||null,
           });
           return;
         }
-        result.push({name,type,muscle,modality:'',imageUrl:getStrengthLevelThumb(name,type),imageData:null});
+        result.push({name,type,muscle,muscleSecondary:'',modality:'',imageUrl:getStrengthLevelThumb(name,type),imageData:null});
       });
     });
   });
@@ -1195,7 +1209,7 @@ function getAllExercises(){
     if(consumedCustomIds.has(ex.id)) return;
     if(result.find(r=>r.name===ex.name)) return;
     const type=ex.type||'free';
-    result.push({name:ex.name,type,muscle:ex.muscle||'',modality:ex.modality||'',imageUrl:ex.imageUrl||getStrengthLevelThumb(ex.name,type),imageData:ex.imageData||null});
+    result.push({name:ex.name,type,muscle:ex.muscle||'',muscleSecondary:ex.muscleSecondary||'',modality:ex.modality||'',imageUrl:ex.imageUrl||getStrengthLevelThumb(ex.name,type),imageData:ex.imageData||null});
   });
   return result.sort((a,b)=>(a.name||'').localeCompare((b.name||''),'es',{sensitivity:'base'}));
 }
@@ -1214,13 +1228,20 @@ function getExerciseContext(ex){
   return 'peso-libre';
 }
 
+function getMuscleLabel(ex){
+  const primary=(ex.muscle||'').trim();
+  const secondary=(ex.muscleSecondary||'').trim();
+  if(primary && secondary && primary!==secondary) return `${primary} + ${secondary}`;
+  return primary||secondary||'';
+}
+
 function filterExercises(list,{query='',typeFilter='',contextFilter=''}={}){
   const q=(query||'').trim().toLowerCase();
   return list.filter(e=>{
     const typeOk=!typeFilter || e.type===typeFilter;
     const context=getExerciseContext(e);
     const contextOk=!contextFilter || context===contextFilter;
-    const text=`${e.name} ${e.muscle||''} ${TYPE_MAP[e.type]||e.type} ${context}`.toLowerCase();
+    const text=`${e.name} ${e.muscle||''} ${e.muscleSecondary||''} ${TYPE_MAP[e.type]||e.type} ${context}`.toLowerCase();
     const searchOk=!q || text.includes(q);
     return typeOk&&contextOk&&searchOk;
   });
@@ -1243,8 +1264,9 @@ function renderAddOpts(){
   const grouped={};
   filtered.forEach(e=>{
     const context=getExerciseContext(e);
-    const key=`${e.type}|||${context}|||${e.muscle}`;
-    if(!grouped[key]) grouped[key]={type:e.type,context,muscle:e.muscle,items:[]};
+    const muscleLabel=getMuscleLabel(e);
+    const key=`${e.type}|||${context}|||${muscleLabel}`;
+    if(!grouped[key]) grouped[key]={type:e.type,context,muscle:muscleLabel,items:[]};
     grouped[key].items.push(e);
   });
 
@@ -1461,7 +1483,7 @@ function openExEdit(id=null,prefillName='',prefillType='push',prefillMuscle='',r
     document.getElementById('ee-name').value=ex.name||'';
     document.getElementById('ee-type').value=ex.type||'push';
     document.getElementById('ee-modality').value=ex.modality||'';
-    refreshMuscleOptions(ex.muscle||'');
+    refreshMuscleOptions(ex.muscle||'',ex.muscleSecondary||'');
     document.getElementById('ee-img-url').value=ex.imageUrl||'';
     const preview=document.getElementById('ee-img-preview');
     const img=ex.imageData||ex.imageUrl;
@@ -1471,7 +1493,7 @@ function openExEdit(id=null,prefillName='',prefillType='push',prefillMuscle='',r
     document.getElementById('ee-name').value=prefillName;
     document.getElementById('ee-type').value=prefillType||'push';
     document.getElementById('ee-modality').value=prefillModality||sourceModality||'';
-    refreshMuscleOptions(prefillMuscle||'');
+    refreshMuscleOptions(prefillMuscle||'','');
     const resolved=prefillImageUrl||'';
     document.getElementById('ee-img-url').value=resolved||'';
     document.getElementById('ee-img-preview').innerHTML=resolved
@@ -1489,10 +1511,19 @@ function previewEEImg(){
   eeImgData=null;
 }
 
-function refreshMuscleOptions(selected=''){
+function toggleSecondaryMuscle(forceOpen=null){
+  const wrap=document.getElementById('ee-muscle-secondary-wrap');
+  const btn=document.getElementById('ee-muscle-secondary-toggle');
+  const shouldOpen=forceOpen===null ? wrap.style.display==='none' : !!forceOpen;
+  wrap.style.display=shouldOpen?'flex':'none';
+  btn.textContent=shouldOpen?'− Quitar segundo grupo muscular':'+ Agregar segundo grupo muscular';
+  if(!shouldOpen) document.getElementById('ee-muscle-secondary').value='';
+}
+
+function refreshMuscleOptions(selected='',selectedSecondary=''){
   const builtInMuscles=[];
   Object.values(BUILTIN).forEach(groups=>Object.keys(groups).forEach(m=>builtInMuscles.push(m)));
-  const customMuscles=exercises.map(e=>e.muscle).filter(Boolean);
+  const customMuscles=exercises.flatMap(e=>[e.muscle,e.muscleSecondary]).filter(Boolean);
   const raw=[...BASE_MUSCLE_OPTIONS,...builtInMuscles,...customMuscles].map(m=>(m||'').trim()).filter(Boolean);
   const normalize=v=>v.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
   const canonicalize=v=>{
@@ -1518,14 +1549,24 @@ function refreshMuscleOptions(selected=''){
     if(!byKey[k]) byKey[k]=c;
   });
   const all=Object.values(byKey).sort((a,b)=>a.localeCompare(b,'es'));
-  const sel=document.getElementById('ee-muscle');
-  const current=(selected||sel.value||'').trim();
-  if(current){
+  const ensureOption=value=>{
+    const current=(value||'').trim();
+    if(!current) return;
     const ck=normalize(canonicalize(current));
     if(!byKey[ck]) all.push(canonicalize(current));
-  }
-  sel.innerHTML=['<option value="">Seleccionar...</option>',...all.map(m=>`<option value="${m}">${m}</option>`)].join('');
-  if(current) sel.value=canonicalize(current);
+  };
+  ensureOption(selected);
+  ensureOption(selectedSecondary);
+  const options=['<option value="">Seleccionar...</option>',...all.map(m=>`<option value="${m}">${m}</option>`)].join('');
+  const primary=document.getElementById('ee-muscle');
+  const secondary=document.getElementById('ee-muscle-secondary');
+  const currentPrimary=(selected||primary.value||'').trim();
+  const currentSecondary=(selectedSecondary||secondary.value||'').trim();
+  primary.innerHTML=options;
+  secondary.innerHTML=['<option value="">Sin segundo grupo</option>',...all.map(m=>`<option value="${m}">${m}</option>`)].join('');
+  if(currentPrimary) primary.value=canonicalize(currentPrimary);
+  if(currentSecondary) secondary.value=canonicalize(currentSecondary);
+  toggleSecondaryMuscle(!!currentSecondary);
 }
 
 function openExEditByName(name,type='',muscle='',imageUrl='',modality=''){
@@ -1589,6 +1630,8 @@ function saveExercise(){
   const type=document.getElementById('ee-type').value;
   const modality=document.getElementById('ee-modality').value;
   const muscle=document.getElementById('ee-muscle').value.trim();
+  const rawSecondary=document.getElementById('ee-muscle-secondary').value.trim();
+  const muscleSecondary=(rawSecondary && rawSecondary!==muscle)? rawSecondary : '';
   const rawImageUrl=document.getElementById('ee-img-url').value.trim();
   let imageUrl=rawImageUrl||null;
   let imageData=eeImgData||null;
@@ -1602,7 +1645,7 @@ function saveExercise(){
       } else if(rawImageUrl){
         imageData=null;
       }
-      Object.assign(ex,{name,type,muscle,modality,imageUrl,imageData});
+      Object.assign(ex,{name,type,muscle,muscleSecondary,modality,imageUrl,imageData});
     }
   } else {
     const existing=exercises.find(e=>!e.hidden && e.name.toLowerCase()===name.toLowerCase());
@@ -1613,11 +1656,11 @@ function saveExercise(){
       } else if(rawImageUrl){
         imageData=null;
       }
-      Object.assign(existing,{name,type,muscle,modality,imageUrl,imageData,replaceOf:existing.replaceOf||null,hidden:false});
+      Object.assign(existing,{name,type,muscle,muscleSecondary,modality,imageUrl,imageData,replaceOf:existing.replaceOf||null,hidden:false});
     } else {
       const src=eeCtx.sourceName||null;
       const replaceOf=(src && src!==name)?src:null;
-      exercises.push({id:'ex_'+Date.now(),name,type,muscle,modality,imageUrl,imageData,replaceOf,hidden:false});
+      exercises.push({id:'ex_'+Date.now(),name,type,muscle,muscleSecondary,modality,imageUrl,imageData,replaceOf,hidden:false});
     }
   }
   refreshMuscleOptions();
@@ -1883,7 +1926,7 @@ function renderMgmtEx(){
       <div class="mgmt-thumb">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(e.type)}</div>
       <div class="mgmt-info">
         <div class="mgmt-name">${e.name}</div>
-        <div class="mgmt-sub">${TYPE_MAP[e.type]||e.type}${e.muscle?' - '+e.muscle:''}${contextLabel?' - '+contextLabel:''}</div>
+        <div class="mgmt-sub">${TYPE_MAP[e.type]||e.type}${getMuscleLabel(e)?' - '+getMuscleLabel(e):''}${contextLabel?' - '+contextLabel:''}</div>
         ${link?`<div class="mgmt-link">${link}</div>`:''}
       </div>
       <span class="mgmt-arrow">></span>
