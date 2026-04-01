@@ -72,10 +72,16 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .super-group-label{font-size:10px;font-family:'DM Mono',monospace;padding:5px 12px;letter-spacing:.07em}
 
 /* exercise card */
-.exc{display:flex;align-items:flex-start;gap:10px;padding:10px 11px;background:transparent;cursor:pointer;position:relative;border-bottom:1px solid var(--b0)}
+.exc{display:flex;align-items:flex-start;gap:10px;padding:0;background:transparent;cursor:pointer;position:relative;border-bottom:1px solid var(--b0)}
 .exc:last-child{border-bottom:none}
 .exc.standalone{border-radius:var(--r);border:1px solid var(--b1);margin-bottom:4px}
 .exc:active{opacity:.75}
+.exc.swiping{opacity:1}
+.exc-body{display:flex;align-items:flex-start;gap:10px;padding:10px 11px;position:relative;z-index:2;width:100%;background:transparent;transition:transform .18s ease}
+.exc-swipe-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 10px;pointer-events:none;z-index:1}
+.sw-act{font-size:10px;font-family:'DM Mono',monospace;padding:6px 9px;border-radius:999px;border:1px solid var(--b1);background:rgba(255,255,255,.03);color:var(--tx2)}
+.sw-act.ss{border-color:rgba(176,107,255,.35);color:#d9c3ff;background:rgba(176,107,255,.14)}
+.sw-act.del{border-color:rgba(232,93,58,.35);color:var(--push);background:rgba(232,93,58,.14)}
 .exc-thumb{width:42px;height:42px;border-radius:9px;background:var(--s2);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid var(--b1)}
 .exc-thumb img{width:100%;height:100%;object-fit:cover}
 .exc-info{flex:1;min-width:0}
@@ -271,9 +277,9 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   }
 }
 @media (max-width:520px){
-  .exc{padding:10px}
+  .exc{padding:0}
   .exc-title-row{align-items:flex-start}
-  .exc-actions{flex-direction:column;gap:4px}
+  .exc-actions{display:none}
   .exc-del,.exc-ss{padding:5px 7px}
   .exc-progress-row{gap:3px}
   .exc-progress-chip{font-size:9px}
@@ -1286,6 +1292,12 @@ function getSupersetButtonLabel(ex,di,i){
   if(ex.superGroup) return 'Quitar';
   return '+Super';
 }
+function getSupersetSwipeLabel(ex,di,i){
+  if(isPendingSuper(di,i)) return 'Cancelar SS';
+  if(pendingSuperLink) return 'Unir SS';
+  if(ex.superGroup) return 'Quitar SS';
+  return 'Superserie';
+}
 
 function supersetAction(di,i){
   const arr=weekData[di]||[];
@@ -1335,22 +1347,88 @@ function getSetProgressText(ex){
   }).join(' | ');
 }
 
+const SWIPE_MAX=92;
+const SWIPE_TRIGGER=62;
+let excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,di:null,i:null,lock:'',moved:false};
+function resetExcSwipeState(){
+  excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,di:null,i:null,lock:'',moved:false};
+}
+function excTouchStart(ev,di,i){
+  if(!ev.touches || ev.touches.length!==1) return;
+  if(ev.target.closest('.drag-handle')) return;
+  const el=ev.currentTarget;
+  const body=el.querySelector('.exc-body');
+  if(!body) return;
+  const t=ev.touches[0];
+  excSwipeState={active:true,el,body,startX:t.clientX,startY:t.clientY,dx:0,di,i,lock:'',moved:false};
+  body.style.transition='none';
+}
+function excTouchMove(ev){
+  if(!excSwipeState.active) return;
+  const t=ev.touches[0];
+  const dx=t.clientX-excSwipeState.startX;
+  const dy=t.clientY-excSwipeState.startY;
+  if(!excSwipeState.lock){
+    if(Math.abs(dx)>8 && Math.abs(dx)>Math.abs(dy)) excSwipeState.lock='x';
+    else if(Math.abs(dy)>8) excSwipeState.lock='y';
+  }
+  if(excSwipeState.lock!=='x') return;
+  ev.preventDefault();
+  const clamped=Math.max(-SWIPE_MAX,Math.min(SWIPE_MAX,dx));
+  excSwipeState.dx=clamped;
+  excSwipeState.moved=true;
+  excSwipeState.el.classList.add('swiping');
+  excSwipeState.body.style.transform=`translateX(${clamped}px)`;
+}
+function excTouchEnd(){
+  if(!excSwipeState.active) return;
+  const {el,body,dx,di,i,moved}=excSwipeState;
+  body.style.transition='transform .18s ease';
+  body.style.transform='translateX(0px)';
+  if(el) el.classList.remove('swiping');
+  if(moved && Math.abs(dx)>=SWIPE_TRIGGER){
+    if(dx>0) removeFromDay(di,i);
+    else supersetAction(di,i);
+    if(el){
+      el.dataset.swiped='1';
+      setTimeout(()=>{ if(el) delete el.dataset.swiped; },260);
+    }
+  }
+  setTimeout(()=>{ if(body) body.style.transition=''; },220);
+  resetExcSwipeState();
+}
+function excTap(ev,di,i){
+  const el=ev.currentTarget;
+  if(el?.dataset?.swiped==='1') return;
+  openDetail(di,i);
+}
+
 function excHTML(ex,di,i,inGroup){
   const img=getExImg(ex.name);
+  const exType=ex.type||getExType(ex.name);
   const meta=getPlannedMeta(ex);
   const progressHTML=getSetProgressHTML(ex);
   const pending=isPendingSuper(di,i);
   const ssClass=(pending||ex.superGroup||pendingSuperLink)?' on':'';
   return `<div class="exc${inGroup?'':' standalone'}" 
-    onclick="openDetail(${di},${i})"
+    onclick="excTap(event,${di},${i})"
+    ontouchstart="excTouchStart(event,${di},${i})"
+    ontouchmove="excTouchMove(event)"
+    ontouchend="excTouchEnd()"
+    ontouchcancel="excTouchEnd()"
     draggable="true"
     ondragstart="dragStart(event,${di},${i})"
     ondragover="dragOver(event,${di},${i})"
     ondrop="dragDrop(event,${di},${i})"
     ondragend="dragEnd(event)"
     ${pending?'data-pending-super="true"':''}>
+    <div class="exc-swipe-bg">
+      <span class="sw-act del">Eliminar</span>
+      <span class="sw-act ss">${getSupersetSwipeLabel(ex,di,i)}</span>
+    </div>
+    <div class="exc-body">
     <span class="drag-handle" onclick="event.stopPropagation()"></span>
-    <div class="exc-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,"\\'")}')">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(getExType(ex.name))}</div>
+    <div class="exc-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,"\\'")}')">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(exType)}</div>
     <div class="exc-info${pending?' exc-pending':''}">
       <div class="exc-title-row">
         <div class="exc-name">${ex.name}</div>
@@ -1363,6 +1441,7 @@ function excHTML(ex,di,i,inGroup){
     <div class="exc-actions">
       <button class="exc-ss${ssClass}" onclick="event.stopPropagation();supersetAction(${di},${i})">${getSupersetButtonLabel(ex,di,i)}</button>
       <button class="exc-del" onclick="event.stopPropagation();removeFromDay(${di},${i})">×</button>
+    </div>
     </div>
   </div>`;
 }
