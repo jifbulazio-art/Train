@@ -246,6 +246,30 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 
 /* â”€â”€ HISTORY placeholder â”€â”€ */
 .hist-empty{text-align:center;padding:60px 20px;color:var(--tx3);font-size:14px;line-height:1.9}
+@media (min-width:521px){
+  .view,.sheet-body,.opts-list{
+    scrollbar-width:thin;
+    scrollbar-color:rgba(255,255,255,.22) transparent;
+  }
+  .view::-webkit-scrollbar,.sheet-body::-webkit-scrollbar,.opts-list::-webkit-scrollbar{
+    width:10px;
+    height:10px;
+  }
+  .view::-webkit-scrollbar-track,.sheet-body::-webkit-scrollbar-track,.opts-list::-webkit-scrollbar-track{
+    background:transparent;
+  }
+  .view::-webkit-scrollbar-thumb,.sheet-body::-webkit-scrollbar-thumb,.opts-list::-webkit-scrollbar-thumb{
+    background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,.16));
+    border:2px solid transparent;
+    border-radius:999px;
+    background-clip:padding-box;
+  }
+  .view::-webkit-scrollbar-thumb:hover,.sheet-body::-webkit-scrollbar-thumb:hover,.opts-list::-webkit-scrollbar-thumb:hover{
+    background:linear-gradient(180deg,rgba(255,255,255,.4),rgba(255,255,255,.26));
+    border:2px solid transparent;
+    background-clip:padding-box;
+  }
+}
 @media (max-width:520px){
   .exc{padding:10px}
   .exc-title-row{align-items:flex-start}
