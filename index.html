@@ -110,18 +110,20 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .drag-handle::before{content:'';position:absolute;left:1px;top:4px;width:2px;height:2px;border-radius:50%;background:var(--tx3);box-shadow:0 4px 0 var(--tx3),0 8px 0 var(--tx3),0 12px 0 var(--tx3),6px 0 0 var(--tx3),6px 4px 0 var(--tx3),6px 8px 0 var(--tx3),6px 12px 0 var(--tx3)}
 .drag-handle.sup::before{
   content:'';
-  left:1px;
-  top:3px;
+  left:0;
+  top:50%;
+  transform:translateY(-50%);
   width:2px;
   height:2px;
   border-radius:50%;
   background:var(--sg-handle,#b06bff);
   box-shadow:
-    3px 0 0 var(--sg-handle,#b06bff), 6px 0 0 var(--sg-handle,#b06bff), 9px 0 0 var(--sg-handle,#b06bff),
-    0 3px 0 var(--sg-handle,#b06bff),
+    3px 0 0 var(--sg-handle,#b06bff), 6px 0 0 var(--sg-handle,#b06bff),
+    0 3px 0 var(--sg-handle,#b06bff), 6px 3px 0 var(--sg-handle,#b06bff),
     0 6px 0 var(--sg-handle,#b06bff), 3px 6px 0 var(--sg-handle,#b06bff), 6px 6px 0 var(--sg-handle,#b06bff),
-    9px 9px 0 var(--sg-handle,#b06bff),
-    0 12px 0 var(--sg-handle,#b06bff), 3px 12px 0 var(--sg-handle,#b06bff), 6px 12px 0 var(--sg-handle,#b06bff), 9px 12px 0 var(--sg-handle,#b06bff);
+    6px 9px 0 var(--sg-handle,#b06bff),
+    0 12px 0 var(--sg-handle,#b06bff), 6px 12px 0 var(--sg-handle,#b06bff),
+    0 15px 0 var(--sg-handle,#b06bff), 3px 15px 0 var(--sg-handle,#b06bff), 6px 15px 0 var(--sg-handle,#b06bff);
 }
 .drag-handle:active{cursor:grabbing}
 .exc.dragging{opacity:.4}
