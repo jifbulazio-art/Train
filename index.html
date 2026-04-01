@@ -76,6 +76,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc-body{display:flex;align-items:flex-start;gap:10px;padding:10px 11px;position:relative;z-index:2;width:100%;background:var(--bg);transition:transform .18s ease;border-bottom:1px solid var(--b0)}
 .exc:last-child .exc-body{border-bottom:none}
 .exc.standalone .exc-body{border-radius:var(--r);border:1px solid var(--b1)}
+.exc.sup-item .exc-body{border-color:var(--sup-border,#6e7cff)}
 .exc-swipe-bg{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:stretch;pointer-events:none;z-index:1;overflow:hidden}
 .sw-lane{width:220px;display:flex;align-items:center;opacity:0;transition:opacity .1s linear;position:relative}
 .sw-lane.del{justify-content:center;background:rgba(220,38,38,.22)}
@@ -107,24 +108,10 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 
 /* drag handle */
 .drag-handle{position:relative;width:12px;height:22px;cursor:grab;flex-shrink:0;touch-action:none;opacity:.8;margin-top:10px}
-.drag-handle::before{content:'';position:absolute;left:1px;top:4px;width:2px;height:2px;border-radius:50%;background:var(--tx3);box-shadow:0 4px 0 var(--tx3),0 8px 0 var(--tx3),0 12px 0 var(--tx3),6px 0 0 var(--tx3),6px 4px 0 var(--tx3),6px 8px 0 var(--tx3),6px 12px 0 var(--tx3)}
-.drag-handle.sup::before{
-  content:'';
-  left:0;
-  top:50%;
-  transform:translateY(-50%);
-  width:2px;
-  height:2px;
-  border-radius:50%;
-  background:var(--sg-handle,#b06bff);
-  box-shadow:
-    3px 0 0 var(--sg-handle,#b06bff), 6px 0 0 var(--sg-handle,#b06bff),
-    0 3px 0 var(--sg-handle,#b06bff), 6px 3px 0 var(--sg-handle,#b06bff),
-    0 6px 0 var(--sg-handle,#b06bff), 3px 6px 0 var(--sg-handle,#b06bff), 6px 6px 0 var(--sg-handle,#b06bff),
-    6px 9px 0 var(--sg-handle,#b06bff),
-    0 12px 0 var(--sg-handle,#b06bff), 6px 12px 0 var(--sg-handle,#b06bff),
-    0 15px 0 var(--sg-handle,#b06bff), 3px 15px 0 var(--sg-handle,#b06bff), 6px 15px 0 var(--sg-handle,#b06bff);
-}
+.drag-handle::before{content:'›';position:absolute;left:2px;top:50%;transform:translateY(-50%);font-family:'DM Mono',monospace;font-size:14px;line-height:1;color:var(--tx3);opacity:.82}
+.drag-handle.sup::before{color:var(--sup-border,#b06bff)}
+.swipe-hint{position:absolute;top:50%;transform:translateY(-50%);font-family:'DM Mono',monospace;font-size:14px;line-height:1;pointer-events:none;opacity:.78}
+.swipe-hint.right{right:9px;color:#c7a6ff}
 .drag-handle:active{cursor:grabbing}
 .exc.dragging{opacity:.4}
 .exc.drag-over{border-top:2px solid var(--pull)}
@@ -1520,8 +1507,8 @@ function excHTML(ex,di,i,inGroup,superColor=''){
   const progressHTML=getSetProgressHTML(ex);
   const pending=isPendingSuper(di,i);
   const ssClass=(pending||ex.superGroup||pendingSuperLink)?' on':'';
-  const handleStyle=ex.superGroup?` style="--sg-handle:${superColor||'#b06bff'};"`:'';
-  return `<div class="exc${inGroup?'':' standalone'}" 
+  const rowStyle=ex.superGroup?` style="--sup-border:${superColor||'#6e7cff'};"`:'';
+  return `<div class="exc${inGroup?'':' standalone'}${ex.superGroup?' sup-item':''}"${rowStyle}
     onclick="excTap(event,${di},${i})"
     onpointerdown="excPointerDown(event,${di},${i})"
     onpointermove="excPointerMove(event)"
@@ -1542,7 +1529,7 @@ function excHTML(ex,di,i,inGroup,superColor=''){
       <div class="sw-lane ss"><span class="sw-label">${getSupersetSwipeLabel(ex,di,i)}</span></div>
     </div>
     <div class="exc-body">
-    <span class="drag-handle${ex.superGroup?' sup':''}"${handleStyle} onclick="event.stopPropagation()"></span>
+    <span class="drag-handle${ex.superGroup?' sup':''}" onclick="event.stopPropagation()"></span>
     <div class="exc-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,"\\'")}')">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(exType)}</div>
     <div class="exc-info${pending?' exc-pending':''}">
       <div class="exc-title-row">
@@ -1553,6 +1540,7 @@ function excHTML(ex,di,i,inGroup,superColor=''){
         <div class="exc-progress-row">${progressHTML}</div>
       </div>
     </div>
+    <span class="swipe-hint right">‹</span>
     <div class="exc-actions">
       <button class="exc-ss${ssClass}" onclick="event.stopPropagation();supersetAction(${di},${i})">${getSupersetButtonLabel(ex,di,i)}</button>
       <button class="exc-del" onclick="event.stopPropagation();removeFromDay(${di},${i})">×</button>
