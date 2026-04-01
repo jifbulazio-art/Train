@@ -638,7 +638,7 @@ function normalizeAllExerciseModalities(){
 const TRUSTED_EXERCISE_LINKS={
 'ab wheel':'https://static.strengthlevel.com/images/exercises/ab-wheel/ab-wheel-800.jpg',
 'arnold press':'https://static.strengthlevel.com/images/exercises/arnold-press/arnold-press-800.jpg',
-'assisted dip machine':'https://static.strengthlevel.com/images/exercises/dip/dip-800.jpg',
+'assisted dip machine':'https://static.strengthlevel.com/images/exercises/assisted-dip/assisted-dip-800.jpg',
 'assisted pull-up machine':'https://static.strengthlevel.com/images/exercises/assisted-pull-up/assisted-pull-up-800.jpg',
 'back squat con barra':'https://static.strengthlevel.com/images/exercises/barbell-squat/barbell-squat-800.jpg',
 'bayesian curl':'https://static.strengthlevel.com/images/exercises/bayesian-cable-curl/bayesian-cable-curl-800.jpg',
@@ -785,26 +785,6 @@ function slugifyExerciseName(name=''){
 }
 
 let trustedExerciseLinksIndex=null;
-const STRENGTHLEVEL_SLUG_ALIASES={
-  'pulldown con brazos rectos':'straight-arm-pulldown',
-  'push-up arquero':'archer-push-up',
-  'push-up inclinado':'incline-push-up',
-  'pike push-up elevado':'pike-push-up',
-  'plancha frontal':'plank',
-  'plancha lateral':'side-plank',
-};
-function buildStrengthLevelUrl(slug=''){
-  const clean=(slug||'').replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-').replace(/^-|-$/g,'');
-  if(!clean) return null;
-  return `https://static.strengthlevel.com/images/exercises/${clean}/${clean}-800.jpg`;
-}
-function looksEnglishExerciseName(name=''){
-  const raw=(name||'').trim().toLowerCase();
-  if(!raw) return false;
-  if(/[áéíóúñ]/.test(raw)) return false;
-  if(/\b(de|del|con|sin|en|para|por|y|o|una|uno|el|la|los|las)\b/.test(raw)) return false;
-  return /^[a-z0-9 ()+\\/-]+$/.test(raw);
-}
 function getTrustedExerciseLinksIndex(){
   if(trustedExerciseLinksIndex) return trustedExerciseLinksIndex;
   const idx={};
@@ -819,17 +799,7 @@ function getTrustedExerciseLinksIndex(){
 function getStrengthLevelThumb(name,type){
   const key=normalizeExerciseKey(name);
   const idx=getTrustedExerciseLinksIndex();
-  if(idx[key]) return idx[key];
-
-  const aliasSlug=STRENGTHLEVEL_SLUG_ALIASES[key];
-  if(aliasSlug) return buildStrengthLevelUrl(aliasSlug);
-
-  if(looksEnglishExerciseName(name)){
-    const slug=slugifyExerciseName(name);
-    return buildStrengthLevelUrl(slug);
-  }
-
-  return null;
+  return idx[key]||null;
 }
 
 function getTypeThumb(type){
@@ -1332,9 +1302,6 @@ function getSetProgressText(ex){
 
 function excHTML(ex,di,i,inGroup){
   const img=getExImg(ex.name);
-  const exType=ex.type||getExType(ex.name);
-  const safeName=(ex.name||'').replace(/'/g,"\\'");
-  const safeType=(exType||'').replace(/'/g,"\\'");
   const meta=getPlannedMeta(ex);
   const progressHTML=getSetProgressHTML(ex);
   const pending=isPendingSuper(di,i);
@@ -1348,7 +1315,7 @@ function excHTML(ex,di,i,inGroup){
     ondragend="dragEnd(event)"
     ${pending?'data-pending-super="true"':''}>
     <span class="drag-handle" onclick="event.stopPropagation()"></span>
-    <div class="exc-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,"\\'")}')">${img?`<img src="${img}" onerror="onThumbImageError(this,'${safeName}','${safeType}')">`:getTypeEmoji(exType)}</div>
+    <div class="exc-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,"\\'")}')">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(getExType(ex.name))}</div>
     <div class="exc-info${pending?' exc-pending':''}">
       <div class="exc-title-row">
         <div class="exc-name">${ex.name}</div>
@@ -1366,17 +1333,6 @@ function excHTML(ex,di,i,inGroup){
 }
 function getTypeEmoji(t){
   return '<span class="thumb-ph"></span>';
-}
-function onThumbImageError(imgEl,exerciseName='',exerciseType=''){
-  const alt=getStrengthLevelThumb(exerciseName,exerciseType);
-  const current=(imgEl.getAttribute('src')||'').trim();
-  if(!imgEl.dataset.fallbackTried && alt && alt!==current){
-    imgEl.dataset.fallbackTried='1';
-    imgEl.src=alt;
-    return;
-  }
-  imgEl.onerror=null;
-  if(imgEl.parentElement) imgEl.parentElement.innerHTML='<span class=\"thumb-ph\"></span>';
 }
 
 function removeFromDay(di,i){
@@ -1602,12 +1558,10 @@ function renderAddOpts(){
       const p=pending.find(x=>x.name===e.name);
       const sel=!!p;
       const img=e.imageData||e.imageUrl;
-      const safeName=(e.name||'').replace(/'/g,"\\'");
-      const safeType=(e.type||'').replace(/'/g,"\\'");
       window._opts[idx]={name:e.name,type:e.type};
       html+=`<div class="opt-row${sel?' on':''}" id="opt${idx}" onclick="toggleOpt(${idx},event)">
         <div class="opt-check"></div>
-        <div class="opt-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom(decodeURIComponent('${encodeURIComponent(img||'')}'))">${img?`<img src="${img}" onerror="onThumbImageError(this,'${safeName}','${safeType}')">`:getTypeEmoji(e.type)}</div>
+        <div class="opt-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom(decodeURIComponent('${encodeURIComponent(img||'')}'))">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(e.type)}</div>
         <span class="opt-name">${e.name}</span>
         <div class="opt-inputs" onclick="event.stopPropagation()">
           <input type="number" placeholder="s" value="${p?p.sets:''}" min="1" max="20" inputmode="numeric"
@@ -2238,7 +2192,7 @@ function renderMgmtEx(){
     const safeMuscle=(e.muscle||'').replace(/'/g,"\\'");
     const safeLink=(link||'').replace(/'/g,"\\'");
     return `<div class="mgmt-item" onclick="openExEditByName('${safeName}','${safeType}','${safeMuscle}','${safeLink}','${getExerciseContext(e)}')">
-      <div class="mgmt-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,"\\'")}')">${img?`<img src="${img}" onerror="onThumbImageError(this,'${safeName}','${safeType}')">`:getTypeEmoji(e.type)}</div>
+      <div class="mgmt-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,"\\'")}')">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(e.type)}</div>
       <div class="mgmt-info">
         <div class="mgmt-name">${e.name}</div>
         <div class="mgmt-sub">${TYPE_MAP[e.type]||e.type}${e.muscle?' - '+e.muscle:''}</div>
@@ -2275,7 +2229,7 @@ function renderMgmtEx(){
     const safeLink=(link||'').replace(/'/g,"\\'");
     const contextLabel=getExerciseContextLabel(e);
     return `<div class="mgmt-item" onclick="openExEditByName('${safeName}','${safeType}','${safeMuscle}','${safeLink}','${getExerciseContext(e)}')">
-      <div class="mgmt-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,"\\'")}')">${img?`<img src="${img}" onerror="onThumbImageError(this,'${safeName}','${safeType}')">`:getTypeEmoji(e.type)}</div>
+      <div class="mgmt-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,"\\'")}')">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(e.type)}</div>
       <div class="mgmt-info">
         <div class="mgmt-name">${e.name}</div>
         <div class="mgmt-sub">${TYPE_MAP[e.type]||e.type}${getMuscleLabel(e)?' - '+getMuscleLabel(e):''}${contextLabel?' - '+contextLabel:''}</div>
