@@ -72,7 +72,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .super-group-label{font-size:10px;font-family:'DM Mono',monospace;padding:5px 12px;letter-spacing:.07em}
 
 /* exercise card */
-.exc{display:flex;align-items:flex-start;gap:10px;padding:0;background:transparent;cursor:pointer;position:relative;border-bottom:1px solid var(--b0)}
+.exc{display:flex;align-items:flex-start;gap:10px;padding:0;background:transparent;cursor:pointer;position:relative;border-bottom:1px solid var(--b0);touch-action:pan-y}
 .exc:last-child{border-bottom:none}
 .exc.standalone{border-radius:var(--r);border:1px solid var(--b1);margin-bottom:4px}
 .exc:active{opacity:.75}
@@ -1356,31 +1356,24 @@ function getSetProgressText(ex){
 
 const SWIPE_MAX=92;
 const SWIPE_TRIGGER=62;
-let excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,di:null,i:null,lock:'',moved:false};
+let excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,di:null,i:null,lock:'',moved:false,pointerId:null};
 function resetExcSwipeState(){
-  excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,di:null,i:null,lock:'',moved:false};
+  excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,di:null,i:null,lock:'',moved:false,pointerId:null};
 }
-function excTouchStart(ev,di,i){
-  if(!ev.touches || ev.touches.length!==1) return;
-  if(ev.target.closest('.drag-handle')) return;
-  const el=ev.currentTarget;
-  const body=el.querySelector('.exc-body');
-  if(!body) return;
-  const t=ev.touches[0];
-  excSwipeState={active:true,el,body,startX:t.clientX,startY:t.clientY,dx:0,di,i,lock:'',moved:false};
+function beginExcSwipe(startX,startY,el,body,di,i,pointerId=null){
+  excSwipeState={active:true,el,body,startX,startY,dx:0,di,i,lock:'',moved:false,pointerId};
   body.style.transition='none';
 }
-function excTouchMove(ev){
+function moveExcSwipe(clientX,clientY,preventDefaultFn){
   if(!excSwipeState.active) return;
-  const t=ev.touches[0];
-  const dx=t.clientX-excSwipeState.startX;
-  const dy=t.clientY-excSwipeState.startY;
+  const dx=clientX-excSwipeState.startX;
+  const dy=clientY-excSwipeState.startY;
   if(!excSwipeState.lock){
     if(Math.abs(dx)>8 && Math.abs(dx)>Math.abs(dy)) excSwipeState.lock='x';
     else if(Math.abs(dy)>8) excSwipeState.lock='y';
   }
   if(excSwipeState.lock!=='x') return;
-  ev.preventDefault();
+  if(preventDefaultFn) preventDefaultFn();
   const clamped=Math.max(-SWIPE_MAX,Math.min(SWIPE_MAX,dx));
   excSwipeState.dx=clamped;
   excSwipeState.moved=true;
@@ -1397,7 +1390,7 @@ function excTouchMove(ev){
   }
   excSwipeState.body.style.transform=`translateX(${clamped}px)`;
 }
-function excTouchEnd(){
+function endExcSwipe(){
   if(!excSwipeState.active) return;
   const {el,body,dx,di,i,moved}=excSwipeState;
   body.style.transition='transform .18s ease';
@@ -1418,6 +1411,31 @@ function excTouchEnd(){
   setTimeout(()=>{ if(body) body.style.transition=''; },220);
   resetExcSwipeState();
 }
+function excPointerDown(ev,di,i){
+  if(ev.target.closest('.drag-handle')) return;
+  if(ev.pointerType==='mouse' && ev.button!==0) return;
+  const el=ev.currentTarget;
+  const body=el.querySelector('.exc-body');
+  if(!body) return;
+  beginExcSwipe(ev.clientX,ev.clientY,el,body,di,i,ev.pointerId);
+  if(el.setPointerCapture){
+    try{ el.setPointerCapture(ev.pointerId); }catch(_){}
+  }
+}
+function excPointerMove(ev){
+  if(!excSwipeState.active) return;
+  if(excSwipeState.pointerId!=null && ev.pointerId!==excSwipeState.pointerId) return;
+  moveExcSwipe(ev.clientX,ev.clientY,()=>ev.preventDefault());
+}
+function excPointerEnd(ev){
+  if(!excSwipeState.active) return;
+  if(excSwipeState.pointerId!=null && ev.pointerId!==excSwipeState.pointerId) return;
+  const el=excSwipeState.el;
+  if(el && el.releasePointerCapture){
+    try{ el.releasePointerCapture(ev.pointerId); }catch(_){}
+  }
+  endExcSwipe();
+}
 function excTap(ev,di,i){
   const el=ev.currentTarget;
   if(el?.dataset?.swiped==='1') return;
@@ -1433,10 +1451,10 @@ function excHTML(ex,di,i,inGroup){
   const ssClass=(pending||ex.superGroup||pendingSuperLink)?' on':'';
   return `<div class="exc${inGroup?'':' standalone'}" 
     onclick="excTap(event,${di},${i})"
-    ontouchstart="excTouchStart(event,${di},${i})"
-    ontouchmove="excTouchMove(event)"
-    ontouchend="excTouchEnd()"
-    ontouchcancel="excTouchEnd()"
+    onpointerdown="excPointerDown(event,${di},${i})"
+    onpointermove="excPointerMove(event)"
+    onpointerup="excPointerEnd(event)"
+    onpointercancel="excPointerEnd(event)"
     draggable="true"
     ondragstart="dragStart(event,${di},${i})"
     ondragover="dragOver(event,${di},${i})"
