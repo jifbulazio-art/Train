@@ -77,16 +77,16 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc:last-child .exc-body{border-bottom:none}
 .exc.standalone .exc-body{border-radius:var(--r);border:1px solid var(--b1)}
 .exc-swipe-bg{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:stretch;pointer-events:none;z-index:1;overflow:hidden}
-.sw-lane{width:220px;display:flex;align-items:center;opacity:0;transition:opacity .12s ease}
+.sw-lane{width:220px;display:flex;align-items:center;opacity:0;transition:opacity .1s linear;position:relative}
 .sw-lane.del{justify-content:center;background:rgba(220,38,38,.22)}
 .sw-lane.ss{justify-content:center;background:rgba(168,85,247,.20)}
-.sw-label{font-size:11px;font-family:'DM Mono',monospace;white-space:nowrap;opacity:calc(.3 + var(--swipe-progress,0) * .7);transition:transform .08s linear,opacity .08s linear}
-.sw-lane.del .sw-label{color:#ff7d7d;transform:translateX(calc((1 - var(--swipe-progress,0)) * -18px))}
-.sw-lane.ss .sw-label{color:#e9d5ff;transform:translateX(calc((1 - var(--swipe-progress,0)) * 18px))}
+.sw-label{font-size:11px;font-family:'DM Mono',monospace;white-space:nowrap;opacity:calc(.2 + var(--swipe-progress,0) * .8);position:absolute;top:50%;transition:transform .08s linear,opacity .08s linear}
+.sw-lane.del .sw-label{left:0;color:#ff7d7d;transform:translate(calc((var(--swipe-px,0px) / 2) - 50%),-50%)}
+.sw-lane.ss .sw-label{right:0;color:#e9d5ff;transform:translate(calc(50% - (var(--swipe-px,0px) / 2)),-50%)}
 .exc.standalone .sw-lane.del{border-radius:var(--r) 0 0 var(--r)}
 .exc.standalone .sw-lane.ss{border-radius:0 var(--r) var(--r) 0}
-.exc.swiping.sw-right .sw-lane.del{opacity:1}
-.exc.swiping.sw-left .sw-lane.ss{opacity:1}
+.exc.sw-right .sw-lane.del{opacity:calc(.15 + var(--swipe-progress,0) * .85)}
+.exc.sw-left .sw-lane.ss{opacity:calc(.15 + var(--swipe-progress,0) * .85)}
 .exc-thumb{width:42px;height:42px;border-radius:9px;background:var(--s2);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid var(--b1)}
 .exc-thumb img{width:100%;height:100%;object-fit:cover}
 .exc-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
@@ -108,6 +108,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 /* drag handle */
 .drag-handle{position:relative;width:12px;height:22px;cursor:grab;flex-shrink:0;touch-action:none;opacity:.8;margin-top:10px}
 .drag-handle::before{content:'';position:absolute;left:1px;top:4px;width:2px;height:2px;border-radius:50%;background:var(--tx3);box-shadow:0 4px 0 var(--tx3),0 8px 0 var(--tx3),0 12px 0 var(--tx3),6px 0 0 var(--tx3),6px 4px 0 var(--tx3),6px 8px 0 var(--tx3),6px 12px 0 var(--tx3)}
+.drag-handle.sup::before{content:'S';left:0;top:2px;width:auto;height:auto;background:none;box-shadow:none;border-radius:0;font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:var(--sg-handle,#b06bff);opacity:.95}
 .drag-handle:active{cursor:grabbing}
 .exc.dragging{opacity:.4}
 .exc.drag-over{border-top:2px solid var(--pull)}
@@ -1207,7 +1208,7 @@ function buildExListHTML(di,exs){
       const col=sgColor[ex.superGroup];
       const grp=exs.map((e,idx)=>({e,idx})).filter(({e})=>e.superGroup===ex.superGroup);
       html+=`<div class="group-tag super" style="color:${col.l};border-color:${col.b};background:${col.bg}">SUPERSERIE</div>`;
-      html+=grp.map(({e,idx})=>excHTML(e,di,idx,false)).join('');
+      html+=grp.map(({e,idx})=>excHTML(e,di,idx,false,col.l)).join('');
       continue;
     }
     if(exType==='warm'){
@@ -1215,11 +1216,11 @@ function buildExListHTML(di,exs){
       while(j<exs.length&&!exs[j].superGroup&&((exs[j].type||getExType(exs[j].name))==='warm')) j++;
       const warmGroup=exs.slice(i,j).map((e,k)=>({e,idx:i+k}));
       html+=`<div class="group-tag warm">CALENTAMIENTO</div>`;
-      html+=warmGroup.map(({e,idx})=>excHTML(e,di,idx,false)).join('');
+      html+=warmGroup.map(({e,idx})=>excHTML(e,di,idx,false,'')).join('');
       i=j-1;
       continue;
     }
-    html+=excHTML(ex,di,i,false);
+    html+=excHTML(ex,di,i,false,'');
   }
   return html;
 }
@@ -1360,6 +1361,7 @@ function resetExcSwipeState(){
 function beginExcSwipe(startX,startY,el,body,di,i,pointerId=null){
   excSwipeState={active:true,el,body,startX,startY,dx:0,di,i,lock:'',moved:false,pointerId};
   if(el) el.style.setProperty('--swipe-progress','0');
+  if(el) el.style.setProperty('--swipe-px','0px');
   body.style.transition='none';
 }
 function moveExcSwipe(clientX,clientY,preventDefaultFn){
@@ -1378,10 +1380,11 @@ function moveExcSwipe(clientX,clientY,preventDefaultFn){
   excSwipeState.moved=true;
   excSwipeState.el.classList.add('swiping');
   excSwipeState.el.style.setProperty('--swipe-progress',progress.toFixed(3));
-  if(clamped>8){
+  excSwipeState.el.style.setProperty('--swipe-px',`${Math.abs(clamped)}px`);
+  if(clamped>2){
     excSwipeState.el.classList.add('sw-right');
     excSwipeState.el.classList.remove('sw-left');
-  }else if(clamped<-8){
+  }else if(clamped<-2){
     excSwipeState.el.classList.add('sw-left');
     excSwipeState.el.classList.remove('sw-right');
   }else{
@@ -1400,6 +1403,7 @@ function endExcSwipe(){
     el.classList.remove('sw-left');
     el.classList.remove('sw-right');
     el.style.setProperty('--swipe-progress','0');
+    el.style.setProperty('--swipe-px','0px');
   }
   if(moved && Math.abs(dx)>=SWIPE_TRIGGER){
     if(dx>0) removeFromDay(di,i);
@@ -1493,13 +1497,14 @@ function setupPullToRefresh(){
   });
 }
 
-function excHTML(ex,di,i,inGroup){
+function excHTML(ex,di,i,inGroup,superColor=''){
   const img=getExImg(ex.name);
   const exType=ex.type||getExType(ex.name);
   const meta=getPlannedMeta(ex);
   const progressHTML=getSetProgressHTML(ex);
   const pending=isPendingSuper(di,i);
   const ssClass=(pending||ex.superGroup||pendingSuperLink)?' on':'';
+  const handleStyle=ex.superGroup?` style="--sg-handle:${superColor||'#b06bff'};"`:'';
   return `<div class="exc${inGroup?'':' standalone'}" 
     onclick="excTap(event,${di},${i})"
     onpointerdown="excPointerDown(event,${di},${i})"
@@ -1521,7 +1526,7 @@ function excHTML(ex,di,i,inGroup){
       <div class="sw-lane ss"><span class="sw-label">${getSupersetSwipeLabel(ex,di,i)}</span></div>
     </div>
     <div class="exc-body">
-    <span class="drag-handle" onclick="event.stopPropagation()"></span>
+    <span class="drag-handle${ex.superGroup?' sup':''}"${handleStyle} onclick="event.stopPropagation()"></span>
     <div class="exc-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,"\\'")}')">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(exType)}</div>
     <div class="exc-info${pending?' exc-pending':''}">
       <div class="exc-title-row">
