@@ -1,0 +1,128 @@
+[
+  {
+    "name": "Push-up estandar",
+    "status": "no_match"
+  },
+  {
+    "name": "Push-up arquero",
+    "status": "no_match"
+  },
+  {
+    "name": "Push-up explosivo",
+    "status": "no_match"
+  },
+  {
+    "name": "Push-up declinado",
+    "status": "no_match"
+  },
+  {
+    "name": "Push-up inclinado",
+    "status": "no_match"
+  },
+  {
+    "name": "Pseudo planche push-up",
+    "status": "ok",
+    "score": 1,
+    "gif": "https://gymvisual.com/img/p/2/2/8/5/7/22857.gif",
+    "page": "https://gymvisual.com/animated-gifs/12967-pseudo-planche-push-up.html",
+    "slug": "pseudo-planche-push-up",
+    "old": ""
+  },
+  {
+    "name": "Press de mancuernas plano",
+    "status": "no_match"
+  },
+  {
+    "name": "Press de mancuernas inclinado",
+    "status": "no_match"
+  },
+  {
+    "name": "Push-up diamante",
+    "status": "no_match"
+  },
+  {
+    "name": "Push-up con pausa",
+    "status": "no_match"
+  },
+  {
+    "name": "Dips en paralelas",
+    "status": "no_match"
+  },
+  {
+    "name": "Press banca con barra",
+    "status": "no_match"
+  },
+  {
+    "name": "Press banca inclinado con barra",
+    "status": "no_match"
+  },
+  {
+    "name": "Aperturas con mancuernas",
+    "status": "no_match"
+  },
+  {
+    "name": "Press en maquina de pecho",
+    "status": "no_match"
+  },
+  {
+    "name": "Press inclinado en maquina",
+    "status": "no_match"
+  },
+  {
+    "name": "Chest press machine",
+    "status": "ok",
+    "score": 0.67,
+    "gif": "https://gymvisual.com/img/p/5/3/1/4/5314.gif",
+    "page": "https://gymvisual.com/animated-gifs/2074-lever-chest-press.html",
+    "slug": "lever-chest-press",
+    "old": "https://static.strengthlevel.com/images/exercises/chest-press/chest-press-800.jpg"
+  },
+  {
+    "name": "Pec deck",
+    "status": "low",
+    "score": 0.5,
+    "slug": "lever-pec-deck-fly",
+    "page": "https://gymvisual.com/animated-gifs/2499-lever-pec-deck-fly.html"
+  },
+  {
+    "name": "Machine fly",
+    "status": "low",
+    "score": 0.33,
+    "slug": "lever-seated-fly",
+    "page": "https://gymvisual.com/animated-gifs/2093-lever-seated-fly.html"
+  },
+  {
+    "name": "Cable fly",
+    "status": "low",
+    "score": 0.4,
+    "slug": "cable-cross-over-revers-fly",
+    "page": "https://gymvisual.com/animated-gifs/1647-cable-cross-over-revers-fly.html"
+  },
+  {
+    "name": "Cable crossover",
+    "status": "ok",
+    "score": 0.67,
+    "gif": "https://gymvisual.com/img/p/4/8/8/8/4888.gif",
+    "page": "https://gymvisual.com/animated-gifs/1648-cable-crossover-variation.html",
+    "slug": "cable-crossover-variation",
+    "old": ""
+  },
+  {
+    "name": "High to low cable fly",
+    "status": "ok",
+    "score": 0.71,
+    "gif": "https://gymvisual.com/img/p/2/9/0/0/5/29005.gif",
+    "page": "https://gymvisual.com/animated-gifs/16442-cable-kneeling-high-to-low-fly-male.html",
+    "slug": "cable-kneeling-high-to-low-fly-male",
+    "old": ""
+  },
+  {
+    "name": "Low to high cable fly",
+    "status": "ok",
+    "score": 0.71,
+    "gif": "https://gymvisual.com/img/p/2/9/0/0/5/29005.gif",
+    "page": "https://gymvisual.com/animated-gifs/16442-cable-kneeling-high-to-low-fly-male.html",
+    "slug": "cable-kneeling-high-to-low-fly-male",
+    "old": ""
+  }
+]
