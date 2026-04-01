@@ -108,7 +108,21 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 /* drag handle */
 .drag-handle{position:relative;width:12px;height:22px;cursor:grab;flex-shrink:0;touch-action:none;opacity:.8;margin-top:10px}
 .drag-handle::before{content:'';position:absolute;left:1px;top:4px;width:2px;height:2px;border-radius:50%;background:var(--tx3);box-shadow:0 4px 0 var(--tx3),0 8px 0 var(--tx3),0 12px 0 var(--tx3),6px 0 0 var(--tx3),6px 4px 0 var(--tx3),6px 8px 0 var(--tx3),6px 12px 0 var(--tx3)}
-.drag-handle.sup::before{content:'S';left:0;top:2px;width:auto;height:auto;background:none;box-shadow:none;border-radius:0;font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:var(--sg-handle,#b06bff);opacity:.95}
+.drag-handle.sup::before{
+  content:'';
+  left:1px;
+  top:2px;
+  width:2px;
+  height:2px;
+  border-radius:50%;
+  background:var(--sg-handle,#b06bff);
+  box-shadow:
+    3px 0 0 var(--sg-handle,#b06bff), 6px 0 0 var(--sg-handle,#b06bff),
+    0 3px 0 var(--sg-handle,#b06bff),
+    0 6px 0 var(--sg-handle,#b06bff), 3px 6px 0 var(--sg-handle,#b06bff), 6px 6px 0 var(--sg-handle,#b06bff),
+    6px 9px 0 var(--sg-handle,#b06bff),
+    0 12px 0 var(--sg-handle,#b06bff), 3px 12px 0 var(--sg-handle,#b06bff), 6px 12px 0 var(--sg-handle,#b06bff);
+}
 .drag-handle:active{cursor:grabbing}
 .exc.dragging{opacity:.4}
 .exc.drag-over{border-top:2px solid var(--pull)}
