@@ -76,15 +76,17 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc-body{display:flex;align-items:flex-start;gap:10px;padding:10px 11px;position:relative;z-index:2;width:100%;background:var(--bg);transition:transform .18s ease;border-bottom:1px solid var(--b0)}
 .exc:last-child .exc-body{border-bottom:none}
 .exc.standalone .exc-body{border-radius:var(--r);border:1px solid var(--b1)}
-.exc-swipe-bg{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:visible}
-.sw-act{position:absolute;top:50%;font-size:10px;font-family:'DM Mono',monospace;padding:6px 9px;border-radius:999px;border:1px solid var(--b1);background:rgba(255,255,255,.03);color:var(--tx2);opacity:0;transition:opacity .14s ease,transform .14s ease;z-index:4;white-space:nowrap}
-.sw-act.ss{border-color:rgba(176,107,255,.35);color:#d9c3ff;background:rgba(176,107,255,.14)}
-.sw-act.del{border-color:rgba(232,93,58,.35);color:var(--push);background:rgba(232,93,58,.14)}
-.sw-act.del{left:-54px;transform:translate(-10px,-50%)}
-.sw-act.ss{right:-66px;transform:translate(10px,-50%)}
-.exc.swiping.sw-right .sw-act.del{opacity:1;transform:translate(0,-50%)}
-.exc.swiping.sw-left .sw-act.ss{opacity:1;transform:translate(0,-50%)}
-.exc.swiping .exc-body{box-shadow:0 10px 24px rgba(0,0,0,.26)}
+.exc-swipe-bg{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:stretch;pointer-events:none;z-index:1;overflow:hidden}
+.sw-lane{width:128px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .12s ease}
+.sw-lane.del{background:rgba(232,93,58,.18);border-right:1px solid rgba(232,93,58,.34)}
+.sw-lane.ss{background:rgba(176,107,255,.17);border-left:1px solid rgba(176,107,255,.30)}
+.sw-label{font-size:11px;font-family:'DM Mono',monospace;white-space:nowrap;opacity:calc(.3 + var(--swipe-progress,0) * .7);transition:transform .08s linear,opacity .08s linear}
+.sw-lane.del .sw-label{color:#ff9f85;transform:translateX(calc((1 - var(--swipe-progress,0)) * -18px))}
+.sw-lane.ss .sw-label{color:#dec7ff;transform:translateX(calc((1 - var(--swipe-progress,0)) * 18px))}
+.exc.standalone .sw-lane.del{border-radius:var(--r) 0 0 var(--r)}
+.exc.standalone .sw-lane.ss{border-radius:0 var(--r) var(--r) 0}
+.exc.swiping.sw-right .sw-lane.del{opacity:1}
+.exc.swiping.sw-left .sw-lane.ss{opacity:1}
 .exc-thumb{width:42px;height:42px;border-radius:9px;background:var(--s2);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid var(--b1)}
 .exc-thumb img{width:100%;height:100%;object-fit:cover}
 .exc-info{flex:1;min-width:0}
@@ -1348,14 +1350,15 @@ function getSetProgressText(ex){
   }).join(' | ');
 }
 
-const SWIPE_MAX=98;
-const SWIPE_TRIGGER=46;
+const SWIPE_MAX=132;
+const SWIPE_TRIGGER=56;
 let excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,di:null,i:null,lock:'',moved:false,pointerId:null};
 function resetExcSwipeState(){
   excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,di:null,i:null,lock:'',moved:false,pointerId:null};
 }
 function beginExcSwipe(startX,startY,el,body,di,i,pointerId=null){
   excSwipeState={active:true,el,body,startX,startY,dx:0,di,i,lock:'',moved:false,pointerId};
+  if(el) el.style.setProperty('--swipe-progress','0');
   body.style.transition='none';
 }
 function moveExcSwipe(clientX,clientY,preventDefaultFn){
@@ -1369,9 +1372,11 @@ function moveExcSwipe(clientX,clientY,preventDefaultFn){
   if(excSwipeState.lock!=='x') return;
   if(preventDefaultFn) preventDefaultFn();
   const clamped=Math.max(-SWIPE_MAX,Math.min(SWIPE_MAX,dx));
+  const progress=Math.min(1,Math.abs(clamped)/SWIPE_MAX);
   excSwipeState.dx=clamped;
   excSwipeState.moved=true;
   excSwipeState.el.classList.add('swiping');
+  excSwipeState.el.style.setProperty('--swipe-progress',progress.toFixed(3));
   if(clamped>8){
     excSwipeState.el.classList.add('sw-right');
     excSwipeState.el.classList.remove('sw-left');
@@ -1393,6 +1398,7 @@ function endExcSwipe(){
     el.classList.remove('swiping');
     el.classList.remove('sw-left');
     el.classList.remove('sw-right');
+    el.style.setProperty('--swipe-progress','0');
   }
   if(moved && Math.abs(dx)>=SWIPE_TRIGGER){
     if(dx>0) removeFromDay(di,i);
@@ -1481,8 +1487,8 @@ function excHTML(ex,di,i,inGroup){
     ondragend="dragEnd(event)"
     ${pending?'data-pending-super="true"':''}>
     <div class="exc-swipe-bg">
-      <span class="sw-act del">Eliminar</span>
-      <span class="sw-act ss">${getSupersetSwipeLabel(ex,di,i)}</span>
+      <div class="sw-lane del"><span class="sw-label">Eliminar</span></div>
+      <div class="sw-lane ss"><span class="sw-label">${getSupersetSwipeLabel(ex,di,i)}</span></div>
     </div>
     <div class="exc-body">
     <span class="drag-handle" onclick="event.stopPropagation()"></span>
