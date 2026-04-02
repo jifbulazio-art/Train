@@ -108,9 +108,9 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 
 /* drag handle */
 .drag-handle{position:relative;width:12px;height:22px;cursor:grab;flex-shrink:0;touch-action:none;opacity:.8;margin-top:10px}
-.drag-handle::before{content:'⇢';position:absolute;left:1px;top:50%;transform:translateY(-50%);font-family:'DM Mono',monospace;font-size:11px;line-height:1;color:#ff8a8a;opacity:.82;width:14px;height:14px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,138,138,.3);border-radius:999px;background:rgba(255,138,138,.09)}
-.drag-handle.sup::before{color:var(--sup-border,#b06bff);border-color:var(--sup-border,#b06bff);background:rgba(176,107,255,.12)}
-.swipe-hint{position:absolute;top:50%;transform:translateY(-50%);font-family:'DM Mono',monospace;font-size:11px;line-height:1;pointer-events:none;opacity:.82;width:14px;height:14px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(185,140,255,.34);border-radius:999px;background:rgba(185,140,255,.11);color:#cfb3ff}
+.drag-handle::before{content:'›';position:absolute;left:2px;top:50%;transform:translateY(-50%);font-family:'DM Mono',monospace;font-size:13px;line-height:1;color:#ff9a9a;opacity:.8}
+.drag-handle.sup::before{color:var(--sup-border,#b06bff)}
+.swipe-hint{position:absolute;top:50%;transform:translateY(-50%);font-family:'DM Mono',monospace;font-size:13px;line-height:1;pointer-events:none;opacity:.78;color:#cfb3ff}
 .swipe-hint.right{right:9px}
 .drag-handle:active{cursor:grabbing}
 .exc.dragging{opacity:.4}
@@ -1540,7 +1540,7 @@ function excHTML(ex,di,i,inGroup,superColor=''){
         <div class="exc-progress-row">${progressHTML}</div>
       </div>
     </div>
-    <span class="swipe-hint right">⇠</span>
+    <span class="swipe-hint right">‹</span>
     <div class="exc-actions">
       <button class="exc-ss${ssClass}" onclick="event.stopPropagation();supersetAction(${di},${i})">${getSupersetButtonLabel(ex,di,i)}</button>
       <button class="exc-del" onclick="event.stopPropagation();removeFromDay(${di},${i})">×</button>
