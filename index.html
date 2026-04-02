@@ -83,8 +83,8 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .sw-lane.del{justify-content:center;background:rgba(220,38,38,.22)}
 .sw-lane.ss{justify-content:center;background:rgba(168,85,247,.20)}
 .sw-icon{position:absolute;top:50%;line-height:1;font-family:'DM Sans','Segoe UI Symbol','Arial Unicode MS',sans-serif;font-weight:700;white-space:nowrap;opacity:0;transition:transform .06s linear,opacity .06s linear}
-.sw-icon.del{left:0;color:#ff7d7d;font-size:24px;transform:translate(calc((var(--swipe-px,0px) + 6px)/2 - .45em),-50%)}
-.sw-icon.ss{right:0;color:#e9d5ff;font-size:34px;transform:translate(calc(-1 * ((var(--swipe-px,0px) + 6px)/2 - .45em)),-50%)}
+.sw-icon.del{left:var(--swipe-px,0px);color:#ff7d7d;font-size:24px;transform:translate(calc(-6px - (var(--swipe-px,0px) * .5)),-50%)}
+.sw-icon.ss{right:var(--swipe-px,0px);color:#e9d5ff;font-size:34px;transform:translate(calc(6px + (var(--swipe-px,0px) * .5)),-50%)}
 .exc.standalone .sw-lane.del{border-radius:var(--r) 0 0 var(--r)}
 .exc.standalone .sw-lane.ss{border-radius:0 var(--r) var(--r) 0}
 .exc.sw-right .sw-lane.del{opacity:1}
