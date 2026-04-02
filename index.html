@@ -82,7 +82,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .sw-lane{width:220px;display:flex;align-items:center;opacity:1;transition:none;position:relative}
 .sw-lane.del{justify-content:center;background:rgba(220,38,38,.22)}
 .sw-lane.ss{justify-content:center;background:rgba(168,85,247,.20)}
-.sw-label{font-size:24px;font-family:'DM Mono',monospace;white-space:nowrap;opacity:1;position:absolute;top:50%;transition:transform .06s linear}
+.sw-label{font-size:24px;font-family:'DM Sans','Segoe UI Symbol','Arial Unicode MS',sans-serif;font-weight:700;white-space:nowrap;opacity:1;position:absolute;top:50%;line-height:1;transition:transform .06s linear}
 .sw-lane.del .sw-label{right:6px;color:#ff7d7d;transform:translate(calc(-1 * var(--swipe-px,0px) * .22),-50%)}
 .sw-lane.ss .sw-label{left:6px;color:#e9d5ff;font-size:32px;transform:translate(calc(var(--swipe-px,0px) * .22),-50%)}
 .exc.standalone .sw-lane.del{border-radius:var(--r) 0 0 var(--r)}
@@ -1534,8 +1534,8 @@ function excHTML(ex,di,i,inGroup,superBorder='',superAccent='',warmItem=false){
     ondragend="dragEnd(event)"
     ${pending?'data-pending-super="true"':''}>
     <div class="exc-swipe-bg">
-      <div class="sw-lane del"><span class="sw-label">✕</span></div>
-      <div class="sw-lane ss"><span class="sw-label">↭</span></div>
+      <div class="sw-lane del"><span class="sw-label">×</span></div>
+      <div class="sw-lane ss"><span class="sw-label">∞</span></div>
     </div>
     <div class="exc-body">
     <span class="drag-handle${ex.superGroup?' sup':''}" onclick="event.stopPropagation()"></span>
