@@ -82,9 +82,9 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .sw-lane{width:220px;display:flex;align-items:center;opacity:1;transition:none;position:relative}
 .sw-lane.del{justify-content:center;background:rgba(220,38,38,.22)}
 .sw-lane.ss{justify-content:center;background:rgba(168,85,247,.20)}
-.sw-label{font-size:16px;font-family:'DM Mono',monospace;white-space:nowrap;opacity:calc(.55 + var(--swipe-progress,0) * .45);position:absolute;top:50%;transition:transform .08s linear,opacity .08s linear}
-.sw-lane.del .sw-label{left:100%;color:#ff7d7d;transform:translate(calc(-20px - (var(--swipe-px,0px) * .55)),-50%)}
-.sw-lane.ss .sw-label{right:100%;color:#e9d5ff;transform:translate(calc(20px + (var(--swipe-px,0px) * .55)),-50%)}
+.sw-label{font-size:16px;font-family:'DM Mono',monospace;white-space:nowrap;opacity:calc(.72 + var(--swipe-progress,0) * .28);position:absolute;top:50%;transition:transform .08s linear,opacity .08s linear}
+.sw-lane.del .sw-label{left:100%;color:#ff7d7d;transform:translate(calc(-10px - (var(--swipe-px,0px) * .36)),-50%)}
+.sw-lane.ss .sw-label{right:100%;color:#e9d5ff;font-size:22px;transform:translate(calc(10px + (var(--swipe-px,0px) * .36)),-50%)}
 .exc.standalone .sw-lane.del{border-radius:var(--r) 0 0 var(--r)}
 .exc.standalone .sw-lane.ss{border-radius:0 var(--r) var(--r) 0}
 .exc.sw-right .sw-lane.del{opacity:1}
@@ -1357,7 +1357,7 @@ function getSetProgressText(ex){
 }
 
 const SWIPE_MAX=132;
-const SWIPE_TRIGGER=124;
+const SWIPE_TRIGGER=98;
 let excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,di:null,i:null,lock:'',moved:false,pointerId:null};
 let pullRefreshState={active:false,startX:0,startY:0,armed:false};
 function resetExcSwipeState(){
