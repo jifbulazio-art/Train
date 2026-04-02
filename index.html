@@ -109,7 +109,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 /* drag handle */
 .drag-handle{position:relative;width:12px;height:22px;cursor:grab;flex-shrink:0;touch-action:none;opacity:.8;margin-top:10px}
 .drag-handle::before{content:'›';position:absolute;left:2px;top:50%;transform:translateY(-50%);font-family:'DM Mono',monospace;font-size:13px;line-height:1;color:#ff9a9a;opacity:.8}
-.drag-handle.sup::before{color:var(--sup-border,#b06bff)}
+.drag-handle.sup::before{color:var(--sup-accent,#b06bff)}
 .swipe-hint{position:absolute;top:50%;transform:translateY(-50%);font-family:'DM Mono',monospace;font-size:13px;line-height:1;pointer-events:none;opacity:.78;color:#cfb3ff}
 .swipe-hint.right{right:9px}
 .drag-handle:active{cursor:grabbing}
@@ -1211,7 +1211,7 @@ function buildExListHTML(di,exs){
       const col=sgColor[ex.superGroup];
       const grp=exs.map((e,idx)=>({e,idx})).filter(({e})=>e.superGroup===ex.superGroup);
       html+=`<div class="group-tag super" style="color:${col.l};border-color:${col.b};background:${col.bg}">SUPERSERIE</div>`;
-      html+=grp.map(({e,idx})=>excHTML(e,di,idx,false,col.b)).join('');
+      html+=grp.map(({e,idx})=>excHTML(e,di,idx,false,col.b,col.l)).join('');
       continue;
     }
     if(exType==='warm'){
@@ -1219,11 +1219,11 @@ function buildExListHTML(di,exs){
       while(j<exs.length&&!exs[j].superGroup&&((exs[j].type||getExType(exs[j].name))==='warm')) j++;
       const warmGroup=exs.slice(i,j).map((e,k)=>({e,idx:i+k}));
       html+=`<div class="group-tag warm">CALENTAMIENTO</div>`;
-      html+=warmGroup.map(({e,idx})=>excHTML(e,di,idx,false,'')).join('');
+      html+=warmGroup.map(({e,idx})=>excHTML(e,di,idx,false,'','')).join('');
       i=j-1;
       continue;
     }
-    html+=excHTML(ex,di,i,false,'');
+    html+=excHTML(ex,di,i,false,'','');
   }
   return html;
 }
@@ -1500,14 +1500,16 @@ function setupPullToRefresh(){
   });
 }
 
-function excHTML(ex,di,i,inGroup,superColor=''){
+function excHTML(ex,di,i,inGroup,superBorder='',superAccent=''){
   const img=getExImg(ex.name);
   const exType=ex.type||getExType(ex.name);
   const meta=getPlannedMeta(ex);
   const progressHTML=getSetProgressHTML(ex);
   const pending=isPendingSuper(di,i);
   const ssClass=(pending||ex.superGroup||pendingSuperLink)?' on':'';
-  const rowStyle=ex.superGroup?` style="--sup-border:${superColor||'#6e7cff'};"`:'';
+  const rowStyle=ex.superGroup
+    ? ` style="--sup-border:${superBorder||'#6e7cff'};--sup-accent:${superAccent||'#b06bff'};"`
+    : '';
   return `<div class="exc${inGroup?'':' standalone'}${ex.superGroup?' sup-item':''}"${rowStyle}
     onclick="excTap(event,${di},${i})"
     onpointerdown="excPointerDown(event,${di},${i})"
