@@ -115,7 +115,8 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .swipe-hint.right{right:9px}
 .drag-handle:active{cursor:grabbing}
 .exc.dragging{opacity:.4}
-.exc.drag-over{border-top:2px solid var(--pull)}
+.exc.drag-over-top .exc-body{box-shadow:inset 0 2px 0 0 var(--pull)}
+.exc.drag-over-bottom .exc-body{box-shadow:inset 0 -2px 0 0 var(--pull)}
 
 .add-ex-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:12px;background:transparent;border:1px dashed var(--b2);border-radius:var(--r);color:var(--tx3);font-size:13px;margin-top:8px}
 .add-ex-btn:active{background:var(--s1)}
@@ -1573,23 +1574,40 @@ function dragStart(e,di,idx){
   e.currentTarget.classList.add('dragging');
   e.dataTransfer.effectAllowed='move';
 }
+function clearDragMarks(){
+  document.querySelectorAll('.exc').forEach(el=>{
+    el.classList.remove('drag-over-top');
+    el.classList.remove('drag-over-bottom');
+    delete el.dataset.dropPos;
+  });
+}
 function dragOver(e,di,idx){
   e.preventDefault();e.dataTransfer.dropEffect='move';
-  document.querySelectorAll('.exc').forEach(el=>el.classList.remove('drag-over'));
-  if(dragSrcIdx!==idx) e.currentTarget.classList.add('drag-over');
+  clearDragMarks();
+  if(dragSrcIdx===idx) return;
+  const rect=e.currentTarget.getBoundingClientRect();
+  const after=e.clientY>(rect.top+rect.height/2);
+  e.currentTarget.dataset.dropPos=after?'after':'before';
+  e.currentTarget.classList.add(after?'drag-over-bottom':'drag-over-top');
 }
 function dragDrop(e,di,idx){
   e.preventDefault();
   if(dragSrcDay===di&&dragSrcIdx!==idx){
     const arr=weekData[di]||[];
+    const target=e.currentTarget;
+    const dropPos=(target?.dataset?.dropPos==='after')?'after':'before';
+    let insertIdx=idx+(dropPos==='after'?1:0);
     const [item]=arr.splice(dragSrcIdx,1);
-    arr.splice(idx,0,item);
+    if(dragSrcIdx<insertIdx) insertIdx--;
+    insertIdx=Math.max(0,Math.min(arr.length,insertIdx));
+    arr.splice(insertIdx,0,item);
     weekData[di]=arr;sbSave();renderDay();
   }
-  document.querySelectorAll('.exc').forEach(el=>el.classList.remove('drag-over'));
+  clearDragMarks();
 }
 function dragEnd(e){
-  document.querySelectorAll('.exc').forEach(el=>{el.classList.remove('dragging');el.classList.remove('drag-over');});
+  document.querySelectorAll('.exc').forEach(el=>el.classList.remove('dragging'));
+  clearDragMarks();
 }
 
 // â•â• TYPE PICKER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
