@@ -82,15 +82,15 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .sw-lane{width:220px;display:flex;align-items:center;opacity:1;transition:none;position:relative}
 .sw-lane.del{justify-content:center;background:rgba(220,38,38,.22)}
 .sw-lane.ss{justify-content:center;background:rgba(168,85,247,.20)}
-.sw-label{font-size:22px;font-family:'DM Sans','Segoe UI Symbol','Arial Unicode MS',sans-serif;font-weight:700;white-space:nowrap;opacity:0;position:absolute;top:50%;line-height:1;transition:transform .06s linear,opacity .06s linear}
-.sw-lane.del .sw-label{right:6px;color:#ff7d7d;transform:translate(calc(-1 * var(--swipe-px,0px) * .5),-50%)}
-.sw-lane.ss .sw-label{left:6px;color:#e9d5ff;font-size:30px;transform:translate(calc(var(--swipe-px,0px) * .5),-50%)}
+.sw-icon{position:absolute;top:50%;line-height:1;font-family:'DM Sans','Segoe UI Symbol','Arial Unicode MS',sans-serif;font-weight:700;white-space:nowrap;opacity:0;transition:transform .06s linear,opacity .06s linear}
+.sw-icon.del{left:0;color:#ff7d7d;font-size:24px;transform:translate(calc((var(--swipe-px,0px) + 6px)/2 - .45em),-50%)}
+.sw-icon.ss{right:0;color:#e9d5ff;font-size:34px;transform:translate(calc(-1 * ((var(--swipe-px,0px) + 6px)/2 - .45em)),-50%)}
 .exc.standalone .sw-lane.del{border-radius:var(--r) 0 0 var(--r)}
 .exc.standalone .sw-lane.ss{border-radius:0 var(--r) var(--r) 0}
 .exc.sw-right .sw-lane.del{opacity:1}
 .exc.sw-left .sw-lane.ss{opacity:1}
-.exc.sw-right .sw-lane.del .sw-label{opacity:1}
-.exc.sw-left .sw-lane.ss .sw-label{opacity:1}
+.exc.sw-right .sw-icon.del{opacity:1}
+.exc.sw-left .sw-icon.ss{opacity:1}
 .exc-thumb{width:42px;height:42px;border-radius:9px;background:var(--s2);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid var(--b1)}
 .exc-thumb img{width:100%;height:100%;object-fit:cover}
 .exc-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
@@ -1536,8 +1536,10 @@ function excHTML(ex,di,i,inGroup,superBorder='',superAccent='',warmItem=false){
     ondragend="dragEnd(event)"
     ${pending?'data-pending-super="true"':''}>
     <div class="exc-swipe-bg">
-      <div class="sw-lane del"><span class="sw-label">×</span></div>
-      <div class="sw-lane ss"><span class="sw-label">∞</span></div>
+      <div class="sw-lane del"></div>
+      <div class="sw-lane ss"></div>
+      <span class="sw-icon del">×</span>
+      <span class="sw-icon ss">∞</span>
     </div>
     <div class="exc-body">
     <span class="drag-handle${ex.superGroup?' sup':''}" onclick="event.stopPropagation()"></span>
