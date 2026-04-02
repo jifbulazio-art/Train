@@ -74,7 +74,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc.standalone{border-radius:var(--r);margin-bottom:4px}
 .exc:active{opacity:.75}
 .exc.swiping{opacity:1}
-.exc-body{display:flex;align-items:flex-start;gap:10px;padding:10px 11px 10px 26px;position:relative;z-index:2;width:calc(100% - 8px);margin:0 4px;background:var(--bg);transition:transform .18s ease;border-bottom:1px solid var(--b0)}
+.exc-body{display:flex;align-items:flex-start;gap:10px;padding:10px 11px 10px 26px;position:relative;z-index:2;width:calc(100% - 12px);margin:0 6px;background:var(--bg);transition:transform .18s ease;border-bottom:1px solid var(--b0)}
 .exc:last-child .exc-body{border-bottom:none}
 .exc.standalone .exc-body{border-radius:var(--r);border:1px solid var(--b1)}
 .exc.sup-item .exc-body{border-color:var(--sup-border,#6e7cff)}
@@ -82,9 +82,9 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .sw-lane{width:220px;display:flex;align-items:center;opacity:1;transition:none;position:relative}
 .sw-lane.del{justify-content:center;background:rgba(220,38,38,.22)}
 .sw-lane.ss{justify-content:center;background:rgba(168,85,247,.20)}
-.sw-label{font-size:16px;font-family:'DM Mono',monospace;white-space:nowrap;opacity:calc(.72 + var(--swipe-progress,0) * .28);position:absolute;top:50%;transition:transform .08s linear,opacity .08s linear}
-.sw-lane.del .sw-label{left:100%;color:#ff7d7d;transform:translate(calc(-10px - (var(--swipe-px,0px) * .36)),-50%)}
-.sw-lane.ss .sw-label{right:100%;color:#e9d5ff;font-size:22px;transform:translate(calc(10px + (var(--swipe-px,0px) * .36)),-50%)}
+.sw-label{font-size:22px;font-family:'DM Mono',monospace;white-space:nowrap;opacity:1;position:absolute;top:50%;transition:transform .06s linear}
+.sw-lane.del .sw-label{left:100%;color:#ff7d7d;transform:translate(calc(-3px - (var(--swipe-px,0px) * .20)),-50%)}
+.sw-lane.ss .sw-label{right:100%;color:#e9d5ff;font-size:30px;transform:translate(calc(3px + (var(--swipe-px,0px) * .20)),-50%)}
 .exc.standalone .sw-lane.del{border-radius:var(--r) 0 0 var(--r)}
 .exc.standalone .sw-lane.ss{border-radius:0 var(--r) var(--r) 0}
 .exc.sw-right .sw-lane.del{opacity:1}
@@ -1357,7 +1357,7 @@ function getSetProgressText(ex){
 }
 
 const SWIPE_MAX=132;
-const SWIPE_TRIGGER=98;
+const SWIPE_TRIGGER=84;
 let excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,di:null,i:null,lock:'',moved:false,pointerId:null};
 let pullRefreshState={active:false,startX:0,startY:0,armed:false};
 function resetExcSwipeState(){
