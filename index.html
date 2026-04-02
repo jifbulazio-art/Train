@@ -82,9 +82,9 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .sw-lane{width:220px;display:flex;align-items:center;opacity:1;transition:none;position:relative}
 .sw-lane.del{justify-content:center;background:rgba(220,38,38,.22)}
 .sw-lane.ss{justify-content:center;background:rgba(168,85,247,.20)}
-.sw-icon{position:absolute;top:50%;line-height:1;font-family:'DM Sans','Segoe UI Symbol','Arial Unicode MS',sans-serif;font-weight:700;white-space:nowrap;opacity:var(--swipe-icon-o,0);transition:transform .06s linear,opacity .06s linear}
-.sw-icon.del{left:var(--swipe-px,0px);color:#ff7d7d;font-size:24px;transform:translate(calc(-.5em - var(--swipe-icon-shift,0px)),-50%)}
-.sw-icon.ss{right:var(--swipe-px,0px);color:#e9d5ff;font-size:34px;transform:translate(calc(.5em + var(--swipe-icon-shift,0px)),-50%)}
+.sw-icon{position:absolute;top:50%;line-height:1;font-family:'DM Sans','Segoe UI Symbol','Arial Unicode MS',sans-serif;font-weight:700;white-space:nowrap;opacity:var(--swipe-icon-o,0);transition:transform .08s ease-out,opacity .08s ease-out}
+.sw-icon.del{left:calc(var(--swipe-px,0px) + 6px);color:#ff7d7d;font-size:24px;transform:translate(calc(-.5em - var(--swipe-icon-shift,0px)),calc(-50% + var(--swipe-icon-y,10px)))}
+.sw-icon.ss{right:calc(var(--swipe-px,0px) + 6px);color:#e9d5ff;font-size:34px;transform:translate(calc(.5em + var(--swipe-icon-shift,0px)),calc(-50% + var(--swipe-icon-y,10px)))}
 .exc.standalone .sw-lane.del{border-radius:var(--r) 0 0 var(--r)}
 .exc.standalone .sw-lane.ss{border-radius:0 var(--r) var(--r) 0}
 .exc.sw-right .sw-lane.del{opacity:1}
@@ -1374,6 +1374,7 @@ function beginExcSwipe(startX,startY,el,body,di,i,pointerId=null){
   if(el) el.style.setProperty('--swipe-px','0px');
   if(el) el.style.setProperty('--swipe-icon-o','0');
   if(el) el.style.setProperty('--swipe-icon-shift','0px');
+  if(el) el.style.setProperty('--swipe-icon-y','10px');
   body.style.transition='none';
 }
 function moveExcSwipe(clientX,clientY,preventDefaultFn){
@@ -1390,13 +1391,15 @@ function moveExcSwipe(clientX,clientY,preventDefaultFn){
   const clamped=Math.max(-max,Math.min(max,dx));
   const progress=Math.min(1,Math.abs(clamped)/max);
   const iconT=progress<=.8?0:Math.min(1,(progress-.8)/.2);
+  const iconE=iconT*iconT*(3-2*iconT);
   excSwipeState.dx=clamped;
   excSwipeState.moved=true;
   excSwipeState.el.classList.add('swiping');
   excSwipeState.el.style.setProperty('--swipe-progress',progress.toFixed(3));
   excSwipeState.el.style.setProperty('--swipe-px',`${Math.abs(clamped)}px`);
-  excSwipeState.el.style.setProperty('--swipe-icon-o',iconT.toFixed(3));
-  excSwipeState.el.style.setProperty('--swipe-icon-shift',`${(Math.abs(clamped)*0.5*iconT).toFixed(2)}px`);
+  excSwipeState.el.style.setProperty('--swipe-icon-o',(iconE*.96).toFixed(3));
+  excSwipeState.el.style.setProperty('--swipe-icon-shift',`${(Math.abs(clamped)*0.5*iconE).toFixed(2)}px`);
+  excSwipeState.el.style.setProperty('--swipe-icon-y',`${((1-iconE)*10).toFixed(2)}px`);
   if(clamped>2){
     excSwipeState.el.classList.add('sw-right');
     excSwipeState.el.classList.remove('sw-left');
@@ -1422,6 +1425,7 @@ function endExcSwipe(){
     el.style.setProperty('--swipe-px','0px');
     el.style.setProperty('--swipe-icon-o','0');
     el.style.setProperty('--swipe-icon-shift','0px');
+    el.style.setProperty('--swipe-icon-y','10px');
   }
   if(moved && Math.abs(dx)>= (excSwipeState.trigger||Math.round(SWIPE_MAX_FALLBACK*SWIPE_TRIGGER_RATIO))){
     if(dx>0) removeFromDay(di,i);
