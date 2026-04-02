@@ -1530,8 +1530,8 @@ function excHTML(ex,di,i,inGroup,superBorder='',superAccent='',warmItem=false){
     ondragend="dragEnd(event)"
     ${pending?'data-pending-super="true"':''}>
     <div class="exc-swipe-bg">
-      <div class="sw-lane del"><span class="sw-label">Eliminar</span></div>
-      <div class="sw-lane ss"><span class="sw-label">${getSupersetSwipeLabel(ex,di,i)}</span></div>
+      <div class="sw-lane del"><span class="sw-label">✕</span></div>
+      <div class="sw-lane ss"><span class="sw-label">↭</span></div>
     </div>
     <div class="exc-body">
     <span class="drag-handle${ex.superGroup?' sup':''}" onclick="event.stopPropagation()"></span>
