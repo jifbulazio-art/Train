@@ -82,9 +82,9 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .sw-lane{width:220px;display:flex;align-items:center;opacity:1;transition:none;position:relative}
 .sw-lane.del{justify-content:center;background:rgba(220,38,38,.22)}
 .sw-lane.ss{justify-content:center;background:rgba(168,85,247,.20)}
-.sw-label{font-size:22px;font-family:'DM Mono',monospace;white-space:nowrap;opacity:1;position:absolute;top:50%;transition:transform .06s linear}
-.sw-lane.del .sw-label{left:100%;color:#ff7d7d;transform:translate(calc(-3px - (var(--swipe-px,0px) * .20)),-50%)}
-.sw-lane.ss .sw-label{right:100%;color:#e9d5ff;font-size:30px;transform:translate(calc(3px + (var(--swipe-px,0px) * .20)),-50%)}
+.sw-label{font-size:24px;font-family:'DM Mono',monospace;white-space:nowrap;opacity:1;position:absolute;top:50%;transition:transform .06s linear}
+.sw-lane.del .sw-label{right:-2px;color:#ff7d7d;transform:translate(calc(-1 * var(--swipe-px,0px) * .55),-50%)}
+.sw-lane.ss .sw-label{left:-2px;color:#e9d5ff;font-size:34px;transform:translate(calc(var(--swipe-px,0px) * .55),-50%)}
 .exc.standalone .sw-lane.del{border-radius:var(--r) 0 0 var(--r)}
 .exc.standalone .sw-lane.ss{border-radius:0 var(--r) var(--r) 0}
 .exc.sw-right .sw-lane.del{opacity:1}
@@ -1356,15 +1356,18 @@ function getSetProgressText(ex){
   }).join(' | ');
 }
 
-const SWIPE_MAX=132;
-const SWIPE_TRIGGER=84;
-let excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,di:null,i:null,lock:'',moved:false,pointerId:null};
+const SWIPE_MAX_FALLBACK=96;
+const SWIPE_TRIGGER_RATIO=.62;
+let excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,di:null,i:null,lock:'',moved:false,pointerId:null,max:SWIPE_MAX_FALLBACK,trigger:Math.round(SWIPE_MAX_FALLBACK*SWIPE_TRIGGER_RATIO)};
 let pullRefreshState={active:false,startX:0,startY:0,armed:false};
 function resetExcSwipeState(){
-  excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,di:null,i:null,lock:'',moved:false,pointerId:null};
+  excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,di:null,i:null,lock:'',moved:false,pointerId:null,max:SWIPE_MAX_FALLBACK,trigger:Math.round(SWIPE_MAX_FALLBACK*SWIPE_TRIGGER_RATIO)};
 }
 function beginExcSwipe(startX,startY,el,body,di,i,pointerId=null){
-  excSwipeState={active:true,el,body,startX,startY,dx:0,di,i,lock:'',moved:false,pointerId};
+  const h=Math.max(44,Math.min(110,Math.round(body?.getBoundingClientRect?.().height||SWIPE_MAX_FALLBACK)));
+  const max=h;
+  const trigger=Math.max(30,Math.round(max*SWIPE_TRIGGER_RATIO));
+  excSwipeState={active:true,el,body,startX,startY,dx:0,di,i,lock:'',moved:false,pointerId,max,trigger};
   if(el) el.style.setProperty('--swipe-progress','0');
   if(el) el.style.setProperty('--swipe-px','0px');
   body.style.transition='none';
@@ -1379,8 +1382,9 @@ function moveExcSwipe(clientX,clientY,preventDefaultFn){
   }
   if(excSwipeState.lock!=='x') return;
   if(preventDefaultFn) preventDefaultFn();
-  const clamped=Math.max(-SWIPE_MAX,Math.min(SWIPE_MAX,dx));
-  const progress=Math.min(1,Math.abs(clamped)/SWIPE_MAX);
+  const max=excSwipeState.max||SWIPE_MAX_FALLBACK;
+  const clamped=Math.max(-max,Math.min(max,dx));
+  const progress=Math.min(1,Math.abs(clamped)/max);
   excSwipeState.dx=clamped;
   excSwipeState.moved=true;
   excSwipeState.el.classList.add('swiping');
@@ -1410,7 +1414,7 @@ function endExcSwipe(){
     el.style.setProperty('--swipe-progress','0');
     el.style.setProperty('--swipe-px','0px');
   }
-  if(moved && Math.abs(dx)>=SWIPE_TRIGGER){
+  if(moved && Math.abs(dx)>= (excSwipeState.trigger||Math.round(SWIPE_MAX_FALLBACK*SWIPE_TRIGGER_RATIO))){
     if(dx>0) removeFromDay(di,i);
     else supersetAction(di,i);
     if(el){
