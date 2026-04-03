@@ -90,26 +90,18 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   border-radius:999px;background:rgba(255,255,255,.08)
 }
 .exc-group-mark::after{
-  content:'';position:absolute;left:8px;right:-7px;top:50%;height:2px;transform:translateY(-50%);
+  content:'';position:absolute;left:8px;width:10px;top:50%;height:2px;transform:translateY(-50%);
   border-radius:999px;background:rgba(255,255,255,.08)
 }
 .exc-group-mark.plain::before{display:none}
 .exc-group-mark.plain::after{display:none}
+.exc.group-mid .exc-group-mark::after{display:none}
 .exc.group-start .exc-group-mark::before{top:50%}
 .exc.group-end .exc-group-mark::before{bottom:50%}
 .exc.group-single .exc-group-mark::before{display:none}
 .exc.group-single .exc-group-mark::after{display:none}
-.exc-group-badge{
-  position:relative;z-index:1;
-  min-width:18px;height:18px;padding:0 4px;border-radius:999px;
-  display:inline-flex;align-items:center;justify-content:center;
-  font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase;
-  border:1px solid rgba(255,255,255,.08);background:var(--s2);color:var(--tx3)
-}
 .exc.group-super .exc-group-mark::before,.exc.group-super .exc-group-mark::after{background:rgba(129,140,248,.38)}
-.exc.group-super .exc-group-badge{color:#c7d2fe;background:rgba(99,102,241,.12);border-color:rgba(129,140,248,.26)}
 .exc.group-warm .exc-group-mark::before,.exc.group-warm .exc-group-mark::after{background:rgba(245,197,24,.4)}
-.exc.group-warm .exc-group-badge{color:#f6d86d;background:rgba(245,197,24,.10);border-color:rgba(245,197,24,.22)}
 .exc-swipe-bg{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:stretch;pointer-events:none;z-index:1;overflow:hidden}
 .sw-lane{width:220px;display:flex;align-items:center;opacity:1;transition:none;position:relative}
 .sw-lane.del{justify-content:center;background:rgba(220,38,38,.16)}
@@ -1677,7 +1669,6 @@ function excHTML(ex,di,i,inGroup,superBorder='',superAccent='',warmItem=false,gr
     : '';
   const warmClass=warmItem?' warm-item':'';
   const groupCls=groupKind?` group-${groupKind} group-${groupPos}`:' group-single';
-  const badge=groupKind==='super'?'SS':(groupKind==='warm'?'WU':'');
   return `<div class="exc${inGroup?'':' standalone'}${ex.superGroup?' sup-item':''}${warmClass}${openRight?' sw-open-right':''}${openLeft?' sw-open-left':''}${groupCls}"${rowStyle}
     onclick="excTap(event,${di},${i})"
     onpointerdown="excPointerDown(event,${di},${i})"
@@ -1703,7 +1694,7 @@ function excHTML(ex,di,i,inGroup,superBorder='',superAccent='',warmItem=false,gr
     ${openRight?`<button class="sw-action-btn del" type="button" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation();confirmSwipeDelete(${di},${i})" aria-label="Eliminar"></button>`:''}
     ${openLeft?`<button class="sw-action-btn ss" type="button" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation();supersetAction(${di},${i})" aria-label="Superserie"></button>`:''}
     <div class="exc-body">
-    ${badge?`<div class="exc-group-mark"><span class="exc-group-badge">${badge}</span></div>`:'<div class="exc-group-mark plain"></div>'}
+    ${groupKind?`<div class="exc-group-mark"></div>`:'<div class="exc-group-mark plain"></div>'}
     <span class="drag-handle${ex.superGroup?' sup':''}" onclick="event.stopPropagation()"></span>
     <div class="exc-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,"\\'")}')">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(exType)}</div>
     <div class="exc-info${pending?' exc-pending':''}">
