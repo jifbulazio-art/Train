@@ -270,34 +270,56 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc-inline-confirm{
   display:flex;
   align-items:center;
-  gap:6px;
+  gap:5px;
   flex-shrink:0;
   margin-left:8px;
   align-self:center;
-  padding:4px;
+  padding:5px;
   border-radius:999px;
-  border:1px solid rgba(220,38,38,.18);
-  background:rgba(255,255,255,.02);
+  border:1px solid rgba(255,255,255,.06);
+  background:rgba(255,255,255,.025);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
 }
 .exc-inline-btn{
-  width:28px;
-  height:28px;
+  width:26px;
+  height:26px;
   border-radius:999px;
-  border:1px solid var(--b1);
-  background:var(--s2);
-  color:var(--tx2);
+  border:none;
+  background:transparent;
+  color:var(--tx3);
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:14px;
+  font-size:0;
   line-height:1;
   flex-shrink:0;
+  position:relative;
 }
-.exc-inline-btn.cancel{color:var(--tx2)}
+.exc-inline-btn::before,.exc-inline-btn::after{
+  content:'';
+  position:absolute;
+  display:block;
+  border-radius:999px;
+}
+.exc-inline-btn.cancel{
+  background:rgba(255,255,255,.03);
+}
+.exc-inline-btn.cancel::before{
+  width:11px;height:1.6px;background:currentColor;transform:rotate(45deg);
+}
+.exc-inline-btn.cancel::after{
+  width:11px;height:1.6px;background:currentColor;transform:rotate(-45deg);
+}
 .exc-inline-btn.delete{
-  color:#ff9e9e;
-  border-color:rgba(220,38,38,.32);
-  background:rgba(220,38,38,.12);
+  background:rgba(78,207,122,.10);
+  color:#7fe0a0;
+  box-shadow:inset 0 0 0 1px rgba(78,207,122,.18);
+}
+.exc-inline-btn.delete::before{
+  width:9px;height:1.8px;background:currentColor;transform:translate(2px,1px) rotate(-45deg);
+}
+.exc-inline-btn.delete::after{
+  width:5px;height:1.8px;background:currentColor;transform:translate(-3px,4px) rotate(45deg);
 }
 
 /* â”€â”€ TOAST â”€â”€ */
@@ -1321,7 +1343,8 @@ function getSetProgress(ex){
 function getSetProgressHTML(ex){
   return getSetProgress(ex).map(item=>{
     const done=item.hasAnyValue && item.value;
-    return `<span class="exc-progress-chip${done?' done':''}">${item.label}${item.hasAnyValue?` ${item.value||'-'}`:''}</span>`;
+    const text=item.hasAnyValue ? (item.value||'-') : '-';
+    return `<span class="exc-progress-chip${done?' done':''}">${text}</span>`;
   }).join('');
 }
 
@@ -1393,7 +1416,7 @@ function supersetAction(di,i){
 
 function getSetProgressText(ex){
   return getSetProgress(ex).map(item=>{
-    return item.hasAnyValue ? `${item.label} ${item.value||'-'}` : item.label;
+    return item.hasAnyValue ? `${item.value||'-'}` : '-';
   }).join(' | ');
 }
 
