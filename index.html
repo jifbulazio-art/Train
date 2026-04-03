@@ -90,7 +90,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .sw-lane{width:220px;display:flex;align-items:center;opacity:1;transition:none;position:relative}
 .sw-lane.del{justify-content:center;background:rgba(220,38,38,.16)}
 .sw-lane.ss{justify-content:center;background:rgba(168,85,247,.15)}
-.sw-icon{position:absolute;top:50%;width:22px;height:22px;font-size:0;line-height:0;white-space:nowrap;opacity:var(--swipe-icon-o,0);transition:transform .08s ease-out,opacity .08s ease-out}
+.sw-icon{position:absolute;top:50%;width:22px;height:22px;font-size:0;line-height:0;white-space:nowrap;opacity:var(--swipe-icon-o,0);transition:transform .08s ease-out,opacity .08s ease-out,filter .18s ease-out}
 .sw-icon::before{
   content:'';
   position:absolute;
@@ -102,6 +102,14 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .sw-icon.del{left:calc(var(--swipe-px,0px) + 6px);color:#ff8f8f;--swipe-icon-x:calc(-11px - var(--swipe-icon-shift,0px));transform:translate(var(--swipe-icon-x),-50%)}
 .sw-icon.ss{right:calc(var(--swipe-px,0px) + 6px);color:#d7bcff;--swipe-icon-x:calc(11px + var(--swipe-icon-shift,0px));transform:translate(var(--swipe-icon-x),-50%)}
 .sw-icon.ss::before{transform:rotate(45deg)}
+.exc.sw-open-right .sw-icon.del{
+  left:calc(4px + (var(--swipe-px,0px) / 2));
+  transform:translate(-50%,-50%);
+}
+.exc.sw-open-left .sw-icon.ss{
+  right:calc(4px + (var(--swipe-px,0px) / 2));
+  transform:translate(50%,-50%);
+}
 .exc.standalone .sw-lane.del{border-radius:var(--r) 0 0 var(--r)}
 .exc.standalone .sw-lane.ss{border-radius:0 var(--r) var(--r) 0}
 .exc.sw-right .sw-lane.del{opacity:1}
@@ -111,20 +119,22 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc.sw-open-right .sw-lane.del,.exc.sw-open-left .sw-lane.ss{opacity:1}
 .exc.sw-open-right .sw-icon.del,.exc.sw-open-left .sw-icon.ss{
   opacity:1;
-  animation:swActionPulse 1.2s ease-in-out infinite;
+  animation:swActionGlow 1.35s ease-in-out infinite;
 }
 .sw-action-btn{
   position:absolute;
   top:50%;
-  width:38px;
-  height:38px;
+  width:44px;
+  height:44px;
   transform:translateY(-50%);
   border:none;
   background:transparent;
-  z-index:3;
+  z-index:5;
+  pointer-events:auto;
+  cursor:pointer;
 }
-.sw-action-btn.del{left:calc(var(--swipe-px,0px) - 8px)}
-.sw-action-btn.ss{right:calc(var(--swipe-px,0px) - 8px)}
+.exc.sw-open-right .sw-action-btn.del{left:calc(4px + (var(--swipe-px,0px) / 2) - 22px)}
+.exc.sw-open-left .sw-action-btn.ss{right:calc(4px + (var(--swipe-px,0px) / 2) - 22px)}
 .exc-thumb{width:42px;height:42px;border-radius:9px;background:var(--s2);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid var(--b1)}
 .exc-thumb img{width:100%;height:100%;object-fit:cover}
 .exc-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
@@ -146,9 +156,9 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc.dragging{opacity:.4}
 .exc.drag-over-top .exc-body{box-shadow:inset 0 2px 0 0 var(--pull)}
 .exc.drag-over-bottom .exc-body{box-shadow:inset 0 -2px 0 0 var(--pull)}
-@keyframes swActionPulse{
-  0%,100%{transform:translate(calc(var(--swipe-icon-x,0px)),-50%) scale(1)}
-  50%{transform:translate(calc(var(--swipe-icon-x,0px)),-50%) scale(1.08)}
+@keyframes swActionGlow{
+  0%,100%{opacity:1;filter:drop-shadow(0 0 0 rgba(255,255,255,0))}
+  50%{opacity:.82;filter:drop-shadow(0 0 8px rgba(255,255,255,.14))}
 }
 
 .add-ex-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:12px;background:transparent;border:1px dashed var(--b2);border-radius:var(--r);color:var(--tx3);font-size:13px;margin-top:8px}
@@ -1476,6 +1486,15 @@ function endExcSwipe(){
   if(shouldOpen){
     if(dx>0){
       setOpenSwipe(di,i,'right');
+    }else if((weekData?.[di]?.[i]?.superGroup)){
+      supersetAction(di,i);
+      clearOpenSwipe();
+      if(el){
+        el.dataset.swiped='1';
+        setTimeout(()=>{ if(el) delete el.dataset.swiped; },260);
+      }
+      resetExcSwipeState();
+      return;
     }else if(pendingSuperLink && !isPendingSuper(di,i)){
       supersetAction(di,i);
       clearOpenSwipe();
@@ -1645,11 +1664,9 @@ function excHTML(ex,di,i,inGroup,superBorder='',superAccent='',warmItem=false){
       <div class="sw-lane ss"></div>
       <span class="sw-icon del">×</span>
       <span class="sw-icon ss">∞</span>
-      ${openRight?`<button class="sw-action-btn del" type="button" onclick="event.stopPropagation();confirmSwipeDelete(${di},${i})" aria-label="Eliminar"></button>`:''}
-      ${openLeft?`<button class="sw-action-btn ss" type="button" onclick="event.stopPropagation();supersetAction(${di},${i})" aria-label="Superserie"></button>`:''}
     </div>
-    ${openRight?`<button class="sw-action-btn del" type="button" onclick="event.stopPropagation();confirmSwipeDelete(${di},${i})" aria-label="Eliminar"></button>`:''}
-    ${openLeft?`<button class="sw-action-btn ss" type="button" onclick="event.stopPropagation();supersetAction(${di},${i})" aria-label="Superserie"></button>`:''}
+    ${openRight?`<button class="sw-action-btn del" type="button" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation();confirmSwipeDelete(${di},${i})" aria-label="Eliminar"></button>`:''}
+    ${openLeft?`<button class="sw-action-btn ss" type="button" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation();supersetAction(${di},${i})" aria-label="Superserie"></button>`:''}
     <div class="exc-body">
     <span class="drag-handle${ex.superGroup?' sup':''}" onclick="event.stopPropagation()"></span>
     <div class="exc-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,"\\'")}')">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(exType)}</div>
