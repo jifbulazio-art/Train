@@ -271,6 +271,40 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .btn-full{width:100%;padding:13px;background:var(--tx);color:var(--bg);border:none;border-radius:var(--rs);font-size:14px;font-weight:600}
 .btn-row{display:flex;gap:8px}
 
+/* delete confirm modal */
+.confirm-overlay{
+  position:fixed;inset:0;z-index:520;
+  background:rgba(0,0,0,.72);backdrop-filter:blur(4px);
+  display:none;align-items:flex-end;justify-content:center;
+  padding:18px 12px calc(14px + env(safe-area-inset-bottom,0px));
+}
+.confirm-overlay.on{display:flex}
+.confirm-card{
+  width:min(100%,460px);
+  background:linear-gradient(180deg,#0f1014,#0c0d10);
+  border:1px solid var(--b1);
+  border-radius:18px;
+  box-shadow:0 16px 38px rgba(0,0,0,.42);
+  padding:14px 14px 12px;
+}
+.confirm-title{
+  font-size:12px;font-family:'DM Mono',monospace;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase
+}
+.confirm-msg{
+  margin-top:7px;color:var(--tx);font-size:14px;line-height:1.45
+}
+.confirm-actions{display:flex;gap:8px;margin-top:12px}
+.confirm-btn{
+  flex:1;padding:11px 12px;border-radius:12px;border:1px solid var(--b1);
+  background:var(--s2);color:var(--tx);font-size:13px
+}
+.confirm-btn.cancel{color:var(--tx2)}
+.confirm-btn.delete{
+  background:rgba(220,38,38,.17);
+  border-color:rgba(220,38,38,.36);
+  color:#ff9e9e;
+}
+
 /* â”€â”€ TOAST â”€â”€ */
 #toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);font-size:12px;font-family:'DM Mono',monospace;padding:6px 16px;border-radius:20px;z-index:999;pointer-events:none;opacity:0;transition:opacity .35s;white-space:nowrap}
 
@@ -341,6 +375,16 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 </div>
 
 <div id="toast"></div>
+<div class="confirm-overlay" id="delete-confirm" onclick="if(event.target===this)closeDeleteConfirm()">
+  <div class="confirm-card">
+    <div class="confirm-title">Confirmar</div>
+    <div class="confirm-msg" id="delete-confirm-msg">Eliminar ejercicio de la rutina?</div>
+    <div class="confirm-actions">
+      <button class="confirm-btn cancel" type="button" onclick="closeDeleteConfirm()">Cancelar</button>
+      <button class="confirm-btn delete" type="button" onclick="confirmDeleteFromDay()">Eliminar</button>
+    </div>
+  </div>
+</div>
 
 <!-- â•â• TYPE PICKER â•â• -->
 <div class="picker-overlay" id="type-picker" onclick="if(event.target===this)closePicker()">
@@ -953,6 +997,7 @@ let detailPlan={sets:'',reps:'',unit:'rep'};
 let eeCtx={id:null,sourceName:null,sourceType:null,sourceMuscle:null,sourceModality:null};
 let eeImgData=null;
 let eeReturnToAdd=false;
+let deleteCtx={di:null,i:null,name:''};
 
 // edit routine state
 let reCtx={id:null};
@@ -1583,10 +1628,25 @@ function getTypeEmoji(t){
 }
 
 function removeFromDay(di,i){
-  if(!confirm('Eliminar?'))return;
+  const ex=weekData?.[di]?.[i];
+  if(!ex) return;
+  deleteCtx={di,i,name:ex.name||'este ejercicio'};
+  const msg=document.getElementById('delete-confirm-msg');
+  if(msg) msg.textContent=`Eliminar "${deleteCtx.name}" de la rutina de ${DAYS[di]}?`;
+  document.getElementById('delete-confirm')?.classList.add('on');
+}
+function closeDeleteConfirm(){
+  document.getElementById('delete-confirm')?.classList.remove('on');
+  deleteCtx={di:null,i:null,name:''};
+}
+function confirmDeleteFromDay(){
+  const {di,i}=deleteCtx;
+  if(di==null || i==null){closeDeleteConfirm();return;}
+  if(!weekData?.[di]?.[i]){closeDeleteConfirm();return;}
   weekData[di].splice(i,1);
   normalizeSupersets(di);
   pendingSuperLink=null;
+  closeDeleteConfirm();
   sbSave();renderDay();
 }
 function toggleRun(di){
