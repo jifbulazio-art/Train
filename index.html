@@ -74,7 +74,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc.standalone{border-radius:var(--r);margin-bottom:4px}
 .exc:active{opacity:.75}
 .exc.swiping{opacity:1}
-.exc-body{display:flex;align-items:flex-start;gap:10px;padding:10px 11px 10px 26px;position:relative;z-index:2;width:calc(100% - 8px);margin:0 4px;background:var(--bg);transition:transform .18s ease;border-bottom:1px solid var(--b0)}
+.exc-body{display:flex;align-items:flex-start;gap:10px;padding:10px 11px 10px 14px;position:relative;z-index:2;width:calc(100% - 8px);margin:0 4px;background:var(--bg);transition:transform .18s ease;border-bottom:1px solid var(--b0)}
 .exc:last-child .exc-body{border-bottom:none}
 .exc.standalone .exc-body{border-radius:var(--r);border:1px solid var(--b1)}
 .exc.sup-item .exc-body{border-color:var(--sup-border,#6e7cff)}
@@ -118,12 +118,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc-pending .exc-progress-chip{border-color:rgba(176,107,255,.35);background:rgba(176,107,255,.12);color:#d9c3ff}
 .exc-del{background:transparent;border:1px solid var(--b1);color:var(--tx3);font-size:15px;padding:4px 6px;line-height:1;border-radius:7px;flex-shrink:0}
 
-/* drag handle */
-.drag-handle{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:12px;height:16px;cursor:grab;touch-action:none;opacity:.8}
-.drag-handle::before{content:'›';position:absolute;left:0;top:50%;transform:translateY(-50%);font-family:'DM Mono',monospace;font-size:13px;line-height:1;color:#ff9a9a;opacity:.8}
-.drag-handle.sup::before{color:#ff9a9a}
-.swipe-hint{position:absolute;top:50%;transform:translateY(-50%);font-family:'DM Mono',monospace;font-size:13px;line-height:1;pointer-events:none;opacity:.78;color:#cfb3ff}
-.swipe-hint.right{right:9px}
+.drag-handle{position:absolute;left:0;top:0;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none}
 .drag-handle:active{cursor:grabbing}
 .exc.dragging{opacity:.4}
 .exc.drag-over-top .exc-body{box-shadow:inset 0 2px 0 0 var(--pull)}
@@ -272,37 +267,37 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .btn-row{display:flex;gap:8px}
 
 /* inline delete confirmation */
-.exc-delete-inline{
-  margin-top:10px;
-  padding:10px 11px;
-  border-radius:12px;
-  border:1px solid rgba(220,38,38,.24);
-  background:linear-gradient(180deg,rgba(220,38,38,.10),rgba(220,38,38,.05));
-}
-.exc-delete-msg{
-  font-size:12px;
-  color:#ffd1d1;
-  line-height:1.4;
-}
-.exc-delete-actions{
+.exc-inline-confirm{
   display:flex;
-  gap:8px;
-  margin-top:10px;
+  align-items:center;
+  gap:6px;
+  flex-shrink:0;
+  margin-left:8px;
+  align-self:center;
+  padding:4px;
+  border-radius:999px;
+  border:1px solid rgba(220,38,38,.18);
+  background:rgba(255,255,255,.02);
 }
-.exc-delete-btn{
-  flex:1;
-  padding:9px 10px;
-  border-radius:11px;
+.exc-inline-btn{
+  width:28px;
+  height:28px;
+  border-radius:999px;
   border:1px solid var(--b1);
   background:var(--s2);
-  color:var(--tx);
-  font-size:12px;
+  color:var(--tx2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  line-height:1;
+  flex-shrink:0;
 }
-.exc-delete-btn.cancel{color:var(--tx2)}
-.exc-delete-btn.delete{
+.exc-inline-btn.cancel{color:var(--tx2)}
+.exc-inline-btn.delete{
   color:#ff9e9e;
-  border-color:rgba(220,38,38,.34);
-  background:rgba(220,38,38,.14);
+  border-color:rgba(220,38,38,.32);
+  background:rgba(220,38,38,.12);
 }
 
 /* â”€â”€ TOAST â”€â”€ */
@@ -1605,17 +1600,13 @@ function excHTML(ex,di,i,inGroup,superBorder='',superAccent='',warmItem=false){
         ${meta?`<span class="exc-plan">${meta}</span>`:''}
         <div class="exc-progress-row">${progressHTML}</div>
       </div>
-      ${deleteOpen?`
-      <div class="exc-delete-inline" onclick="event.stopPropagation()">
-        <div class="exc-delete-msg">Eliminar este ejercicio de ${DAYS[di]}?</div>
-        <div class="exc-delete-actions">
-          <button class="exc-delete-btn cancel" type="button" onclick="cancelDeleteFromDay()">Cancelar</button>
-          <button class="exc-delete-btn delete" type="button" onclick="confirmDeleteFromDay()">Eliminar</button>
-        </div>
-      </div>
-      `:''}
     </div>
-    <span class="swipe-hint right">‹</span>
+    ${deleteOpen?`
+    <div class="exc-inline-confirm" onclick="event.stopPropagation()">
+      <button class="exc-inline-btn cancel" type="button" title="Cancelar" aria-label="Cancelar" onclick="cancelDeleteFromDay()">✕</button>
+      <button class="exc-inline-btn delete" type="button" title="Confirmar eliminacion" aria-label="Confirmar eliminacion" onclick="confirmDeleteFromDay()">✓</button>
+    </div>
+    `:''}
     <div class="exc-actions">
       <button class="exc-ss${ssClass}" onclick="event.stopPropagation();supersetAction(${di},${i})">${getSupersetButtonLabel(ex,di,i)}</button>
       <button class="exc-del" onclick="event.stopPropagation();removeFromDay(${di},${i})">×</button>
