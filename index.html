@@ -1407,7 +1407,6 @@ function getSetProgressText(ex){
 
 const SWIPE_MAX_FALLBACK=96;
 const SWIPE_TRIGGER_RATIO=.80;
-const SWIPE_OPEN_PX=Math.round(SWIPE_MAX_FALLBACK*SWIPE_TRIGGER_RATIO);
 let excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,baseDx:0,di:null,i:null,lock:'',moved:false,pointerId:null,max:SWIPE_MAX_FALLBACK,trigger:Math.round(SWIPE_MAX_FALLBACK*SWIPE_TRIGGER_RATIO)};
 let pullRefreshState={active:false,startX:0,startY:0,armed:false};
 function resetExcSwipeState(){
@@ -1420,8 +1419,8 @@ function clearOpenSwipe({render=false}={}){
   openSwipe=null;
   if(render) renderDay();
 }
-function setOpenSwipe(di,i,side){
-  openSwipe={di,i,side};
+function setOpenSwipe(di,i,side,px){
+  openSwipe={di,i,side,px:Math.max(0,Math.round(px||0))};
 }
 function confirmSwipeDelete(di,i){
   if(!isOpenSwipe(di,i,'right')) return;
@@ -1432,7 +1431,8 @@ function beginExcSwipe(startX,startY,el,body,di,i,pointerId=null){
   const h=Math.max(44,Math.min(110,Math.round(body?.getBoundingClientRect?.().height||SWIPE_MAX_FALLBACK)));
   const max=h;
   const trigger=Math.max(30,Math.round(max*SWIPE_TRIGGER_RATIO));
-  const baseDx=isOpenSwipe(di,i,'right')?trigger:(isOpenSwipe(di,i,'left')?-trigger:0);
+  const openPx=openSwipe?.px||trigger;
+  const baseDx=isOpenSwipe(di,i,'right')?openPx:(isOpenSwipe(di,i,'left')?-openPx:0);
   excSwipeState={active:true,el,body,startX,startY,dx:baseDx,baseDx,di,i,lock:'',moved:false,pointerId,max,trigger};
   if(el) el.style.setProperty('--swipe-progress','0');
   if(el) el.style.setProperty('--swipe-px',`${Math.abs(baseDx)}px`);
@@ -1485,7 +1485,7 @@ function endExcSwipe(){
   const shouldOpen=moved && Math.abs(dx)>= trigger;
   if(shouldOpen){
     if(dx>0){
-      setOpenSwipe(di,i,'right');
+      setOpenSwipe(di,i,'right',Math.abs(dx));
     }else if((weekData?.[di]?.[i]?.superGroup)){
       supersetAction(di,i);
       clearOpenSwipe();
@@ -1506,7 +1506,7 @@ function endExcSwipe(){
       return;
     }else{
       pendingSuperLink={di,i};
-      setOpenSwipe(di,i,'left');
+      setOpenSwipe(di,i,'left',Math.abs(dx));
     }
     renderDay();
     if(el){
@@ -1634,10 +1634,11 @@ function excHTML(ex,di,i,inGroup,superBorder='',superAccent='',warmItem=false){
   const openRight=isOpenSwipe(di,i,'right');
   const openLeft=isOpenSwipe(di,i,'left');
   const ssClass=(pending||ex.superGroup||pendingSuperLink)?' on':'';
+  const openPx=Math.max(0,openSwipe?.px||0);
   const swipeVars=openRight
-    ? `--swipe-px:${SWIPE_OPEN_PX}px;--swipe-left-gap:${SWIPE_OPEN_PX}px;--swipe-right-gap:0px;--swipe-icon-o:1;--swipe-icon-shift:${(SWIPE_OPEN_PX*0.5).toFixed(2)}px;`
+    ? `--swipe-px:${openPx}px;--swipe-left-gap:${openPx}px;--swipe-right-gap:0px;--swipe-icon-o:1;--swipe-icon-shift:${(openPx*0.5).toFixed(2)}px;`
     : (openLeft
-      ? `--swipe-px:${SWIPE_OPEN_PX}px;--swipe-left-gap:0px;--swipe-right-gap:${SWIPE_OPEN_PX}px;--swipe-icon-o:1;--swipe-icon-shift:${(SWIPE_OPEN_PX*0.5).toFixed(2)}px;`
+      ? `--swipe-px:${openPx}px;--swipe-left-gap:0px;--swipe-right-gap:${openPx}px;--swipe-icon-o:1;--swipe-icon-shift:${(openPx*0.5).toFixed(2)}px;`
       : '');
   const rowStyle=(ex.superGroup || swipeVars)
     ? ` style="${ex.superGroup?`--sup-border:${superBorder||'#6e7cff'};--sup-accent:${superAccent||'#b06bff'};`:''}${swipeVars}"`
