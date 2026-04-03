@@ -75,12 +75,11 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   margin-right:calc(var(--card-edge,4px) + var(--swipe-right-gap,0px));
   background:var(--bg);
   transition:width .18s ease,margin-left .18s ease,margin-right .18s ease;
-  border:1px solid var(--b1);
-  border-top:none;
+  border:none;
   border-radius:0
 }
-.exc:first-child .exc-body{border-top:1px solid var(--b1)}
-.exc.group-start .exc-body{border-top:1px solid var(--b1)}
+.exc:first-child .exc-body{border-top:none}
+.exc.group-start .exc-body{border-top:none}
 .exc.group-single .exc-body{border-radius:0}
 .exc-group-mark{
   width:22px;flex-shrink:0;align-self:stretch;display:flex;align-items:center;justify-content:center;position:relative
