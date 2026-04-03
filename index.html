@@ -96,6 +96,8 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc-group-mark.plain::before{display:none}
 .exc-group-mark.plain::after{display:none}
 .exc.group-mid .exc-group-mark::after{display:none}
+.exc.group-start .exc-group-mark::before{top:50%;bottom:0}
+.exc.group-end .exc-group-mark::before{top:0;bottom:50%}
 .exc.group-single .exc-group-mark::before{display:none}
 .exc.group-single .exc-group-mark::after{display:none}
 .exc.group-super .exc-group-mark::before,.exc.group-super .exc-group-mark::after{background:rgba(129,140,248,.38)}
