@@ -79,12 +79,9 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   border-top:none;
   border-radius:0
 }
-.exc:first-child .exc-body{border-top:1px solid var(--b1);border-top-left-radius:18px;border-top-right-radius:18px}
-.exc:last-child .exc-body{border-bottom-left-radius:18px;border-bottom-right-radius:18px}
+.exc:first-child .exc-body{border-top:1px solid var(--b1)}
 .exc.group-start .exc-body{border-top:1px solid var(--b1)}
-.exc.group-start:not(:first-child) .exc-body{border-top-left-radius:18px;border-top-right-radius:18px}
-.exc.group-end .exc-body{border-bottom-left-radius:18px;border-bottom-right-radius:18px}
-.exc.group-single .exc-body{border-radius:18px}
+.exc.group-single .exc-body{border-radius:0}
 .exc-group-mark{
   width:22px;flex-shrink:0;align-self:stretch;display:flex;align-items:center;justify-content:center;position:relative
 }
@@ -132,8 +129,8 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   right:calc(var(--card-edge,4px) + (var(--swipe-px,0px) / 2));
   transform:translate(50%,-50%);
 }
-.exc.standalone .sw-lane.del{border-radius:var(--r) 0 0 var(--r)}
-.exc.standalone .sw-lane.ss{border-radius:0 var(--r) var(--r) 0}
+.exc.standalone .sw-lane.del{border-radius:0}
+.exc.standalone .sw-lane.ss{border-radius:0}
 .exc.sw-right .sw-lane.del{opacity:1}
 .exc.sw-left .sw-lane.ss{opacity:1}
 .exc.sw-right .sw-icon.del{opacity:var(--swipe-icon-o,0)}
