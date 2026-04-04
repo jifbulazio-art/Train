@@ -64,8 +64,8 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .ex-list{display:flex;flex-direction:column;gap:0}
 
 /* exercise card */
-.exc{--card-edge:4px;display:flex;align-items:flex-start;gap:10px;padding:0;background:transparent;cursor:pointer;position:relative;touch-action:pan-y;overflow:visible}
-.exc.standalone{border-radius:0;margin-bottom:0}
+.exc{--card-edge:4px;display:flex;align-items:flex-start;gap:10px;padding:0;background:transparent;cursor:pointer;position:relative;touch-action:pan-y;overflow:visible;margin-bottom:6px}
+.exc.standalone{border-radius:0}
 .exc:active{opacity:.75}
 .exc.swiping{opacity:1}
 .exc-body{
@@ -73,40 +73,14 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   width:calc(100% - (var(--card-edge,4px) * 2) - var(--swipe-px,0px));
   margin-left:calc(var(--card-edge,4px) + var(--swipe-left-gap,0px));
   margin-right:calc(var(--card-edge,4px) + var(--swipe-right-gap,0px));
-  background:var(--bg);
+  background:var(--s1);
   transition:width .18s ease,margin-left .18s ease,margin-right .18s ease;
-  border:none;
-  border-radius:0
+  border:1px solid var(--b0);
+  border-radius:var(--rs)
 }
-.exc:first-child .exc-body{border-top:none}
-.exc.group-start .exc-body{border-top:none}
-.exc.group-single .exc-body{border-radius:0}
-.exc-group-mark{width:2px;flex-shrink:0;align-self:stretch}
-.exc-group-mark.plain{width:6px}
+.exc-group-mark{width:0;flex-shrink:0;align-self:stretch}
+.exc-group-mark.plain{width:0}
 .exc-group-mark::before,.exc-group-mark::after{display:none}
-.exc.group-super .exc-body{
-  background:linear-gradient(90deg, rgba(129,140,248,.07) 0, rgba(129,140,248,.03) 110px, var(--bg) 220px);
-  box-shadow:inset 0 0 0 1px rgba(129,140,248,.16)
-}
-.exc.group-warm .exc-body{
-  background:linear-gradient(90deg, rgba(245,197,24,.08) 0, rgba(245,197,24,.03) 110px, var(--bg) 220px);
-  box-shadow:inset 0 0 0 1px rgba(245,197,24,.16)
-}
-.group-pill{
-  display:inline-flex;align-items:center;justify-content:center;height:16px;padding:0 7px;border-radius:999px;
-  border:1px solid rgba(255,255,255,.12);font-size:9px;line-height:1;font-family:'DM Mono',monospace;
-  letter-spacing:.08em;text-transform:uppercase;white-space:nowrap
-}
-.group-pill.super{color:#d3c2ff;background:rgba(129,140,248,.12);border-color:rgba(129,140,248,.26)}
-.group-pill.warm{color:#f5c518;background:rgba(245,197,24,.12);border-color:rgba(245,197,24,.28)}
-.exc-group-start-tag{
-  position:absolute;left:18px;top:-8px;display:none;z-index:3
-}
-.exc.group-start .exc-group-start-tag,
-.exc.group-single .exc-group-start-tag{display:inline-flex}
-.exc-group-item-tag{
-  margin-top:5px
-}
 .exc-swipe-bg{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:stretch;pointer-events:none;z-index:1;overflow:hidden}
 .sw-lane{width:220px;display:flex;align-items:center;opacity:1;transition:none;position:relative}
 .sw-lane.del{justify-content:center;background:rgba(220,38,38,.16)}
@@ -1674,9 +1648,6 @@ function excHTML(ex,di,i,inGroup,superBorder='',superAccent='',warmItem=false,gr
     : '';
   const warmClass=warmItem?' warm-item':'';
   const groupCls=groupKind?` group-${groupKind} group-${groupPos}`:' group-single';
-  const groupBadge=groupKind==='super'?'Superserie':(groupKind==='warm'?'Warm Up':'');
-  const groupMiniBadge=groupKind==='super'?'SS':(groupKind==='warm'?'WU':'');
-  const groupTone=groupKind==='super'?'super':'warm';
   return `<div class="exc${inGroup?'':' standalone'}${ex.superGroup?' sup-item':''}${warmClass}${openRight?' sw-open-right':''}${openLeft?' sw-open-left':''}${groupCls}"${rowStyle}
     onclick="excTap(event,${di},${i})"
     onpointerdown="excPointerDown(event,${di},${i})"
@@ -1699,7 +1670,6 @@ function excHTML(ex,di,i,inGroup,superBorder='',superAccent='',warmItem=false,gr
       <span class="sw-icon del">×</span>
       <span class="sw-icon ss">∞</span>
     </div>
-    ${groupKind?`<div class="exc-group-start-tag"><span class="group-pill ${groupTone}">${groupBadge}</span></div>`:''}
     ${openRight?`<button class="sw-action-btn del" type="button" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation();confirmSwipeDelete(${di},${i})" aria-label="Eliminar"></button>`:''}
     ${openLeft?`<button class="sw-action-btn ss" type="button" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation();supersetAction(${di},${i})" aria-label="Superserie"></button>`:''}
     <div class="exc-body">
@@ -1711,7 +1681,6 @@ function excHTML(ex,di,i,inGroup,superBorder='',superAccent='',warmItem=false,gr
         <div class="exc-name">${ex.name}</div>
       </div>
       <div class="exc-meta">
-        ${groupKind?`<span class="group-pill ${groupTone} exc-group-item-tag">${groupMiniBadge}</span>`:''}
         ${meta?`<span class="exc-plan">${meta}</span>`:''}
         <div class="exc-progress-row">${progressHTML}</div>
       </div>
