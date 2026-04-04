@@ -83,34 +83,38 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc.group-single .exc-body{border-radius:0}
 .exc-group-mark{
   --group-mark-color:rgba(255,255,255,.08);
-  width:24px;flex-shrink:0;align-self:stretch;display:flex;align-items:center;justify-content:center;position:relative
+  --group-line-x:8px;
+  --group-thumb-mid:31px;
+  --group-elbow-h:12px;
+  --group-arm-w:28px;
+  width:26px;flex-shrink:0;align-self:stretch;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible
 }
 .exc-group-mark.plain{width:6px}
 .exc-group-mark::before{
-  content:'';position:absolute;top:-10px;bottom:-10px;left:8px;width:2px;
+  content:'';position:absolute;top:-10px;bottom:-10px;left:var(--group-line-x);width:2px;
   border-radius:999px;background:var(--group-mark-color)
 }
 .exc-group-mark::after{
-  content:'';position:absolute;left:8px;width:10px;top:50%;height:2px;transform:translateY(-50%);
+  content:'';position:absolute;left:var(--group-line-x);width:var(--group-arm-w);top:calc(var(--group-thumb-mid) - 1px);height:2px;transform:none;
   border-radius:999px;background:var(--group-mark-color)
 }
 .exc-group-mark.plain::before{display:none}
 .exc-group-mark.plain::after{display:none}
 .exc.group-mid .exc-group-mark::after{display:none}
-.exc.group-start .exc-group-mark::before{top:calc(50% + 12px);bottom:-10px}
-.exc.group-end .exc-group-mark::before{top:-10px;bottom:calc(50% + 12px)}
+.exc.group-start .exc-group-mark::before{top:calc(var(--group-thumb-mid) + var(--group-elbow-h));bottom:-10px}
+.exc.group-end .exc-group-mark::before{top:-10px;bottom:calc(100% - var(--group-thumb-mid) + var(--group-elbow-h))}
 .exc.group-start .exc-group-mark::after,
 .exc.group-end .exc-group-mark::after{
-  width:12px;height:12px;left:8px;background:none;transform:none
+  width:var(--group-arm-w);height:var(--group-elbow-h);left:var(--group-line-x);background:none;transform:none;border-radius:0
 }
 .exc.group-start .exc-group-mark::after{
-  top:50%;
+  top:var(--group-thumb-mid);
   border-top:2px solid var(--group-mark-color);
   border-left:2px solid var(--group-mark-color);
   border-top-left-radius:10px
 }
 .exc.group-end .exc-group-mark::after{
-  top:calc(50% - 12px);
+  top:calc(var(--group-thumb-mid) - var(--group-elbow-h));
   border-bottom:2px solid var(--group-mark-color);
   border-left:2px solid var(--group-mark-color);
   border-bottom-left-radius:10px
