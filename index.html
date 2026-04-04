@@ -101,7 +101,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .sw-lane{width:50vw;max-width:50vw;display:flex;align-items:center;opacity:1;transition:none;position:relative;background:transparent}
 .sw-lane.del{justify-content:flex-start}
 .sw-lane.ss{justify-content:flex-end}
-.sw-icon{position:absolute;top:50%;width:22px;height:22px;font-size:0;line-height:0;white-space:nowrap;opacity:var(--swipe-icon-o,0);transition:transform .08s ease-out,opacity .08s ease-out,filter .18s ease-out}
+.sw-icon{position:absolute;top:50%;width:22px;height:22px;font-size:0;line-height:0;white-space:nowrap;opacity:0;transition:transform .08s ease-out,opacity .08s ease-out,filter .18s ease-out}
 .sw-icon::before{
   content:'';
   position:absolute;
@@ -110,8 +110,8 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2.2 3.6L8.7 10.1A3.05 3.05 0 0 1 8.7 13.9L2.2 20.4' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='butt' stroke-linejoin='round'/%3E%3Cpath d='M21.8 3.6L15.3 10.1A3.05 3.05 0 0 0 15.3 13.9L21.8 20.4' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='butt' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
   mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2.2 3.6L8.7 10.1A3.05 3.05 0 0 1 8.7 13.9L2.2 20.4' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='butt' stroke-linejoin='round'/%3E%3Cpath d='M21.8 3.6L15.3 10.1A3.05 3.05 0 0 0 15.3 13.9L21.8 20.4' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='butt' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
 }
-.sw-icon.del{left:0;color:#ff8f8f;transform:translate(calc(-28px + var(--swipe-icon-shift,0px)),-50%)}
-.sw-icon.ss{right:0;color:#d7bcff;transform:translate(calc(28px - var(--swipe-icon-shift,0px)),-50%)}
+.sw-icon.del{left:0;color:#ff8f8f;opacity:var(--swipe-icon-o-del,0);transform:translate(calc(-28px + var(--swipe-icon-shift-del,0px)),-50%)}
+.sw-icon.ss{right:0;color:#d7bcff;opacity:var(--swipe-icon-o-ss,0);transform:translate(calc(28px - var(--swipe-icon-shift-ss,0px)),-50%)}
 .sw-icon.ss::before{transform:rotate(45deg)}
 .exc.sw-open-right .sw-icon.del{
   left:calc(var(--card-edge,4px) + (var(--swipe-px,0px) / 2));
@@ -1462,8 +1462,10 @@ function beginExcSwipe(startX,startY,el,body,di,i,pointerId=null){
   excSwipeState={active:true,el,body,startX,startY,dx:baseDx,baseDx,di,i,lock:'',moved:false,pointerId,max,trigger,armed:Math.abs(baseDx)>=trigger};
   if(el) el.style.setProperty('--swipe-progress','0');
   if(el) el.style.setProperty('--swipe-px',`${Math.abs(baseDx)}px`);
-  if(el) el.style.setProperty('--swipe-icon-o',baseDx? '1':'0');
-  if(el) el.style.setProperty('--swipe-icon-shift',baseDx?`${(Math.abs(baseDx)*0.5).toFixed(2)}px`:'0px');
+  if(el) el.style.setProperty('--swipe-icon-o-del',baseDx>0?'1':'0');
+  if(el) el.style.setProperty('--swipe-icon-o-ss',baseDx<0?'1':'0');
+  if(el) el.style.setProperty('--swipe-icon-shift-del',baseDx>0?`${(Math.abs(baseDx)*0.5).toFixed(2)}px`:'0px');
+  if(el) el.style.setProperty('--swipe-icon-shift-ss',baseDx<0?`${(Math.abs(baseDx)*0.5).toFixed(2)}px`:'0px');
   if(el) el.style.setProperty('--swipe-left-gap',baseDx>0?`${Math.abs(baseDx)}px`:'0px');
   if(el) el.style.setProperty('--swipe-right-gap',baseDx<0?`${Math.abs(baseDx)}px`:'0px');
   body.style.transition='none';
@@ -1491,8 +1493,10 @@ function moveExcSwipe(clientX,clientY,preventDefaultFn){
   excSwipeState.el.classList.add('swiping');
   excSwipeState.el.style.setProperty('--swipe-progress',progress.toFixed(3));
   excSwipeState.el.style.setProperty('--swipe-px',`${Math.abs(clamped)}px`);
-  excSwipeState.el.style.setProperty('--swipe-icon-o',(iconE*.96).toFixed(3));
-  excSwipeState.el.style.setProperty('--swipe-icon-shift',`${(Math.abs(clamped)*0.5*iconE).toFixed(2)}px`);
+  excSwipeState.el.style.setProperty('--swipe-icon-o-del',clamped>0?(iconE*.96).toFixed(3):'0');
+  excSwipeState.el.style.setProperty('--swipe-icon-o-ss',clamped<0?(iconE*.96).toFixed(3):'0');
+  excSwipeState.el.style.setProperty('--swipe-icon-shift-del',clamped>0?`${(Math.abs(clamped)*0.5*iconE).toFixed(2)}px`:'0px');
+  excSwipeState.el.style.setProperty('--swipe-icon-shift-ss',clamped<0?`${(Math.abs(clamped)*0.5*iconE).toFixed(2)}px`:'0px');
   excSwipeState.el.style.setProperty('--swipe-left-gap',clamped>0?`${Math.abs(clamped)}px`:'0px');
   excSwipeState.el.style.setProperty('--swipe-right-gap',clamped<0?`${Math.abs(clamped)}px`:'0px');
   if(clamped>2){
@@ -1559,8 +1563,10 @@ function endExcSwipe(){
     el.classList.remove('sw-right');
     el.style.setProperty('--swipe-progress','0');
     el.style.setProperty('--swipe-px','0px');
-    el.style.setProperty('--swipe-icon-o','0');
-    el.style.setProperty('--swipe-icon-shift','0px');
+    el.style.setProperty('--swipe-icon-o-del','0');
+    el.style.setProperty('--swipe-icon-o-ss','0');
+    el.style.setProperty('--swipe-icon-shift-del','0px');
+    el.style.setProperty('--swipe-icon-shift-ss','0px');
     el.style.setProperty('--swipe-left-gap','0px');
     el.style.setProperty('--swipe-right-gap','0px');
   }
