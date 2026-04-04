@@ -81,48 +81,28 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc:first-child .exc-body{border-top:none}
 .exc.group-start .exc-body{border-top:none}
 .exc.group-single .exc-body{border-radius:0}
-.exc-group-mark{
-  --group-mark-color:rgba(255,255,255,.08);
-  --group-line-x:8px;
-  --group-thumb-mid:21px;
-  --group-elbow-h:12px;
-  --group-arm-w:18px;
-  width:26px;flex-shrink:0;align-self:stretch;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible
-}
+.exc-group-mark{width:16px;flex-shrink:0;align-self:stretch}
 .exc-group-mark.plain{width:6px}
-.exc-group-mark::before{
-  content:'';position:absolute;top:-10px;bottom:-10px;left:var(--group-line-x);width:2px;
-  border-radius:999px;background:var(--group-mark-color)
+.exc-group-rail{
+  --group-rail-color:rgba(255,255,255,.16);
+  position:absolute;left:8px;top:8px;bottom:8px;width:10px;pointer-events:none;z-index:0
 }
-.exc-group-mark::after{
-  content:'';position:absolute;left:var(--group-line-x);width:var(--group-arm-w);top:calc(var(--group-thumb-mid) - 1px);height:2px;transform:none;
-  border-radius:999px;background:var(--group-mark-color)
+.exc-group-rail::before{
+  content:'';position:absolute;left:4px;top:0;bottom:0;width:2px;border-radius:999px;background:var(--group-rail-color)
 }
-.exc-group-mark.plain::before{display:none}
-.exc-group-mark.plain::after{display:none}
-.exc.group-mid .exc-group-mark::after{display:none}
-.exc.group-start .exc-group-mark::before{top:calc(var(--group-thumb-mid) + var(--group-elbow-h));bottom:-10px}
-.exc.group-end .exc-group-mark::before{top:-10px;bottom:calc(100% - var(--group-thumb-mid) + var(--group-elbow-h))}
-.exc.group-start .exc-group-mark::after,
-.exc.group-end .exc-group-mark::after{
-  width:var(--group-arm-w);height:var(--group-elbow-h);left:var(--group-line-x);background:none;transform:none;border-radius:0
+.exc.group-start .exc-group-rail::before{top:22px}
+.exc.group-end .exc-group-rail::before{bottom:22px}
+.exc.group-single .exc-group-rail{display:none}
+.exc.group-super .exc-group-rail{--group-rail-color:rgba(129,140,248,.46)}
+.exc.group-warm .exc-group-rail{--group-rail-color:rgba(245,197,24,.5)}
+.exc-group-badge{
+  position:absolute;left:-2px;top:8px;display:none;align-items:center;justify-content:center;
+  min-width:24px;height:16px;padding:0 6px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
+  background:rgba(14,14,15,.92);font-size:9px;line-height:1;font-family:'DM Mono',monospace;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--group-rail-color)
 }
-.exc.group-start .exc-group-mark::after{
-  top:var(--group-thumb-mid);
-  border-top:2px solid var(--group-mark-color);
-  border-left:2px solid var(--group-mark-color);
-  border-top-left-radius:10px
-}
-.exc.group-end .exc-group-mark::after{
-  top:calc(var(--group-thumb-mid) - var(--group-elbow-h));
-  border-bottom:2px solid var(--group-mark-color);
-  border-left:2px solid var(--group-mark-color);
-  border-bottom-left-radius:10px
-}
-.exc.group-single .exc-group-mark::before{display:none}
-.exc.group-single .exc-group-mark::after{display:none}
-.exc.group-super .exc-group-mark{--group-mark-color:rgba(129,140,248,.38)}
-.exc.group-warm .exc-group-mark{--group-mark-color:rgba(245,197,24,.4)}
+.exc.group-start .exc-group-badge,
+.exc.group-single .exc-group-badge{display:inline-flex}
 .exc-swipe-bg{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:stretch;pointer-events:none;z-index:1;overflow:hidden}
 .sw-lane{width:220px;display:flex;align-items:center;opacity:1;transition:none;position:relative}
 .sw-lane.del{justify-content:center;background:rgba(220,38,38,.16)}
@@ -1690,6 +1670,7 @@ function excHTML(ex,di,i,inGroup,superBorder='',superAccent='',warmItem=false,gr
     : '';
   const warmClass=warmItem?' warm-item':'';
   const groupCls=groupKind?` group-${groupKind} group-${groupPos}`:' group-single';
+  const groupBadge=groupKind==='super'?'SS':(groupKind==='warm'?'WU':'');
   return `<div class="exc${inGroup?'':' standalone'}${ex.superGroup?' sup-item':''}${warmClass}${openRight?' sw-open-right':''}${openLeft?' sw-open-left':''}${groupCls}"${rowStyle}
     onclick="excTap(event,${di},${i})"
     onpointerdown="excPointerDown(event,${di},${i})"
@@ -1712,6 +1693,7 @@ function excHTML(ex,di,i,inGroup,superBorder='',superAccent='',warmItem=false,gr
       <span class="sw-icon del">×</span>
       <span class="sw-icon ss">∞</span>
     </div>
+    ${groupKind?`<div class="exc-group-rail"><span class="exc-group-badge">${groupBadge}</span></div>`:''}
     ${openRight?`<button class="sw-action-btn del" type="button" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation();confirmSwipeDelete(${di},${i})" aria-label="Eliminar"></button>`:''}
     ${openLeft?`<button class="sw-action-btn ss" type="button" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation();supersetAction(${di},${i})" aria-label="Superserie"></button>`:''}
     <div class="exc-body">
