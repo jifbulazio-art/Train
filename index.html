@@ -69,7 +69,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc:active{opacity:.75}
 .exc.swiping{opacity:1}
 .exc-body{
-  display:flex;align-items:flex-start;gap:10px;padding:10px 11px 10px 14px;position:relative;z-index:2;
+  display:flex;align-items:flex-start;gap:10px;padding:10px 11px 10px 10px;position:relative;z-index:2;
   width:calc(100% - (var(--card-edge,4px) * 2) - var(--swipe-px,0px));
   margin-left:calc(var(--card-edge,4px) + var(--swipe-left-gap,0px));
   margin-right:calc(var(--card-edge,4px) + var(--swipe-right-gap,0px));
@@ -1690,7 +1690,6 @@ function excHTML(ex,di,i,inGroup,superBorder='',superAccent='',warmItem=false,gr
     ${openRight?`<button class="sw-action-btn del" type="button" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation();confirmSwipeDelete(${di},${i})" aria-label="Eliminar"></button>`:''}
     ${openLeft?`<button class="sw-action-btn ss" type="button" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation();supersetAction(${di},${i})" aria-label="Superserie"></button>`:''}
     <div class="exc-body">
-    ${groupKind?`<div class="exc-group-mark"></div>`:'<div class="exc-group-mark plain"></div>'}
     <span class="drag-handle${ex.superGroup?' sup':''}" onclick="event.stopPropagation()"></span>
     <div class="exc-thumb thumb-tap" onclick="event.stopPropagation();openImageZoom('${(img||'').replace(/'/g,"\\'")}')">${img?`<img src="${img}" onerror="this.onerror=null;this.parentElement.innerHTML='&lt;span class=&quot;thumb-ph&quot;&gt;&lt;/span&gt;'">`:getTypeEmoji(exType)}</div>
     <div class="exc-info${pending?' exc-pending':''}">
