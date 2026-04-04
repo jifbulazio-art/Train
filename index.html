@@ -78,6 +78,22 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   border:1px solid var(--b0);
   border-radius:var(--rs)
 }
+.exc.group-start,
+.exc.group-mid{margin-bottom:0}
+.exc.group-start .exc-body{
+  border-radius:var(--rs) var(--rs) 0 0
+}
+.exc.group-mid .exc-body{
+  border-top:none;
+  border-radius:0
+}
+.exc.group-end .exc-body{
+  border-top:none;
+  border-radius:0 0 var(--rs) var(--rs)
+}
+.exc.group-single .exc-body{
+  border-radius:var(--rs)
+}
 .exc-group-mark{width:0;flex-shrink:0;align-self:stretch}
 .exc-group-mark.plain{width:0}
 .exc-group-mark::before,.exc-group-mark::after{display:none}
@@ -331,6 +347,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 @media (max-width:520px){
   #view-week{padding:0 0 90px}
   #view-week .sticky-top{padding-left:16px;padding-right:16px}
+  #view-week .ex-list{padding:0 16px}
   #view-week .week-actions{padding:0 16px}
   #view-week .exc{--card-edge:0px}
   .exc{padding:0}
