@@ -97,22 +97,22 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc-group-mark.plain::before{display:none}
 .exc-group-mark.plain::after{display:none}
 .exc.group-mid .exc-group-mark::after{display:none}
-.exc.group-start .exc-group-mark::before{top:50%;bottom:-10px}
-.exc.group-end .exc-group-mark::before{top:-10px;bottom:50%}
+.exc.group-start .exc-group-mark::before{top:calc(50% + 12px);bottom:-10px}
+.exc.group-end .exc-group-mark::before{top:-10px;bottom:calc(50% + 12px)}
 .exc.group-start .exc-group-mark::after,
 .exc.group-end .exc-group-mark::after{
   width:12px;height:12px;left:8px;background:none;transform:none
 }
 .exc.group-start .exc-group-mark::after{
   top:50%;
-  border-left:2px solid var(--group-mark-color);
   border-top:2px solid var(--group-mark-color);
+  border-left:2px solid var(--group-mark-color);
   border-top-left-radius:10px
 }
 .exc.group-end .exc-group-mark::after{
   top:calc(50% - 12px);
-  border-left:2px solid var(--group-mark-color);
   border-bottom:2px solid var(--group-mark-color);
+  border-left:2px solid var(--group-mark-color);
   border-bottom-left-radius:10px
 }
 .exc.group-single .exc-group-mark::before{display:none}
