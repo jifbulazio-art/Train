@@ -97,10 +97,10 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc-group-mark{width:0;flex-shrink:0;align-self:stretch}
 .exc-group-mark.plain{width:0}
 .exc-group-mark::before,.exc-group-mark::after{display:none}
-.exc-swipe-bg{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:stretch;pointer-events:none;z-index:1;overflow:hidden}
-.sw-lane{width:220px;display:flex;align-items:center;opacity:1;transition:none;position:relative}
-.sw-lane.del{justify-content:center;background:rgba(220,38,38,.16)}
-.sw-lane.ss{justify-content:center;background:rgba(168,85,247,.15)}
+.exc-swipe-bg{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:stretch;pointer-events:none;z-index:1;overflow:visible}
+.sw-lane{width:50vw;max-width:50vw;display:flex;align-items:center;opacity:1;transition:none;position:relative;background:transparent}
+.sw-lane.del{justify-content:flex-start}
+.sw-lane.ss{justify-content:flex-end}
 .sw-icon{position:absolute;top:50%;width:22px;height:22px;font-size:0;line-height:0;white-space:nowrap;opacity:var(--swipe-icon-o,0);transition:transform .08s ease-out,opacity .08s ease-out,filter .18s ease-out}
 .sw-icon::before{
   content:'';
@@ -110,8 +110,8 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2.2 3.6L8.7 10.1A3.05 3.05 0 0 1 8.7 13.9L2.2 20.4' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='butt' stroke-linejoin='round'/%3E%3Cpath d='M21.8 3.6L15.3 10.1A3.05 3.05 0 0 0 15.3 13.9L21.8 20.4' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='butt' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
   mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2.2 3.6L8.7 10.1A3.05 3.05 0 0 1 8.7 13.9L2.2 20.4' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='butt' stroke-linejoin='round'/%3E%3Cpath d='M21.8 3.6L15.3 10.1A3.05 3.05 0 0 0 15.3 13.9L21.8 20.4' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='butt' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
 }
-.sw-icon.del{left:calc(var(--swipe-px,0px) + 6px);color:#ff8f8f;--swipe-icon-x:calc(-11px - var(--swipe-icon-shift,0px));transform:translate(var(--swipe-icon-x),-50%)}
-.sw-icon.ss{right:calc(var(--swipe-px,0px) + 6px);color:#d7bcff;--swipe-icon-x:calc(11px + var(--swipe-icon-shift,0px));transform:translate(var(--swipe-icon-x),-50%)}
+.sw-icon.del{left:0;color:#ff8f8f;transform:translate(calc(-28px + var(--swipe-icon-shift,0px)),-50%)}
+.sw-icon.ss{right:0;color:#d7bcff;transform:translate(calc(28px - var(--swipe-icon-shift,0px)),-50%)}
 .sw-icon.ss::before{transform:rotate(45deg)}
 .exc.sw-open-right .sw-icon.del{
   left:calc(var(--card-edge,4px) + (var(--swipe-px,0px) / 2));
@@ -1425,12 +1425,17 @@ function getSetProgressText(ex){
   }).join(' | ');
 }
 
-const SWIPE_MAX_FALLBACK=96;
-const SWIPE_TRIGGER_RATIO=.80;
-let excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,baseDx:0,di:null,i:null,lock:'',moved:false,pointerId:null,max:SWIPE_MAX_FALLBACK,trigger:Math.round(SWIPE_MAX_FALLBACK*SWIPE_TRIGGER_RATIO)};
+const SWIPE_MAX_FALLBACK=180;
+const SWIPE_TRIGGER_RATIO=.50;
+let excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,baseDx:0,di:null,i:null,lock:'',moved:false,pointerId:null,max:SWIPE_MAX_FALLBACK,trigger:Math.round(SWIPE_MAX_FALLBACK*SWIPE_TRIGGER_RATIO),armed:false};
 let pullRefreshState={active:false,startX:0,startY:0,armed:false};
 function resetExcSwipeState(){
-  excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,baseDx:0,di:null,i:null,lock:'',moved:false,pointerId:null,max:SWIPE_MAX_FALLBACK,trigger:Math.round(SWIPE_MAX_FALLBACK*SWIPE_TRIGGER_RATIO)};
+  excSwipeState={active:false,el:null,body:null,startX:0,startY:0,dx:0,baseDx:0,di:null,i:null,lock:'',moved:false,pointerId:null,max:SWIPE_MAX_FALLBACK,trigger:Math.round(SWIPE_MAX_FALLBACK*SWIPE_TRIGGER_RATIO),armed:false};
+}
+function vibrateTap(ms=14){
+  try{
+    if(typeof navigator!=='undefined' && typeof navigator.vibrate==='function') navigator.vibrate(ms);
+  }catch(_){}
 }
 function isOpenSwipe(di,i,side=''){
   return !!openSwipe && openSwipe.di===di && openSwipe.i===i && (!side || openSwipe.side===side);
@@ -1444,16 +1449,17 @@ function setOpenSwipe(di,i,side,px){
 }
 function confirmSwipeDelete(di,i){
   if(!isOpenSwipe(di,i,'right')) return;
+  vibrateTap(18);
   clearOpenSwipe();
   removeFromDay(di,i);
 }
 function beginExcSwipe(startX,startY,el,body,di,i,pointerId=null){
-  const h=Math.max(44,Math.min(110,Math.round(body?.getBoundingClientRect?.().height||SWIPE_MAX_FALLBACK)));
-  const max=h;
+  const viewportHalf=Math.round(((window.innerWidth||360)*0.5));
+  const max=Math.max(96,Math.min(260,viewportHalf));
   const trigger=Math.max(30,Math.round(max*SWIPE_TRIGGER_RATIO));
   const openPx=openSwipe?.px||trigger;
   const baseDx=isOpenSwipe(di,i,'right')?openPx:(isOpenSwipe(di,i,'left')?-openPx:0);
-  excSwipeState={active:true,el,body,startX,startY,dx:baseDx,baseDx,di,i,lock:'',moved:false,pointerId,max,trigger};
+  excSwipeState={active:true,el,body,startX,startY,dx:baseDx,baseDx,di,i,lock:'',moved:false,pointerId,max,trigger,armed:Math.abs(baseDx)>=trigger};
   if(el) el.style.setProperty('--swipe-progress','0');
   if(el) el.style.setProperty('--swipe-px',`${Math.abs(baseDx)}px`);
   if(el) el.style.setProperty('--swipe-icon-o',baseDx? '1':'0');
@@ -1475,8 +1481,11 @@ function moveExcSwipe(clientX,clientY,preventDefaultFn){
   const max=excSwipeState.max||SWIPE_MAX_FALLBACK;
   const clamped=Math.max(-max,Math.min(max,dx));
   const progress=Math.min(1,Math.abs(clamped)/max);
-  const iconT=progress<=.8?0:Math.min(1,(progress-.8)/.2);
+  const iconT=Math.min(1,progress/.65);
   const iconE=iconT*iconT*(3-2*iconT);
+  const armed=Math.abs(clamped)>= (excSwipeState.trigger||Math.round(SWIPE_MAX_FALLBACK*SWIPE_TRIGGER_RATIO));
+  if(armed && !excSwipeState.armed) vibrateTap(12);
+  excSwipeState.armed=armed;
   excSwipeState.dx=clamped;
   excSwipeState.moved=true;
   excSwipeState.el.classList.add('swiping');
@@ -1505,8 +1514,10 @@ function endExcSwipe(){
   const shouldOpen=moved && Math.abs(dx)>= trigger;
   if(shouldOpen){
     if(dx>0){
+      vibrateTap(18);
       setOpenSwipe(di,i,'right',Math.abs(dx));
     }else if((weekData?.[di]?.[i]?.superGroup)){
+      vibrateTap(18);
       supersetAction(di,i);
       clearOpenSwipe();
       if(el){
@@ -1516,6 +1527,7 @@ function endExcSwipe(){
       resetExcSwipeState();
       return;
     }else if(pendingSuperLink && !isPendingSuper(di,i)){
+      vibrateTap(18);
       supersetAction(di,i);
       clearOpenSwipe();
       if(el){
@@ -1525,6 +1537,7 @@ function endExcSwipe(){
       resetExcSwipeState();
       return;
     }else{
+      vibrateTap(18);
       pendingSuperLink={di,i};
       setOpenSwipe(di,i,'left',Math.abs(dx));
     }
