@@ -82,26 +82,43 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc.group-start .exc-body{border-top:none}
 .exc.group-single .exc-body{border-radius:0}
 .exc-group-mark{
+  --group-mark-color:rgba(255,255,255,.08);
   width:24px;flex-shrink:0;align-self:stretch;display:flex;align-items:center;justify-content:center;position:relative
 }
 .exc-group-mark.plain{width:6px}
 .exc-group-mark::before{
   content:'';position:absolute;top:-10px;bottom:-10px;left:8px;width:2px;
-  border-radius:999px;background:rgba(255,255,255,.08)
+  border-radius:999px;background:var(--group-mark-color)
 }
 .exc-group-mark::after{
   content:'';position:absolute;left:8px;width:10px;top:50%;height:2px;transform:translateY(-50%);
-  border-radius:999px;background:rgba(255,255,255,.08)
+  border-radius:999px;background:var(--group-mark-color)
 }
 .exc-group-mark.plain::before{display:none}
 .exc-group-mark.plain::after{display:none}
 .exc.group-mid .exc-group-mark::after{display:none}
 .exc.group-start .exc-group-mark::before{top:50%;bottom:-10px}
 .exc.group-end .exc-group-mark::before{top:-10px;bottom:50%}
+.exc.group-start .exc-group-mark::after,
+.exc.group-end .exc-group-mark::after{
+  width:12px;height:12px;left:8px;background:none;transform:none
+}
+.exc.group-start .exc-group-mark::after{
+  top:50%;
+  border-left:2px solid var(--group-mark-color);
+  border-top:2px solid var(--group-mark-color);
+  border-top-left-radius:10px
+}
+.exc.group-end .exc-group-mark::after{
+  top:calc(50% - 12px);
+  border-left:2px solid var(--group-mark-color);
+  border-bottom:2px solid var(--group-mark-color);
+  border-bottom-left-radius:10px
+}
 .exc.group-single .exc-group-mark::before{display:none}
 .exc.group-single .exc-group-mark::after{display:none}
-.exc.group-super .exc-group-mark::before,.exc.group-super .exc-group-mark::after{background:rgba(129,140,248,.38)}
-.exc.group-warm .exc-group-mark::before,.exc.group-warm .exc-group-mark::after{background:rgba(245,197,24,.4)}
+.exc.group-super .exc-group-mark{--group-mark-color:rgba(129,140,248,.38)}
+.exc.group-warm .exc-group-mark{--group-mark-color:rgba(245,197,24,.4)}
 .exc-swipe-bg{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:stretch;pointer-events:none;z-index:1;overflow:hidden}
 .sw-lane{width:220px;display:flex;align-items:center;opacity:1;transition:none;position:relative}
 .sw-lane.del{justify-content:center;background:rgba(220,38,38,.16)}
