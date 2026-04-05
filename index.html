@@ -57,12 +57,10 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   display:flex;align-items:center;justify-content:center;position:relative
 }
 .module-tab svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.module-tab img{width:22px;height:22px;object-fit:contain;display:block;opacity:.55;filter:grayscale(1) brightness(.86)}
 .module-tab .fill-icon{fill:currentColor;stroke:none}
-.module-tab.on{color:var(--tx)}
-.module-tab.on::after{
-  content:'';position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);
-  width:18px;height:2px;border-radius:999px;background:var(--acc)
-}
+.module-tab.on{color:var(--acc)}
+.module-tab.on img{opacity:1;filter:brightness(0) saturate(100%) invert(53%) sepia(61%) saturate(2985%) hue-rotate(338deg) brightness(97%) contrast(86%)}
 
 /* â”€â”€ DAY ROW â”€â”€ */
 .day-row{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:10px 16px 0;flex-shrink:0}
@@ -619,13 +617,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 <div class="bottom-nav">
   <div class="bottom-nav-inner" id="bottom-nav">
     <button class="module-tab on" data-module="train" onclick="showModule('train')" aria-label="Train">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M3.5 10.2h2.8"/>
-        <path d="M17.7 10.2h2.8"/>
-        <rect x="5.7" y="8.3" width="2.2" height="3.8" rx="0.7"/>
-        <rect x="16.1" y="8.3" width="2.2" height="3.8" rx="0.7"/>
-        <rect x="8.3" y="9.3" width="7.4" height="1.8" rx="0.8"/>
-      </svg>
+      <img src="./icons/train.png" alt="">
     </button>
     <button class="module-tab" data-module="meals" onclick="showModule('meals')" aria-label="Meals">
       <svg viewBox="0 0 24 24" aria-hidden="true">
