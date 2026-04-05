@@ -30,11 +30,38 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer}
 input,select,textarea{font-family:'DM Sans',sans-serif}
 
 /* â”€â”€ NAV â”€â”€ */
-.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 0;flex-shrink:0}
+.nav{display:flex;flex-direction:column;gap:10px;padding:14px 16px 0;flex-shrink:0}
+.nav-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.nav-meta{display:flex;flex-direction:column;gap:3px}
 .nav-logo{font-family:'DM Mono',monospace;font-size:12px;color:var(--tx3);letter-spacing:.1em}
-.nav-tabs{display:flex;gap:2px;background:var(--s2);border-radius:20px;padding:3px}
-.ntab{padding:5px 12px;font-size:12px;border:none;background:transparent;color:var(--tx2);border-radius:16px;transition:all .18s}
-.ntab.on{background:var(--s3);color:var(--tx);font-weight:500}
+.nav-title{font-size:24px;line-height:1;font-weight:600;letter-spacing:-.03em}
+.subnav{display:flex;gap:2px;background:var(--s2);border-radius:14px;padding:3px;width:max-content;max-width:100%}
+.subtab{padding:6px 12px;font-size:12px;border:none;background:transparent;color:var(--tx2);border-radius:11px;transition:all .18s}
+.subtab.on{background:var(--s3);color:var(--tx);font-weight:500}
+.module-view{display:none;flex:1;min-height:0}
+.module-view.on{display:block}
+.module-pane{display:none}
+.module-pane.on{display:block}
+.module-placeholder{padding:18px 16px 110px;display:flex;flex-direction:column;gap:14px}
+.module-card{padding:16px;background:var(--s1);border:1px solid var(--b0);border-radius:12px}
+.module-card-title{font-size:16px;font-weight:600;letter-spacing:-.02em}
+.module-card-sub{margin-top:6px;font-size:12px;color:var(--tx2);line-height:1.6}
+.bottom-nav{
+  position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,520px);
+  padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 12px);z-index:90;pointer-events:none;
+  background:linear-gradient(180deg,rgba(14,14,15,0),rgba(14,14,15,.92) 28%,#0e0e0f 58%)
+}
+.bottom-nav-inner{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:6px;
+  background:rgba(26,26,28,.96);border:1px solid var(--b0);border-radius:14px;pointer-events:auto
+}
+.module-tab{
+  height:46px;border:none;border-radius:10px;background:transparent;color:var(--tx2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px
+}
+.module-tab small{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.08em;opacity:.7}
+.module-tab.on{background:var(--s3);color:var(--tx)}
+.module-tab.on small{opacity:1}
 
 /* â”€â”€ DAY ROW â”€â”€ */
 .day-row{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:10px 16px 0;flex-shrink:0}
@@ -509,32 +536,95 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 <body>
 
 <div class="nav">
-  <span class="nav-logo">RUTINA</span>
-  <div class="nav-tabs">
-    <button class="ntab on" onclick="showView('week',this)">Semana</button>
-    <button class="ntab" onclick="showView('hist',this)">Historial</button>
-    <button class="ntab" onclick="showView('mgmt',this)">Ejercicios</button>
+  <div class="nav-head">
+    <div class="nav-meta">
+      <span class="nav-logo" id="module-kicker">TRAIN</span>
+      <div class="nav-title" id="module-title">Train</div>
+    </div>
+  </div>
+  <div class="subnav" id="subnav"></div>
+</div>
+
+<div class="module-view on" id="module-train">
+  <div class="day-row" id="day-row"></div>
+  <div class="view on" id="view-week">
+    <div id="day-content"></div>
+  </div>
+  <div class="view" id="view-hist">
+    <div class="hist-empty">El historial estara disponible proximamente.<br>Por ahora registra tus entrenos desde la rutina semanal.</div>
+  </div>
+  <div class="view" id="view-mgmt">
+    <div id="mgmt-content"></div>
   </div>
 </div>
 
-<div class="day-row" id="day-row"></div>
-
-<!-- WEEK VIEW -->
-<div class="view on" id="view-week">
-  <div id="day-content"></div>
+<div class="module-view" id="module-meals">
+  <div class="module-pane on" id="view-meals-plan">
+    <div class="module-placeholder">
+      <div class="module-card">
+        <div class="module-card-title">Plan de comidas</div>
+        <div class="module-card-sub">Aca despues podemos armar desayuno, almuerzo, cena, snacks y objetivos diarios.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-card-title">Lista rapida</div>
+        <div class="module-card-sub">Tambien puede vivir aca una lista de compras o un resumen de macros por dia.</div>
+      </div>
+    </div>
+  </div>
+  <div class="module-pane" id="view-meals-list">
+    <div class="module-placeholder">
+      <div class="module-card">
+        <div class="module-card-title">Lista</div>
+        <div class="module-card-sub">Espacio reservado para alimentos, recetas guardadas o compras.</div>
+      </div>
+    </div>
+  </div>
+  <div class="module-pane" id="view-meals-history">
+    <div class="module-placeholder">
+      <div class="module-card">
+        <div class="module-card-title">Historial</div>
+        <div class="module-card-sub">Aca despues puede ir el seguimiento de comidas y adherencia.</div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- HISTORY VIEW -->
-<div class="view" id="view-hist">
-  <div class="hist-empty">El historial estara disponible proximamente.<br>Por ahora registra tus entrenos desde la rutina semanal.</div>
-</div>
-
-<!-- MGMT VIEW -->
-<div class="view" id="view-mgmt">
-  <div id="mgmt-content"></div>
+<div class="module-view" id="module-daily">
+  <div class="module-pane on" id="view-daily-agenda">
+    <div class="module-placeholder">
+      <div class="module-card">
+        <div class="module-card-title">Agenda</div>
+        <div class="module-card-sub">Aca puede entrar tu plan del dia, bloques horarios o pendientes clave.</div>
+      </div>
+    </div>
+  </div>
+  <div class="module-pane" id="view-daily-habits">
+    <div class="module-placeholder">
+      <div class="module-card">
+        <div class="module-card-title">Habitos</div>
+        <div class="module-card-sub">Perfecto para agua, sueño, pasos, lectura o cualquier check diario.</div>
+      </div>
+    </div>
+  </div>
+  <div class="module-pane" id="view-daily-notes">
+    <div class="module-placeholder">
+      <div class="module-card">
+        <div class="module-card-title">Notas</div>
+        <div class="module-card-sub">Seccion libre para ideas, journaling rapido o recordatorios del dia.</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="toast"></div>
+
+<div class="bottom-nav">
+  <div class="bottom-nav-inner" id="bottom-nav">
+    <button class="module-tab on" data-module="train" onclick="showModule('train')"><span>Train</span><small>WORK</small></button>
+    <button class="module-tab" data-module="meals" onclick="showModule('meals')"><span>Meals</span><small>FOOD</small></button>
+    <button class="module-tab" data-module="daily" onclick="showModule('daily')"><span>Daily</span><small>LIFE</small></button>
+  </div>
+</div>
 
 <!-- â•â• TYPE PICKER â•â• -->
 <div class="picker-overlay" id="type-picker" onclick="if(event.target===this)closePicker()">
@@ -718,7 +808,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
     </div>
     <div class="sheet-body">
       <div id="rp-list"></div>
-      <button class="btn-outline" style="width:100%" onclick="closeSheet('routine-picker-sheet');showView('mgmt',document.querySelectorAll('.ntab')[2]);">Ir a crear rutina</button>
+      <button class="btn-outline" style="width:100%" onclick="closeSheet('routine-picker-sheet');showTrainView('mgmt');">Ir a crear rutina</button>
     </div>
   </div>
 </div>
@@ -1127,6 +1217,13 @@ const CONTEXT_FILTERS=[
 // â•â• STATE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 let curDay=0;
 let openDayTypeMenu=null;
+let currentModule='train';
+const subViews={train:'week',meals:'plan',daily:'agenda'};
+const MODULES={
+  train:{label:'Train',kicker:'TRAIN',tabs:[{id:'week',label:'Semana'},{id:'hist',label:'Historial'},{id:'mgmt',label:'Ejercicios'}]},
+  meals:{label:'Meals',kicker:'MEALS',tabs:[{id:'plan',label:'Plan'},{id:'list',label:'Lista'},{id:'history',label:'Historial'}]},
+  daily:{label:'Daily',kicker:'DAILY',tabs:[{id:'agenda',label:'Agenda'},{id:'habits',label:'Habitos'},{id:'notes',label:'Notas'}]},
+};
 let weekData={};    // {0..6: [{name,sets,reps,unit,superGroup,logs:[]}]}
 let dayCfg={};      // {0..6: {type,run}}
 let exercises=[];   // [{id,name,type,muscle,muscleSecondary,modality,modalitySecondary,imageUrl,imageData}]
@@ -1354,14 +1451,45 @@ function lsLoad(){
 function today(){return new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});}
 
 // â•â• VIEWS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-function showView(v,btn){
-  document.querySelectorAll('.view').forEach(el=>el.classList.remove('on'));
-  document.querySelectorAll('.ntab').forEach(el=>el.classList.remove('on'));
-  document.getElementById('view-'+v).classList.add('on');
-  btn.classList.add('on');
-  document.getElementById('day-row').style.display=v==='week'?'grid':'none';
-  if(v==='mgmt') renderMgmt();
+function renderShell(){
+  const mod=MODULES[currentModule];
+  document.getElementById('module-kicker').textContent=mod.kicker;
+  document.getElementById('module-title').textContent=mod.label;
+  document.getElementById('subnav').innerHTML=mod.tabs.map(t=>
+    `<button class="subtab${subViews[currentModule]===t.id?' on':''}" onclick="showSubView('${currentModule}','${t.id}')">${t.label}</button>`
+  ).join('');
+  document.querySelectorAll('.module-view').forEach(el=>el.classList.remove('on'));
+  document.getElementById('module-'+currentModule).classList.add('on');
+  document.querySelectorAll('.module-tab').forEach(el=>el.classList.remove('on'));
+  const activeModuleBtn=document.querySelector(`.module-tab[data-module="${currentModule}"]`);
+  if(activeModuleBtn) activeModuleBtn.classList.add('on');
+
+  if(currentModule==='train'){
+    document.querySelectorAll('#module-train .view').forEach(el=>el.classList.remove('on'));
+    document.getElementById('view-'+subViews.train).classList.add('on');
+    document.getElementById('day-row').style.display=subViews.train==='week'?'grid':'none';
+    if(subViews.train==='mgmt') renderMgmt();
+  }else if(currentModule==='meals'){
+    document.querySelectorAll('#module-meals .module-pane').forEach(el=>el.classList.remove('on'));
+    document.getElementById('view-meals-'+subViews.meals).classList.add('on');
+  }else if(currentModule==='daily'){
+    document.querySelectorAll('#module-daily .module-pane').forEach(el=>el.classList.remove('on'));
+    document.getElementById('view-daily-'+subViews.daily).classList.add('on');
+  }
 }
+function showModule(mod){
+  currentModule=mod;
+  openDayTypeMenu=null;
+  renderShell();
+}
+function showSubView(mod,v){
+  currentModule=mod;
+  subViews[mod]=v;
+  openDayTypeMenu=null;
+  renderShell();
+}
+function showTrainView(v){ showSubView('train',v); }
+function showView(v){ showTrainView(v); }
 
 // â•â• DAY ROW â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function renderDayRow(){
@@ -2704,7 +2832,7 @@ function applyRoutine(routineId){
   weekData[curDay]=(r.items||[]).map(ex=>({...ex,logs:[]}));
   dayCfg[curDay].type=r.type||'push';
   sbSave();renderDayRow();renderDay();closeSheet('routine-picker-sheet');
-  showView('week',document.querySelector('.ntab'));
+  showTrainView('week');
 }
 
 // â•â• MGMT VIEW â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -2890,6 +3018,7 @@ function closeImageZoom(){
   if(bootNamesChanged || bootModalitiesChanged) lsSave();
   renderDayRow();
   renderDay();
+  renderShell();
   setupPullToRefresh();
   document.addEventListener('pointerdown',(ev)=>{
     if(openDayTypeMenu!==null && !ev.target.closest('.day-type-wrap')){
