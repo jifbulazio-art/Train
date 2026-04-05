@@ -32,8 +32,6 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 /* â”€â”€ NAV â”€â”€ */
 .nav{display:flex;flex-direction:column;gap:10px;padding:14px 16px 0;flex-shrink:0}
 .nav-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
-.nav-meta{display:flex;flex-direction:column;gap:3px}
-.nav-logo{font-family:'DM Mono',monospace;font-size:12px;color:var(--tx3);letter-spacing:.1em}
 .nav-title{font-size:24px;line-height:1;font-weight:600;letter-spacing:-.03em}
 .subnav{display:flex;gap:2px;background:var(--s2);border-radius:14px;padding:3px;width:max-content;max-width:100%}
 .subtab{padding:6px 12px;font-size:12px;border:none;background:transparent;color:var(--tx2);border-radius:11px;transition:all .18s}
@@ -48,20 +46,23 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .module-card-sub{margin-top:6px;font-size:12px;color:var(--tx2);line-height:1.6}
 .bottom-nav{
   position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,520px);
-  padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 12px);z-index:90;pointer-events:none;
-  background:linear-gradient(180deg,rgba(14,14,15,0),rgba(14,14,15,.92) 28%,#0e0e0f 58%)
+  padding:10px 0 calc(env(safe-area-inset-bottom,0px) + 8px);z-index:90;pointer-events:none;
+  background:#0e0e0f
 }
 .bottom-nav-inner{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:6px;
-  background:rgba(26,26,28,.96);border:1px solid var(--b0);border-radius:14px;pointer-events:auto
+  display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding:0 8px;pointer-events:auto
 }
 .module-tab{
-  height:46px;border:none;border-radius:10px;background:transparent;color:var(--tx2);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px
+  height:40px;border:none;border-radius:0;background:transparent;color:var(--tx3);
+  display:flex;align-items:center;justify-content:center;position:relative
 }
-.module-tab small{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.08em;opacity:.7}
-.module-tab.on{background:var(--s3);color:var(--tx)}
-.module-tab.on small{opacity:1}
+.module-tab svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.module-tab .fill-icon{fill:currentColor;stroke:none}
+.module-tab.on{color:var(--tx)}
+.module-tab.on::after{
+  content:'';position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);
+  width:18px;height:2px;border-radius:999px;background:var(--acc)
+}
 
 /* â”€â”€ DAY ROW â”€â”€ */
 .day-row{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:10px 16px 0;flex-shrink:0}
@@ -537,10 +538,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 
 <div class="nav">
   <div class="nav-head">
-    <div class="nav-meta">
-      <span class="nav-logo" id="module-kicker">TRAIN</span>
-      <div class="nav-title" id="module-title">Train</div>
-    </div>
+    <div class="nav-title" id="module-title">Train</div>
   </div>
   <div class="subnav" id="subnav"></div>
 </div>
@@ -620,9 +618,39 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 
 <div class="bottom-nav">
   <div class="bottom-nav-inner" id="bottom-nav">
-    <button class="module-tab on" data-module="train" onclick="showModule('train')"><span>Train</span><small>WORK</small></button>
-    <button class="module-tab" data-module="meals" onclick="showModule('meals')"><span>Meals</span><small>FOOD</small></button>
-    <button class="module-tab" data-module="daily" onclick="showModule('daily')"><span>Daily</span><small>LIFE</small></button>
+    <button class="module-tab on" data-module="train" onclick="showModule('train')" aria-label="Train">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3.5 10.2h2.8"/>
+        <path d="M17.7 10.2h2.8"/>
+        <rect x="5.7" y="8.3" width="2.2" height="3.8" rx="0.7"/>
+        <rect x="16.1" y="8.3" width="2.2" height="3.8" rx="0.7"/>
+        <rect x="8.3" y="9.3" width="7.4" height="1.8" rx="0.8"/>
+      </svg>
+    </button>
+    <button class="module-tab" data-module="meals" onclick="showModule('meals')" aria-label="Meals">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4.8 4.2v6.1"/>
+        <path d="M6.2 4.2v6.1"/>
+        <path d="M7.6 4.2v6.1"/>
+        <path d="M4.8 7.4h2.8"/>
+        <path d="M6.2 10.3v9.2"/>
+        <circle cx="13.2" cy="11.8" r="4"/>
+        <circle cx="13.2" cy="11.8" r="6"/>
+        <path d="M18.8 4.3v15.1"/>
+      </svg>
+    </button>
+    <button class="module-tab" data-module="daily" onclick="showModule('daily')" aria-label="Daily">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="5" y="4.8" width="14" height="14.4" rx="2.2"/>
+        <path d="M8 3.5v3.6"/>
+        <path d="M16 3.5v3.6"/>
+        <path d="M5 9h14"/>
+        <rect x="8.1" y="12.1" width="2.5" height="2.5" rx=".4"/>
+        <path d="M8.55 13.3l.7.7l1.2-1.25"/>
+        <rect x="13.2" y="12.1" width="2.5" height="2.5" rx=".4"/>
+        <rect x="8.1" y="16.1" width="2.5" height="2.5" rx=".4"/>
+      </svg>
+    </button>
   </div>
 </div>
 
@@ -1453,7 +1481,6 @@ function today(){return new Date().toLocaleDateString('es-AR',{weekday:'long',da
 // â•â• VIEWS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function renderShell(){
   const mod=MODULES[currentModule];
-  document.getElementById('module-kicker').textContent=mod.kicker;
   document.getElementById('module-title').textContent=mod.label;
   document.getElementById('subnav').innerHTML=mod.tabs.map(t=>
     `<button class="subtab${subViews[currentModule]===t.id?' on':''}" onclick="showSubView('${currentModule}','${t.id}')">${t.label}</button>`
