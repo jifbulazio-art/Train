@@ -29,12 +29,21 @@ body{display:flex;flex-direction:column;max-width:520px;margin:0 auto;min-height
 button{font-family:'DM Sans',sans-serif;cursor:pointer}
 input,select,textarea{font-family:'DM Sans',sans-serif}
 #app-shell{
-  position:fixed;left:50%;top:0;bottom:78px;transform:translateX(-50%);
+  position:fixed;left:50%;top:0;bottom:66px;transform:translateX(-50%);
   width:min(100%,520px);display:flex;flex-direction:column;
   background:var(--bg);border-bottom-left-radius:28px;border-bottom-right-radius:28px;
-  overflow:hidden;z-index:95;pointer-events:none
+  overflow:hidden;z-index:95;pointer-events:none;
+  transition:filter .22s ease,opacity .22s ease
 }
 .nav,#app-shell .module-view{position:relative;z-index:1;pointer-events:auto}
+#app-shell.menu-softened{
+  filter:blur(2px) saturate(.88) brightness(.88);
+  opacity:.74
+}
+#app-shell.menu-softened,
+#app-shell.menu-softened *{
+  pointer-events:none !important
+}
 
 /* â”€â”€ NAV â”€â”€ */
 .nav{display:flex;flex-direction:column;gap:10px;padding:14px 16px 0;flex-shrink:0}
@@ -56,6 +65,11 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   padding:0 0 env(safe-area-inset-bottom,0px);z-index:70;pointer-events:none;
   background:transparent;overflow:visible
 }
+.module-menu-dismiss{
+  position:fixed;inset:0;z-index:120;background:transparent;display:none;
+  border:none;outline:none;box-shadow:none;padding:0;margin:0;appearance:none;-webkit-appearance:none
+}
+.module-menu-dismiss.on{display:block;pointer-events:auto}
 .bottom-nav-inner{
   position:relative;display:block;
   padding:18px 14px 20px;pointer-events:auto;min-height:118px;overflow:visible;
@@ -65,7 +79,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .bottom-side{
   position:relative;z-index:2;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;align-items:end;min-width:0;
   width:calc(50% - 44px);
-  transform:translateY(30px)
+  transform:translateY(38px)
 }
 #bottom-left{float:left}
 #bottom-right{float:right}
@@ -85,26 +99,24 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   width:78px;height:196px;opacity:1;pointer-events:auto;overflow:visible
 }
 .module-liquid{
-  --module-center-y:123px;
-  --module-core-bottom:39px;
-  --module-fill-bottom:44px;
-  --module-slot-x:42px;
-  --module-slot-y:54px;
+  --module-center-y:135px;
+  --module-core-bottom:27px;
+  --module-fill-bottom:32px;
+  --module-slot-gap:48px;
   position:relative;width:100%;height:100%
 }
 .module-liquid-core,.module-liquid-fill,.module-liquid-wing{
   position:absolute;left:50%;border-radius:999px;border:none;box-shadow:none;pointer-events:none;
   transition:
-    opacity .18s ease,
-    transform .34s cubic-bezier(.2,.84,.24,1)
+    opacity .18s ease
 }
 .module-liquid-core{
   bottom:var(--module-core-bottom);transform:translateX(-50%);z-index:1;opacity:1;
-  width:68px;height:68px;background:#09090a
+  width:72px;height:72px;background:#09090a
 }
 .module-liquid-fill{
   bottom:var(--module-fill-bottom);transform:translateX(-50%);z-index:2;opacity:1;
-  width:58px;height:58px;
+  width:62px;height:62px;
   background:
     linear-gradient(180deg,#9c3924 0%, var(--acc) 58%, var(--acc-deep) 100%);
   box-shadow:
@@ -116,53 +128,54 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .module-liquid-wing{
   display:none
 }
-.bottom-nav.open .module-liquid-core,
-.module-switcher.open .module-liquid-core{
-  transform:translateX(-50%) scale(1)
-}
-.bottom-nav.open .module-liquid-fill,
-.module-switcher.open .module-liquid-fill{
-  transform:translateX(-50%) scale(1)
-}
 .module-liquid-slot,.module-liquid-center{
   position:absolute;left:50%;border:none;background:transparent;display:flex;align-items:center;justify-content:center
 }
 .module-liquid-center{
-  top:var(--module-center-y);width:68px;height:68px;transform:translate(-50%,-50%);
-  color:#0e0e0f;z-index:4;transition:transform .32s cubic-bezier(.2,.84,.24,1)
+  top:var(--module-center-y);width:72px;height:72px;transform:translate(-50%,-50%);
+  color:#0e0e0f;z-index:4;transition:none
 }
-.bottom-nav.open .module-liquid-center,
-.module-switcher.open .module-liquid-center{transform:translate(-50%,-50%) scale(.94)}
 .module-liquid-slot{
-  width:50px;height:50px;color:#efefeb;opacity:0;pointer-events:none;z-index:5;
+  width:44px;height:36px;color:#f8f6f2;opacity:0;pointer-events:none;z-index:5;
   transition:opacity .22s ease,transform .36s cubic-bezier(.2,.84,.24,1),color .22s ease,filter .22s ease
 }
 .module-liquid-slot::before{
-  content:'';position:absolute;inset:0;border-radius:999px;background:#09090a;z-index:-1;
-  opacity:0;transform:scale(.2);
-  transition:opacity .22s ease,transform .36s cubic-bezier(.2,.84,.24,1)
+  content:'';position:absolute;left:50%;top:50%;width:40px;height:40px;border-radius:999px;z-index:-1;
+  transform:translate(-50%,-50%);
+  background:
+    linear-gradient(180deg,#9c3924 0%, var(--acc) 58%, var(--acc-deep) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.1),
+    inset 0 0 0 1px rgba(255,255,255,.04),
+    inset 0 -4px 8px rgba(34,10,6,.34),
+    0 3px 8px rgba(0,0,0,.14)
 }
 .module-liquid-slot.left{
   top:var(--module-center-y);
-  transform:translate(-50%,-50%) translate(0,0) scale(.18)
+  transform:translate(-50%,-50%) translateY(0) scale(.35)
 }
 .module-liquid-slot.right{
   top:var(--module-center-y);
-  transform:translate(-50%,-50%) translate(0,0) scale(.18)
+  transform:translate(-50%,-50%) translateY(0) scale(.35)
 }
 .bottom-nav.open .module-liquid-slot,
 .module-switcher.open .module-liquid-slot{opacity:1;pointer-events:auto}
-.bottom-nav.open .module-liquid-slot::before,
-.module-switcher.open .module-liquid-slot::before{opacity:1;transform:scale(1)}
 .bottom-nav.open .module-liquid-slot.left,
-.module-switcher.open .module-liquid-slot.left{transform:translate(-50%,-50%) translate(calc(var(--module-slot-x) * -1), calc(var(--module-slot-y) * -1)) scale(1);transition-delay:.08s}
+.module-switcher.open .module-liquid-slot.left{transform:translate(-50%,-50%) translateY(calc(var(--module-slot-gap) * -2.55)) scale(1);transition-delay:.08s}
 .bottom-nav.open .module-liquid-slot.right,
-.module-switcher.open .module-liquid-slot.right{transform:translate(-50%,-50%) translate(var(--module-slot-x), calc(var(--module-slot-y) * -1)) scale(1);transition-delay:.12s}
+.module-switcher.open .module-liquid-slot.right{transform:translate(-50%,-50%) translateY(calc(var(--module-slot-gap) * -1.45)) scale(1);transition-delay:.12s}
 .module-liquid-slot svg,.module-liquid-center svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .module-liquid-slot img,.module-liquid-center img{width:25px;height:25px;object-fit:contain;display:block;opacity:1}
-.module-liquid-center svg,.module-liquid-center img{position:relative;z-index:1}
-.module-liquid-slot img{filter:brightness(0) saturate(100%) invert(94%) sepia(4%) saturate(163%) hue-rotate(16deg) brightness(108%) contrast(87%)}
-.module-liquid-center img{width:31px;height:31px;object-fit:contain;display:block;opacity:1;filter:brightness(0) saturate(100%) invert(98%) sepia(6%) saturate(73%) hue-rotate(296deg) brightness(118%) contrast(88%)}
+.module-liquid-center svg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1}
+.module-liquid-center img{position:absolute;left:50%;top:50%;transform:translate(-49%,-53%);z-index:1}
+.module-liquid-slot img[src*="meals.png"]{transform:translate(4%,-2%)}
+.module-liquid-center img[src*="meals.png"]{transform:translate(-46%,-54%)}
+.module-liquid-center img[src*="meals.png"]{width:39px;height:39px}
+.module-liquid-center img[src*="train.png"]{width:37px;height:37px}
+.module-liquid-slot img[src*="daily.png"]{transform:translate(0,-1%);width:23px;height:23px}
+.module-liquid-center img[src*="daily.png"]{transform:translate(-50%,-56%);width:31px;height:31px}
+.module-liquid-slot img{filter:brightness(0) saturate(100%) invert(95%) sepia(5%) saturate(122%) hue-rotate(306deg) brightness(109%) contrast(92%)}
+.module-liquid-center img{width:33px;height:33px;object-fit:contain;display:block;opacity:1;filter:brightness(0) saturate(100%) invert(95%) sepia(5%) saturate(122%) hue-rotate(306deg) brightness(109%) contrast(92%)}
 
 /* â”€â”€ DAY ROW â”€â”€ */
 .day-row{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:10px 16px 0;flex-shrink:0}
@@ -742,6 +755,8 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 </div>
 
 <div id="toast"></div>
+
+<div class="module-menu-dismiss" id="module-menu-dismiss" aria-hidden="true" onclick="dismissModuleMenu(event)"></div>
 
 <div class="bottom-nav" id="bottom-nav">
   <div class="bottom-nav-inner">
@@ -1344,6 +1359,10 @@ let curDay=0;
 let openDayTypeMenu=null;
 let currentModule='train';
 let moduleMenuOpen=false;
+let suppressDismissClickUntil=0;
+let moduleDismissHoldTimer=null;
+let uiBackStack=[];
+let ignoreNextUiPop=false;
 const subViews={train:'week',meals:'plan',daily:'agenda'};
 const MODULES={
   train:{label:'Train',tabs:[{id:'week',label:'Semana',icon:'week'},{id:'hist',label:'Historial',icon:'history'},{id:'mgmt',label:'Ejercicios',icon:'exercise'},{id:'routines',label:'Rutinas',icon:'stack'}]},
@@ -1580,6 +1599,7 @@ function today(){return new Date().toLocaleDateString('es-AR',{weekday:'long',da
 function getModuleIconHTML(mod){
   if(mod==='train') return `<img src="./icons/train.png" alt="">`;
   if(mod==='meals') return `<img src="./icons/meals.png" alt="">`;
+  if(mod==='daily') return `<img src="./icons/daily.png" alt="">`;
   return `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4.8" width="14" height="14.4" rx="2.2"/><path d="M8 3.5v3.6"/><path d="M16 3.5v3.6"/><path d="M5 9h14"/><rect x="8.1" y="12.1" width="2.5" height="2.5" rx=".4"/><path d="M8.55 13.3l.7.7l1.2-1.25"/><rect x="13.2" y="12.1" width="2.5" height="2.5" rx=".4"/><rect x="8.1" y="16.1" width="2.5" height="2.5" rx=".4"/></svg>`;
 }
 function getBottomTabIcon(icon){
@@ -1619,8 +1639,12 @@ function renderBottomNav(){
     </div>`;
   const bottomNavEl=document.getElementById('bottom-nav');
   const moduleSwitcherEl=document.getElementById('module-switcher');
+  const appShellEl=document.getElementById('app-shell');
+  const moduleDismissEl=document.getElementById('module-menu-dismiss');
   bottomNavEl.classList.remove('open');
   moduleSwitcherEl.classList.remove('open');
+  appShellEl.classList.toggle('menu-softened',moduleMenuOpen);
+  moduleDismissEl.classList.toggle('on',moduleMenuOpen || Date.now()<suppressDismissClickUntil);
   if(moduleMenuOpen){
     requestAnimationFrame(()=>{
       bottomNavEl.classList.add('open');
@@ -1649,27 +1673,107 @@ function renderShell(){
   }
 }
 function toggleModuleMenu(){
-  moduleMenuOpen=!moduleMenuOpen;
+  if(moduleMenuOpen){
+    closeModuleMenu();
+    return;
+  }
+  moduleMenuOpen=true;
+  pushUiBackLayer('module-menu');
   vibrateTap(12);
   renderBottomNav();
 }
+function closeModuleMenu(fromBack=false){
+  if(!moduleMenuOpen) return;
+  moduleMenuOpen=false;
+  releaseUiBackLayer('module-menu',fromBack);
+  suppressDismissClickUntil=Date.now()+420;
+  clearTimeout(moduleDismissHoldTimer);
+  moduleDismissHoldTimer=setTimeout(()=>{
+    if(!moduleMenuOpen) renderBottomNav();
+  },430);
+  renderBottomNav();
+}
+function dismissModuleMenu(ev){
+  if(ev){
+    ev.preventDefault();
+    ev.stopPropagation();
+  }
+  closeModuleMenu();
+}
 function showModule(mod){
   if(currentModule!==mod) vibrateTap(16);
+  if(moduleMenuOpen) closeModuleMenu();
+  if(openDayTypeMenu!==null) closeDayTypeMenu();
   currentModule=mod;
-  moduleMenuOpen=false;
-  openDayTypeMenu=null;
   renderShell();
 }
 function showSubView(mod,v){
   if(currentModule!==mod || subViews[mod]!==v) vibrateTap(14);
+  if(moduleMenuOpen) closeModuleMenu();
+  if(openDayTypeMenu!==null) closeDayTypeMenu();
   currentModule=mod;
   subViews[mod]=v;
-  moduleMenuOpen=false;
-  openDayTypeMenu=null;
   renderShell();
 }
 function showTrainView(v){ showSubView('train',v); }
 function showView(v){ showTrainView(v); }
+
+function ensureUiHistoryBase(){
+  const state=history.state||{};
+  const baseUrl=location.pathname+location.search;
+  if(!state.__trainAppBase){
+    history.replaceState({...state,__trainAppBase:true,uiDepth:uiBackStack.length},document.title,baseUrl);
+  }
+}
+function pushUiBackLayer(kind){
+  ensureUiHistoryBase();
+  uiBackStack.push(kind);
+  const uiUrl=`${location.pathname}${location.search}#ui-${uiBackStack.length}`;
+  history.pushState({__trainAppBase:true,uiDepth:uiBackStack.length,uiKind:kind},document.title,uiUrl);
+}
+function releaseUiBackLayer(kind,fromBack=false){
+  const idx=kind?uiBackStack.lastIndexOf(kind):uiBackStack.length-1;
+  if(idx<0) return;
+  const isTop=idx===uiBackStack.length-1;
+  uiBackStack.splice(idx,1);
+  if(fromBack || !isTop) return;
+  ignoreNextUiPop=true;
+  history.back();
+}
+function closeDayTypeMenu(fromBack=false){
+  if(openDayTypeMenu===null) return;
+  openDayTypeMenu=null;
+  renderDay();
+  releaseUiBackLayer('day-type',fromBack);
+}
+function getOpenSheetId(){
+  return ['routine-picker-sheet','routine-edit-sheet','ex-edit-sheet','detail-sheet','add-sheet']
+    .find(id=>document.getElementById(id)?.classList.contains('on'))||null;
+}
+function closeTopUiLayer(fromBack=false){
+  if(document.getElementById('img-zoom')?.classList.contains('on')){
+    closeImageZoom(fromBack);
+    return true;
+  }
+  if(document.getElementById('type-picker')?.classList.contains('on')){
+    closePicker(fromBack);
+    return true;
+  }
+  const openSheetId=getOpenSheetId();
+  if(openSheetId){
+    closeSheet(openSheetId,fromBack);
+    return true;
+  }
+  if(openDayTypeMenu!==null){
+    closeDayTypeMenu(fromBack);
+    return true;
+  }
+  if(moduleMenuOpen){
+    closeModuleMenu(fromBack);
+    return true;
+  }
+  return false;
+}
 
 // â•â• DAY ROW â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function renderDayRow(){
@@ -2235,7 +2339,16 @@ function toggleRun(di){
   dayCfg[di].run=!dayCfg[di].run;sbSave();renderDay();
 }
 function toggleDayTypeMenu(di){
-  openDayTypeMenu=openDayTypeMenu===di?null:di;
+  if(openDayTypeMenu===di){
+    closeDayTypeMenu();
+    return;
+  }
+  if(openDayTypeMenu===null){
+    openDayTypeMenu=di;
+    pushUiBackLayer('day-type');
+  }else{
+    openDayTypeMenu=di;
+  }
   renderDay();
 }
 
@@ -2288,14 +2401,21 @@ function openTypePicker(di){
   document.getElementById('picker-grid').innerHTML=TYPES.map(t=>
     `<button class="picker-opt" style="color:${t.color};border-color:${t.color}33" onclick="setDayType('${t.id}')">${t.label}</button>`
   ).join('');
+  if(!document.getElementById('type-picker').classList.contains('on')) pushUiBackLayer('type-picker');
   document.getElementById('type-picker').classList.add('on');
 }
-function closePicker(){document.getElementById('type-picker').classList.remove('on');}
+function closePicker(fromBack=false){
+  const picker=document.getElementById('type-picker');
+  if(!picker.classList.contains('on')) return;
+  picker.classList.remove('on');
+  releaseUiBackLayer('type-picker',fromBack);
+}
 function setDayType(tid){
   dayCfg[pickerDay].type=tid;closePicker();sbSave();renderDayRow();renderDay();
 }
 function setDayTypeForDay(di,tid){
   dayCfg[di].type=tid;
+  releaseUiBackLayer('day-type');
   openDayTypeMenu=null;
   sbSave();
   renderDayRow();
@@ -3188,20 +3308,35 @@ function renderMgmtRoutines(){
 }
 
 // â•â• SHEET / OVERLAY HELPERS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-function openSheet(id){document.getElementById(id).classList.add('on');}
-function closeSheet(id){document.getElementById(id).classList.remove('on');}
+function openSheet(id){
+  const sheet=document.getElementById(id);
+  if(sheet.classList.contains('on')) return;
+  sheet.classList.add('on');
+  pushUiBackLayer(`sheet:${id}`);
+}
+function closeSheet(id,fromBack=false){
+  const sheet=document.getElementById(id);
+  if(!sheet.classList.contains('on')) return;
+  sheet.classList.remove('on');
+  releaseUiBackLayer(`sheet:${id}`,fromBack);
+}
 function openImageZoom(src){
   if(!src) return;
+  if(!document.getElementById('img-zoom').classList.contains('on')) pushUiBackLayer('image-zoom');
   document.getElementById('img-zoom-src').src=src;
   document.getElementById('img-zoom').classList.add('on');
 }
-function closeImageZoom(){
-  document.getElementById('img-zoom').classList.remove('on');
+function closeImageZoom(fromBack=false){
+  const zoom=document.getElementById('img-zoom');
+  if(!zoom.classList.contains('on')) return;
+  zoom.classList.remove('on');
   document.getElementById('img-zoom-src').src='';
+  releaseUiBackLayer('image-zoom',fromBack);
 }
 
 // â•â• INIT â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 (async()=>{
+  ensureUiHistoryBase();
   lsLoad();
   const bootNamesChanged=normalizeAllExerciseNames();
   const bootModalitiesChanged=normalizeAllExerciseModalities();
@@ -3210,16 +3345,20 @@ function closeImageZoom(){
   renderDay();
   renderShell();
   setupPullToRefresh();
-  document.addEventListener('pointerdown',(ev)=>{
-    if(moduleMenuOpen && !ev.target.closest('.bottom-nav') && !ev.target.closest('.module-switcher')){
-      moduleMenuOpen=false;
-      renderBottomNav();
+  document.addEventListener('click',(ev)=>{
+    if(Date.now()<suppressDismissClickUntil){
+      ev.preventDefault();
+      ev.stopPropagation();
+      return false;
     }
     if(openDayTypeMenu!==null && !ev.target.closest('.day-type-wrap')){
-      openDayTypeMenu=null;
-      renderDay();
-      return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      closeDayTypeMenu();
+      return false;
     }
+  },true);
+  document.addEventListener('pointerdown',(ev)=>{
     if(!openSwipe || excSwipeState.active) return;
     if(ev.target.closest('.sw-action-btn')) return;
     if(ev.target.closest('.exc')){
@@ -3241,6 +3380,13 @@ function closeImageZoom(){
   window.addEventListener('online',()=>{
     refreshFromRemote({force:true});
     if(syncState.pending) scheduleSync(700);
+  });
+  window.addEventListener('popstate',()=>{
+    if(ignoreNextUiPop){
+      ignoreNextUiPop=false;
+      return;
+    }
+    closeTopUiLayer(true);
   });
   document.addEventListener('visibilitychange',()=>{
     if(document.visibilityState==='hidden' && syncState.pending) flushSync({keepalive:true});

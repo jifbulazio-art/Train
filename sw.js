@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rutina-shell-v2';
+const CACHE_NAME = 'rutina-shell-v3';
 const APP_SHELL = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const APP_SHELL = [
   './icons/icon-maskable.svg',
   './icons/train.png',
   './icons/meals.png',
+  './icons/daily.png',
 ];
 
 self.addEventListener('install', (event) => {
