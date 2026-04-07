@@ -136,7 +136,8 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   color:#0e0e0f;z-index:4;transition:none
 }
 .module-liquid-slot{
-  width:44px;height:36px;color:#f8f6f2;opacity:0;pointer-events:none;z-index:5;
+  width:44px;height:40px;color:#f8f6f2;opacity:0;pointer-events:none;z-index:5;
+  justify-content:center;gap:0;padding:0;
   transition:opacity .22s ease,transform .36s cubic-bezier(.2,.84,.24,1),color .22s ease,filter .22s ease
 }
 .module-liquid-slot::before{
@@ -166,6 +167,13 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .module-switcher.open .module-liquid-slot.right{transform:translate(-50%,-50%) translateY(calc(var(--module-slot-gap) * -1.45)) scale(1);transition-delay:.12s}
 .module-liquid-slot svg,.module-liquid-center svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .module-liquid-slot img,.module-liquid-center img{width:25px;height:25px;object-fit:contain;display:block;opacity:1}
+.module-liquid-slot-label{
+  position:absolute;left:calc(100% + 10px);top:50%;
+  font-size:12px;line-height:1;font-weight:600;letter-spacing:-.01em;color:#f8f6f2;
+  white-space:nowrap;opacity:0;transform:translateY(-50%) translateX(-8px);
+  transition:opacity .2s ease,transform .28s cubic-bezier(.2,.84,.24,1);
+  pointer-events:none
+}
 .module-liquid-center svg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1}
 .module-liquid-center img{position:absolute;left:50%;top:50%;transform:translate(-49%,-53%);z-index:1}
 .module-liquid-slot img[src*="meals.png"]{transform:translate(4%,-2%)}
@@ -174,6 +182,9 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .module-liquid-center img[src*="train.png"]{width:37px;height:37px}
 .module-liquid-slot img[src*="daily.png"]{transform:translate(0,-1%);width:23px;height:23px}
 .module-liquid-center img[src*="daily.png"]{transform:translate(-50%,-56%);width:31px;height:31px}
+.module-switcher.open .module-liquid-slot .module-liquid-slot-label{
+  opacity:.96;transform:translateY(-50%) translateX(0)
+}
 .module-liquid-slot img{filter:brightness(0) saturate(100%) invert(95%) sepia(5%) saturate(122%) hue-rotate(306deg) brightness(109%) contrast(92%)}
 .module-liquid-center img{width:33px;height:33px;object-fit:contain;display:block;opacity:1;filter:brightness(0) saturate(100%) invert(95%) sepia(5%) saturate(122%) hue-rotate(306deg) brightness(109%) contrast(92%)}
 
@@ -252,7 +263,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .exc:active{opacity:.75}
 .exc.swiping{opacity:1}
 .exc-body{
-  display:flex;align-items:flex-start;gap:10px;padding:10px 11px 10px 10px;position:relative;z-index:2;
+  display:flex;flex-wrap:wrap;align-items:flex-start;gap:10px;padding:10px 11px 10px 10px;position:relative;z-index:2;
   width:calc(100% - (var(--card-edge,4px) * 2) - var(--swipe-px,0px));
   margin-left:calc(var(--card-edge,4px) + var(--swipe-left-gap,0px));
   margin-right:calc(var(--card-edge,4px) + var(--swipe-right-gap,0px));
@@ -530,6 +541,92 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .link-btn{font-size:12px;color:var(--tx2);background:none;border:none;padding:2px 0;text-align:left}
 .btn-save{width:100%;padding:12px;background:var(--legs);color:var(--bg);border:none;border-radius:var(--rs);font-size:13px;font-weight:600}
 .btn-secondary{width:100%;padding:10px;background:transparent;color:var(--tx2);border:1px solid var(--b1);border-radius:var(--rs);font-size:12px}
+.exc-detail{
+  width:100%;margin-top:2px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05);
+  display:flex;flex-direction:column;gap:10px
+}
+.exc-detail-stage{
+  width:100%;max-width:100%;margin:0;
+  display:flex;flex-direction:column;gap:10px
+}
+.exc-detail-top{display:flex;flex-direction:column;gap:7px}
+.exc-detail .sets-title{margin-bottom:1px}
+.exc-detail .plan-grid{display:grid;grid-template-columns:26px 58px minmax(0,1fr) 88px;gap:10px;align-items:end}
+.exc-detail .plan-grid input,
+.exc-detail .plan-grid select,
+.exc-detail .set-row input,
+.exc-detail .set-row select{
+  background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.11);border-radius:0;
+  padding:8px 4px 7px;color:var(--tx);font-size:12px;outline:none;min-width:0
+}
+.exc-detail .plan-grid input,
+.exc-detail .set-row input{font-family:'DM Mono',monospace}
+.exc-detail .plan-grid select,
+.exc-detail .set-row select{padding-right:22px}
+.exc-detail .detail-sets-list{display:flex;flex-direction:column;gap:0}
+.exc-detail .set-row{
+  display:grid;grid-template-columns:26px minmax(0,1fr) 88px 72px 22px;
+  align-items:end;gap:10px;padding:10px 0;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.05);border-radius:0
+}
+.exc-detail .set-row:last-child{border-bottom:none}
+.exc-detail .set-num{
+  font-size:10px;font-family:'DM Mono',monospace;color:var(--tx3);text-align:left;background:none;border:none;border-radius:0;height:auto;display:block;padding-bottom:8px
+}
+.set-weight-wrap{position:relative}
+.set-weight-wrap input{width:100%;padding-right:24px !important}
+.set-weight-unit{
+  position:absolute;right:4px;bottom:8px;
+  font-size:10px;font-family:'DM Mono',monospace;color:var(--tx3);pointer-events:none
+}
+.exc-detail .set-del{
+  background:transparent;border:none;color:var(--tx3);font-size:15px;width:22px;height:22px;border-radius:0;padding:0;align-self:end;margin-bottom:4px
+}
+.exc-detail-add{font-size:12px;color:var(--tx2);background:none;border:none;padding:0;text-align:left;align-self:flex-start}
+.exc-detail-actions{display:flex;flex-direction:column;gap:8px}
+.exc-detail .btn-save{
+  width:100%;align-self:stretch;background:rgba(248,246,242,.94);color:#0e0e0f;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 6px 16px rgba(0,0,0,.12)
+}
+.exc-detail .btn-secondary{
+  width:100%;align-self:stretch;background:rgba(255,255,255,.03);color:var(--tx2);border-color:rgba(255,255,255,.08)
+}
+.detail-base-tag{
+  font-size:10px;font-family:'DM Mono',monospace;color:var(--tx3);padding-bottom:8px
+}
+.detail-unit-wrap{position:relative;display:block;height:35px;min-width:0;z-index:7}
+.detail-unit-panel{
+  position:absolute;top:0;left:0;right:0;
+  display:flex;flex-direction:column;gap:0;
+  background:transparent;
+  border:none;
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:none
+}
+.detail-unit-wrap.open .detail-unit-panel{
+  background:rgba(24,24,26,.98);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 12px 26px rgba(0,0,0,.22)
+}
+.detail-unit-select{
+  height:35px;width:100%;padding:0 26px 0 4px;background:transparent;border:none;color:var(--tx);
+  font-size:12px;font-family:'DM Mono',monospace;outline:none;
+  display:inline-flex;align-items:center;text-align:left;position:relative;
+  border-bottom:1px solid rgba(255,255,255,.11)
+}
+.detail-unit-select::after{
+  content:'';position:absolute;right:9px;top:50%;width:7px;height:7px;
+  border-right:1px solid rgba(255,255,255,.5);border-bottom:1px solid rgba(255,255,255,.5);
+  transform:translateY(-65%) rotate(45deg);pointer-events:none
+}
+.detail-unit-value{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.detail-unit-menu{display:flex;flex-direction:column;gap:4px;padding:4px;background:rgba(24,24,26,.98)}
+.detail-unit-opt{
+  display:flex;align-items:center;width:100%;height:28px;padding:0 8px;
+  background:transparent;border:1px solid transparent;border-radius:6px;color:var(--tx2);
+  font-size:12px;font-family:'DM Mono',monospace;text-align:left
+}
+.detail-unit-opt.on{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.06);color:var(--tx)}
 
 /* â”€â”€ TYPE PICKER â”€â”€ */
 .picker-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none;align-items:flex-end;justify-content:center}
@@ -1385,6 +1482,7 @@ window._opts=[];
 let detailCtx={dayIdx:null,exIdx:null};
 let detailSets=[];
 let detailPlan={sets:'',reps:'',unit:'rep'};
+let detailUnitMenu=null;
 
 // edit exercise state
 let eeCtx={id:null,sourceName:null,sourceType:null,sourceMuscle:null,sourceModality:null};
@@ -1633,9 +1731,9 @@ function renderBottomNav(){
       <span class="module-liquid-fill"></span>
       <span class="module-liquid-wing left"></span>
       <span class="module-liquid-wing right"></span>
-      <button class="module-liquid-slot left" type="button" onclick="showModule('${otherModules[0]}')" aria-label="${MODULES[otherModules[0]].label}">${getModuleIconHTML(otherModules[0])}</button>
+      <button class="module-liquid-slot left" type="button" onclick="showModule('${otherModules[0]}')" aria-label="${MODULES[otherModules[0]].label}">${getModuleIconHTML(otherModules[0])}<span class="module-liquid-slot-label">${MODULES[otherModules[0]].label}</span></button>
       <button class="module-liquid-center" type="button" onclick="toggleModuleMenu()" aria-label="Cambiar seccion">${getModuleIconHTML(currentModule)}</button>
-      <button class="module-liquid-slot right" type="button" onclick="showModule('${otherModules[1]}')" aria-label="${MODULES[otherModules[1]].label}">${getModuleIconHTML(otherModules[1])}</button>
+      <button class="module-liquid-slot right" type="button" onclick="showModule('${otherModules[1]}')" aria-label="${MODULES[otherModules[1]].label}">${getModuleIconHTML(otherModules[1])}<span class="module-liquid-slot-label">${MODULES[otherModules[1]].label}</span></button>
     </div>`;
   const bottomNavEl=document.getElementById('bottom-nav');
   const moduleSwitcherEl=document.getElementById('module-switcher');
@@ -1746,13 +1844,38 @@ function closeDayTypeMenu(fromBack=false){
   renderDay();
   releaseUiBackLayer('day-type',fromBack);
 }
+function closeDetailUnitMenu(fromBack=false){
+  if(detailUnitMenu===null) return;
+  detailUnitMenu=null;
+  renderDay();
+  releaseUiBackLayer('detail-unit-menu',fromBack);
+}
 function getOpenSheetId(){
   return ['routine-picker-sheet','routine-edit-sheet','ex-edit-sheet','detail-sheet','add-sheet']
     .find(id=>document.getElementById(id)?.classList.contains('on'))||null;
 }
+function hasInlineDetailOpen(){
+  return detailCtx.dayIdx!==null && detailCtx.exIdx!==null;
+}
+function closeInlineDetail(fromBack=false){
+  if(!hasInlineDetailOpen()) return;
+  if(detailUnitMenu!==null){
+    detailUnitMenu=null;
+    releaseUiBackLayer('detail-unit-menu',fromBack);
+  }
+  detailCtx={dayIdx:null,exIdx:null};
+  detailSets=[];
+  detailPlan={sets:'',reps:'',unit:'rep'};
+  renderDay();
+  releaseUiBackLayer('inline-detail',fromBack);
+}
 function closeTopUiLayer(fromBack=false){
   if(document.getElementById('img-zoom')?.classList.contains('on')){
     closeImageZoom(fromBack);
+    return true;
+  }
+  if(detailUnitMenu!==null){
+    closeDetailUnitMenu(fromBack);
     return true;
   }
   if(document.getElementById('type-picker')?.classList.contains('on')){
@@ -1762,6 +1885,10 @@ function closeTopUiLayer(fromBack=false){
   const openSheetId=getOpenSheetId();
   if(openSheetId){
     closeSheet(openSheetId,fromBack);
+    return true;
+  }
+  if(hasInlineDetailOpen()){
+    closeInlineDetail(fromBack);
     return true;
   }
   if(openDayTypeMenu!==null){
@@ -2216,6 +2343,10 @@ function excTap(ev,di,i){
     clearOpenSwipe({render:true});
     return;
   }
+  if(detailCtx.dayIdx===di && detailCtx.exIdx===i){
+    closeInlineDetail();
+    return;
+  }
   openDetail(di,i);
 }
 
@@ -2257,6 +2388,7 @@ function excHTML(ex,di,i,inGroup,superBorder='',superAccent='',warmItem=false,gr
   const openRight=isOpenSwipe(di,i,'right');
   const openLeft=isOpenSwipe(di,i,'left');
   const ssClass=(pending||ex.superGroup)?' on':'';
+  const isExpanded=detailCtx.dayIdx===di && detailCtx.exIdx===i;
   const openPx=Math.max(0,openSwipe?.px||0);
   const swipeVars=openRight
     ? `--swipe-px:${openPx}px;--swipe-left-gap:${openPx}px;--swipe-right-gap:0px;--swipe-icon-o-del:1;--swipe-icon-o-ss:0;--swipe-icon-center-del:${(openPx*0.5).toFixed(2)}px;--swipe-icon-center-ss:-22px;`
@@ -2319,6 +2451,7 @@ function excHTML(ex,di,i,inGroup,superBorder='',superAccent='',warmItem=false,gr
       <button class="exc-ss${ssClass}" onclick="event.stopPropagation();supersetAction(${di},${i})">${getSupersetButtonLabel(ex,di,i)}</button>
       <button class="exc-del" onclick="event.stopPropagation();removeFromDay(${di},${i})">×</button>
     </div>
+    ${isExpanded?renderInlineDetail(di,i,ex):''}
     </div>
   </div>`;
 }
@@ -2694,6 +2827,7 @@ function openCreateFromSearch(q){
 // â•â• DETAIL SHEET â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function openDetail(di,i){
   const ex=(weekData[di]||[])[i];if(!ex) return;
+  if(hasInlineDetailOpen()) releaseUiBackLayer('inline-detail');
   detailCtx={dayIdx:di,exIdx:i};
   detailPlan={
     sets:(parseInt(ex.sets||0,10)||'').toString(),
@@ -2711,72 +2845,100 @@ function openDetail(di,i){
     detailSets.push({val:'',unit:ex.unit||'rep',weight:'',wunit:'kg'});
   }
   if(!detailSets.length) detailSets=[{val:'',unit:ex.unit||'rep',weight:'',wunit:'kg'}];
-
-  document.getElementById('detail-title').textContent=ex.name;
-  const img=getExImg(ex.name);
-  const hasSG=!!ex.superGroup;
-  const detailImgHtml = img
-    ? `<img src="${img}" onclick="event.stopPropagation();openImageZoom('${img.replace(/'/g,"\\'")}')" onerror="this.parentElement.innerHTML='&lt;span class=&quot;detail-img-ph&quot;&gt;${ex.name}&lt;/span&gt;'">`
-    : `<span class="detail-img-ph">${ex.name}</span>`;
-  const detailMeta = `${TYPE_MAP[getExType(ex.name)]||''}${getPlannedMeta(ex)?` - ${getPlannedMeta(ex)}`:''}`;
-
-  document.getElementById('detail-body').innerHTML=`
-    <div class="detail-hero">
-      <div class="detail-img">${detailImgHtml}</div>
-      <div class="detail-head-copy">
-      <div class="detail-ex-name">${ex.name}</div>
-      <div class="detail-ex-sub">${detailMeta}</div>
-      </div>
-    </div>
-    <div class="detail-block">
-      <div class="sets-title">BASE OBJETIVO</div>
-      <div class="plan-grid">
-        <input type="number" min="1" max="20" inputmode="numeric" placeholder="sets" value="${detailPlan.sets}" oninput="detailPlan.sets=this.value">
-        <input type="text" placeholder="reps o segundos" value="${detailPlan.reps}" oninput="detailPlan.reps=this.value">
-        <select onchange="detailPlan.unit=this.value">
-          <option value="rep"${detailPlan.unit==='rep'?' selected':''}>reps</option>
-          <option value="seg"${detailPlan.unit==='seg'?' selected':''}>seg</option>
-          <option value="cant"${detailPlan.unit==='cant'?' selected':''}>cant</option>
-        </select>
-      </div>
-    </div>
-    <div class="detail-block">
-      <div class="sets-title">SETS</div>
-      <div id="detail-sets-list" class="detail-sets-list"></div>
-    </div>
-    <button class="link-btn" onclick="addDetailSet()">+ agregar set</button>
-    ${hasSG?`<button class="btn-secondary" onclick="separateFromSuper(${di},${i})">Separar de la superserie</button>`:''}
-    <button class="btn-save" onclick="saveDetail()">Guardar</button>
-  `;
-  renderDetailSets();
-  openSheet('detail-sheet');
+  detailPlan.unit=detailPlan.unit==='seg'?'seg':'rep';
+  detailSets=detailSets.map(s=>({
+    ...s,
+    unit:s.unit==='seg'?'seg':'rep',
+    wunit:'kg'
+  }));
+  pushUiBackLayer('inline-detail');
+  renderDay();
 }
 
-function renderDetailSets(){
-  document.getElementById('detail-sets-list').innerHTML=detailSets.map((s,i)=>`
+function renderDetailUnitDropdown(key,value,mode,idx=null){
+  const selected=value==='seg'?'seg':'rep';
+  const open=detailUnitMenu===key;
+  const selectRep=mode==='base'
+    ? `setDetailBaseUnit('rep')`
+    : `setDetailSetUnit(${idx},'rep')`;
+  const selectSeg=mode==='base'
+    ? `setDetailBaseUnit('seg')`
+    : `setDetailSetUnit(${idx},'seg')`;
+  return `
+    <div class="detail-unit-wrap${open?' open':''}">
+      <div class="detail-unit-panel">
+        <button class="detail-unit-select" type="button" onclick="event.stopPropagation();toggleDetailUnitMenu('${key}')">
+          <span class="detail-unit-value">${selected}</span>
+        </button>
+        ${open?`<div class="detail-unit-menu">
+          <button class="detail-unit-opt${selected==='rep'?' on':''}" type="button" onclick="event.stopPropagation();${selectRep}">rep</button>
+          <button class="detail-unit-opt${selected==='seg'?' on':''}" type="button" onclick="event.stopPropagation();${selectSeg}">seg</button>
+        </div>`:''}
+      </div>
+    </div>`;
+}
+function toggleDetailUnitMenu(key){
+  if(detailUnitMenu===key){
+    closeDetailUnitMenu();
+    return;
+  }
+  if(detailUnitMenu===null) pushUiBackLayer('detail-unit-menu');
+  detailUnitMenu=key;
+  renderDay();
+}
+function setDetailBaseUnit(unit){
+  detailPlan.unit=unit==='seg'?'seg':'rep';
+  closeDetailUnitMenu();
+}
+function setDetailSetUnit(idx,unit){
+  if(!detailSets[idx]) return;
+  detailSets[idx].unit=unit==='seg'?'seg':'rep';
+  closeDetailUnitMenu();
+}
+
+function renderDetailSetsHTML(){
+  return detailSets.map((s,i)=>`
     <div class="set-row">
       <span class="set-num">S${i+1}</span>
       <input type="number" placeholder="valor" value="${s.val||''}" min="0" inputmode="numeric" oninput="detailSets[${i}].val=this.value">
-      <select class="set-unit" onchange="detailSets[${i}].unit=this.value">
-        <option value="rep"${s.unit==='rep'?' selected':''}>rep</option>
-        <option value="seg"${s.unit==='seg'?' selected':''}>seg</option>
-        <option value="cant"${s.unit==='cant'?' selected':''}>cant</option>
-      </select>
-      <input type="number" placeholder="kg" value="${s.weight||''}" min="0" step="0.5" inputmode="decimal" oninput="detailSets[${i}].weight=this.value">
-      <select class="set-unit" onchange="detailSets[${i}].wunit=this.value">
-        <option value="kg"${s.wunit==='kg'?' selected':''}>kg</option>
-        <option value="seg"${s.wunit==='seg'?' selected':''}>seg</option>
-        <option value="cant"${s.wunit==='cant'?' selected':''}>cant</option>
-      </select>
-      ${detailSets.length>1?`<button class="set-del" onclick="detailSets.splice(${i},1);renderDetailSets()">x</button>`:'<span style="width:22px"></span>'}
+      ${renderDetailUnitDropdown(`set-${i}`,s.unit,'set',i)}
+      <div class="set-weight-wrap">
+        <input type="number" placeholder="0" value="${s.weight||''}" min="0" step="0.5" inputmode="decimal" oninput="detailSets[${i}].weight=this.value">
+        <span class="set-weight-unit">kg</span>
+      </div>
+      ${detailSets.length>1?`<button class="set-del" onclick="detailSets.splice(${i},1);renderDay()">x</button>`:'<span style="width:22px"></span>'}
     </div>`).join('');
+}
+
+function renderInlineDetail(di,i,ex){
+  const hasSG=!!ex.superGroup;
+  return `
+    <div class="exc-detail" onclick="event.stopPropagation()">
+      <div class="exc-detail-stage">
+        <div class="exc-detail-top">
+          <div class="plan-grid">
+            <span class="detail-base-tag">B</span>
+            <input type="number" min="1" max="20" inputmode="numeric" placeholder="sets" value="${detailPlan.sets}" oninput="detailPlan.sets=this.value">
+            <input type="text" placeholder="valor" value="${detailPlan.reps}" oninput="detailPlan.reps=this.value">
+            ${renderDetailUnitDropdown('base',detailPlan.unit,'base')}
+          </div>
+        </div>
+        <div class="detail-sets-list">${renderDetailSetsHTML()}</div>
+        <div class="exc-detail-actions">
+          <button class="exc-detail-add" type="button" onclick="addDetailSet()">+ agregar set</button>
+          ${hasSG?`<button class="btn-secondary" type="button" onclick="separateFromSuper(${di},${i})">Separar de la superserie</button>`:''}
+          <button class="btn-secondary" type="button" onclick="closeInlineDetail()">Cancelar</button>
+          <button class="btn-save" type="button" onclick="saveDetail()">Guardar</button>
+        </div>
+      </div>
+    </div>`;
 }
 
 function addDetailSet(){
   if(detailSets.length>=5) return;
   const prev=detailSets[detailSets.length-1]||{val:'',unit:'rep',weight:'',wunit:'kg'};
-  detailSets.push({val:'',unit:prev.unit,weight:'',wunit:prev.wunit});
-  renderDetailSets();
+  detailSets.push({val:'',unit:prev.unit==='seg'?'seg':'rep',weight:'',wunit:'kg'});
+  renderDay();
 }
 
 function saveDetail(){
@@ -2784,12 +2946,12 @@ function saveDetail(){
   const ex=(weekData[dayIdx]||[])[exIdx];if(!ex) return;
   const plannedSets=Math.min(Math.max(parseInt(detailPlan.sets||0,10)||1,1),20);
   const plannedReps=(detailPlan.reps||'').toString().trim();
-  const plannedUnit=detailPlan.unit||'rep';
+  const plannedUnit=detailPlan.unit==='seg'?'seg':'rep';
   const cleaned=detailSets.slice(0,5).map(s=>({
     val:(s.val??'').toString().trim(),
-    unit:s.unit||plannedUnit,
+    unit:s.unit==='seg'?'seg':plannedUnit,
     weight:(s.weight??'').toString().trim(),
-    wunit:s.wunit||'kg'
+    wunit:'kg'
   }));
   ex.sets=plannedSets;
   ex.reps=plannedReps;
@@ -2799,7 +2961,7 @@ function saveDetail(){
   const payload={date:today(),sets:cleaned};
   if(todayIdx>=0) ex.logs[todayIdx]=payload;
   else ex.logs.push(payload);
-  sbSave();renderDay();closeSheet('detail-sheet');
+  sbSave();closeInlineDetail();
 }
 
 function separateFromSuper(di,i){
@@ -2808,7 +2970,7 @@ function separateFromSuper(di,i){
     ex.superGroup=null;
     normalizeSupersets(di);
     pendingSuperLink=null;
-    sbSave();renderDay();closeSheet('detail-sheet');
+    sbSave();renderDay();
   }
 }
 
@@ -3349,6 +3511,12 @@ function closeImageZoom(fromBack=false){
     if(Date.now()<suppressDismissClickUntil){
       ev.preventDefault();
       ev.stopPropagation();
+      return false;
+    }
+    if(detailUnitMenu!==null && !ev.target.closest('.detail-unit-wrap')){
+      ev.preventDefault();
+      ev.stopPropagation();
+      closeDetailUnitMenu();
       return false;
     }
     if(openDayTypeMenu!==null && !ev.target.closest('.day-type-wrap')){
