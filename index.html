@@ -134,7 +134,8 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .module-liquid-core,.module-liquid-fill,.module-liquid-wing{
   position:absolute;left:50%;border-radius:999px;border:none;box-shadow:none;pointer-events:none;
   transition:
-    opacity .18s ease
+    opacity .18s ease,
+    filter .22s ease
 }
 .module-liquid-core{
   bottom:var(--module-core-bottom);transform:translateX(-50%);z-index:1;opacity:1;
@@ -187,6 +188,10 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 }
 .bottom-nav.open .module-liquid-slot,
 .module-switcher.open .module-liquid-slot{opacity:1;pointer-events:auto}
+.module-switcher.open .module-liquid-core{
+  filter:blur(2px) saturate(.88) brightness(.88);
+  opacity:.74
+}
 .bottom-nav.open .module-liquid-slot.left,
 .module-switcher.open .module-liquid-slot.left{transform:translate(-50%,-50%) translateY(calc(var(--module-slot-gap) * -2.55)) scale(1);transition-delay:.08s}
 .bottom-nav.open .module-liquid-slot.right,
@@ -215,25 +220,29 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .module-liquid-center img{width:33px;height:33px;object-fit:contain;display:block;opacity:1;filter:brightness(0) saturate(100%) invert(95%) sepia(5%) saturate(122%) hue-rotate(306deg) brightness(109%) contrast(92%)}
 
 /* â”€â”€ DAY ROW â”€â”€ */
-.day-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:10px 16px 0;flex-shrink:0}
+.day-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;padding:10px 16px 0;flex-shrink:0}
 .dp{
   border:none;background:transparent;color:var(--tx2);text-align:center;transition:all .18s;
   display:flex;align-items:center;justify-content:center;padding:0;position:relative
 }
 .dp-core{
-  width:100%;height:48px;border-radius:16px;border:1px solid rgba(255,255,255,.10);
-  background:rgba(255,255,255,.015);display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:3px;font-size:13px;font-weight:600;letter-spacing:-.02em;color:inherit;
+  width:100%;height:52px;border-radius:12px;border:1px solid rgba(255,255,255,.05);
+  background:#111214;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;font-size:13px;font-weight:600;letter-spacing:-.02em;color:inherit;
   transition:all .18s ease
 }
-.dp-letter{font-size:13px;font-weight:700;line-height:1}
-.dp-date{font-size:10px;font-family:'DM Mono',monospace;line-height:1;color:var(--tx3);transition:color .18s ease,opacity .18s ease}
-.dp.on .dp-core{
-  color:#f8f6f2;border-color:#9f3a25;
-  background:linear-gradient(180deg,#9c3924,var(--acc));
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.08), inset 0 0 0 1px rgba(255,255,255,.03), inset 0 -2px 5px rgba(57,16,10,.24)
+.dp-num{font-size:18px;font-weight:700;line-height:1;color:#d7d7d2;letter-spacing:-.04em}
+.dp-name{
+  font-size:8px;font-family:'DM Mono',monospace;line-height:1;text-transform:uppercase;
+  letter-spacing:.08em;color:#666668;transition:color .18s ease,opacity .18s ease
 }
-.dp.on .dp-date{color:rgba(248,246,242,.72)}
+.dp.on .dp-core{
+  border-color:rgba(255,255,255,.12);
+  background:#f2f0eb;
+  box-shadow:0 8px 20px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.65)
+}
+.dp.on .dp-num{color:#111214}
+.dp.on .dp-name{color:#4f4f53}
 
 /* â”€â”€ VIEWS â”€â”€ */
 .view{display:none;flex:1;min-height:0;overflow-y:auto;overflow-x:visible;padding:0 16px 180px}
@@ -267,27 +276,25 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   box-shadow:inset 0 1px 0 rgba(255,255,255,.08), inset 0 0 0 1px rgba(255,255,255,.03), inset 0 -2px 5px rgba(57,16,10,.24)
 }
 .day-type-wrap{position:relative;display:block;height:28px;min-width:108px;z-index:6}
-.day-type-panel{
-  position:absolute;top:0;left:0;right:0;
-  display:flex;flex-direction:column;gap:0;
-  background:rgba(28,28,30,.98);
-  border:1px solid var(--b1);
-  border-radius:6px;
-  overflow:hidden;
-  box-shadow:0 14px 28px rgba(0,0,0,.24)
-}
-.day-type-wrap:not(.open) .day-type-panel{box-shadow:none;background:transparent}
 .day-type-select{
-  height:28px;width:100%;padding:0 28px 0 14px;background:transparent;border:none;color:var(--tx);
+  height:28px;width:100%;padding:0 28px 0 14px;background:transparent;border:1px solid var(--b1);color:var(--tx);
+  border-radius:6px;
   font-size:11px;font-family:'DM Mono',monospace;outline:none;
-  display:inline-flex;align-items:center;text-align:left;position:relative
+  display:inline-flex;align-items:center;text-align:left;position:relative;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none
 }
 .day-type-select::after{
-  content:'';position:absolute;right:12px;top:50%;width:7px;height:7px;
-  border-right:1px solid rgba(255,255,255,.5);border-bottom:1px solid rgba(255,255,255,.5);
-  transform:translateY(-65%) rotate(45deg);pointer-events:none
+  content:'↕';position:absolute;right:10px;top:50%;
+  font-size:10px;line-height:1;color:rgba(255,255,255,.42);
+  transform:translateY(-50%);pointer-events:none
 }
 .day-type-value{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.day-type-wrap.scrubbing .day-type-select{
+  border-color:rgba(255,255,255,.12);
+  background:rgba(255,255,255,.035)
+}
 .day-type-menu{display:flex;flex-direction:column;gap:4px;padding:0 4px 4px}
 .day-type-opt{
   display:flex;align-items:center;gap:7px;width:100%;height:26px;padding:0 10px;
@@ -309,9 +316,9 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   width:calc(100% - (var(--card-edge,4px) * 2) - var(--swipe-px,0px));
   margin-left:calc(var(--card-edge,4px) + var(--swipe-left-gap,0px));
   margin-right:calc(var(--card-edge,4px) + var(--swipe-right-gap,0px));
-  background:var(--s1);
+  background:#111214;
   transition:width .18s ease,margin-left .18s ease,margin-right .18s ease;
-  border:1px solid var(--b0);
+  border:1px solid rgba(255,255,255,.05);
   border-radius:var(--rs)
 }
 .exc.group-start,
@@ -1754,6 +1761,18 @@ function getWeekDayNumbers(){
     return d.getDate();
   });
 }
+function getWeekDayMeta(){
+  const now=new Date();
+  const monday=new Date(now);
+  monday.setHours(0,0,0,0);
+  monday.setDate(now.getDate()-getTodayWeekIndex());
+  return Array.from({length:7},(_,i)=>{
+    const d=new Date(monday);
+    d.setDate(monday.getDate()+i);
+    const short=d.toLocaleDateString('es-AR',{weekday:'short'}).replace('.','').slice(0,3).toUpperCase();
+    return {num:d.getDate(), short};
+  });
+}
 
 // â•â• VIEWS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function getModuleIconHTML(mod){
@@ -1971,9 +1990,9 @@ function closeTopUiLayer(fromBack=false){
 
 // â•â• DAY ROW â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function renderDayRow(){
-  const dayNums=getWeekDayNumbers();
-  document.getElementById('day-row').innerHTML=DL.map((l,i)=>
-    `<button class="dp${i===curDay?' on':''}" data-d="${i}" onclick="selDay(${i})"><span class="dp-core"><span class="dp-letter">${l}</span><span class="dp-date">${dayNums[i]}</span></span></button>`
+  const dayMeta=getWeekDayMeta();
+  document.getElementById('day-row').innerHTML=dayMeta.map((d,i)=>
+    `<button class="dp${i===curDay?' on':''}" data-d="${i}" onclick="selDay(${i})"><span class="dp-core"><span class="dp-num">${d.num}</span><span class="dp-name">${d.short}</span></span></button>`
   ).join('');
 }
 function selDay(i){
@@ -1992,13 +2011,6 @@ function getCfg(di){
 
 function renderDay(){
   const di=curDay,cfg=getCfg(di),exs=weekData[di]||[];
-  const typeMenu=openDayTypeMenu===di
-    ? `<div class="day-type-menu">${TYPES.map(t=>`
-        <button class="day-type-opt${cfg.type===t.id?' on':''}" onclick="event.stopPropagation();setDayTypeForDay(${di},'${t.id}')">
-          <span>${t.label}</span>
-        </button>
-      `).join('')}</div>`
-    : '';
   document.getElementById('day-content').innerHTML=`
     <div class="sticky-top sticky-gap">
       <div class="dh" style="margin-bottom:0">
@@ -2007,13 +2019,15 @@ function renderDay(){
           <button class="day-run-toggle${cfg.run?' on':''}" onclick="toggleRun(${di})">
             <span>Correr</span>
           </button>
-          <div class="day-type-wrap${openDayTypeMenu===di?' open':''}">
-            <div class="day-type-panel">
-              <button class="day-type-select" onclick="event.stopPropagation();toggleDayTypeMenu(${di})">
-                <span class="day-type-value">${cfg.typeCfg.label}</span>
-              </button>
-              ${typeMenu}
-            </div>
+          <div class="day-type-wrap" id="day-type-wrap-${di}">
+            <button class="day-type-select"
+              onpointerdown="startDayTypeScrub(event,${di})"
+              onpointermove="moveDayTypeScrub(event)"
+              onpointerup="endDayTypeScrub(event)"
+              onpointercancel="endDayTypeScrub(event)"
+              onclick="event.preventDefault();event.stopPropagation();return false;">
+              <span class="day-type-value" id="day-type-value-${di}">${cfg.typeCfg.label}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -2597,6 +2611,63 @@ function dragEnd(e){
 
 // â•â• TYPE PICKER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 let pickerDay=null;
+let dayTypeScrub=null;
+
+function getTypeIndexById(tid){
+  const idx=TYPES.findIndex(t=>t.id===tid);
+  return idx<0?0:idx;
+}
+function updateDayTypeScrubLabel(di,idx){
+  const valueEl=document.getElementById(`day-type-value-${di}`);
+  const wrapEl=document.getElementById(`day-type-wrap-${di}`);
+  if(valueEl) valueEl.textContent=TYPES[idx].label;
+  if(wrapEl) wrapEl.classList.add('scrubbing');
+}
+function clearDayTypeScrubLabel(di){
+  const wrapEl=document.getElementById(`day-type-wrap-${di}`);
+  if(wrapEl) wrapEl.classList.remove('scrubbing');
+}
+function startDayTypeScrub(ev,di){
+  if(ev.button!==undefined && ev.button!==0) return;
+  const startIdx=getTypeIndexById(dayCfg[di]?.type||'rest');
+  dayTypeScrub={di,pointerId:ev.pointerId,startY:ev.clientY,startIdx,currentIdx:startIdx};
+  ev.currentTarget.setPointerCapture?.(ev.pointerId);
+  ev.preventDefault();
+  ev.stopPropagation();
+  updateDayTypeScrubLabel(di,startIdx);
+}
+function moveDayTypeScrub(ev){
+  if(!dayTypeScrub || ev.pointerId!==dayTypeScrub.pointerId) return;
+  const delta=dayTypeScrub.startY-ev.clientY;
+  const step=Math.trunc(delta/18);
+  const nextIdx=Math.max(0,Math.min(TYPES.length-1,dayTypeScrub.startIdx+step));
+  if(nextIdx!==dayTypeScrub.currentIdx){
+    dayTypeScrub.currentIdx=nextIdx;
+    vibrateTap(10);
+    updateDayTypeScrubLabel(dayTypeScrub.di,nextIdx);
+  }
+  ev.preventDefault();
+  ev.stopPropagation();
+}
+function endDayTypeScrub(ev){
+  if(!dayTypeScrub || (ev.pointerId!==undefined && ev.pointerId!==dayTypeScrub.pointerId)) return;
+  const {di,startIdx,currentIdx,pointerId}=dayTypeScrub;
+  ev.currentTarget?.releasePointerCapture?.(pointerId);
+  clearDayTypeScrubLabel(di);
+  if(currentIdx!==startIdx){
+    dayCfg[di].type=TYPES[currentIdx].id;
+    sbSave();
+    renderDayRow();
+    renderDay();
+  }else{
+    const valueEl=document.getElementById(`day-type-value-${di}`);
+    if(valueEl) valueEl.textContent=getCfg(di).typeCfg.label;
+  }
+  dayTypeScrub=null;
+  ev.preventDefault?.();
+  ev.stopPropagation?.();
+}
+
 function openTypePicker(di){
   pickerDay=di;
   document.getElementById('picker-grid').innerHTML=TYPES.map(t=>
