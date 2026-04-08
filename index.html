@@ -35,6 +35,14 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   overflow:hidden;z-index:95;pointer-events:none;
   transition:filter .22s ease,opacity .22s ease
 }
+#app-shell-clip{
+  position:relative;
+  z-index:1;
+  display:flex;
+  flex-direction:column;
+  min-height:100%;
+  pointer-events:none;
+}
 .nav,#app-shell .module-view{position:relative;z-index:1;pointer-events:auto}
 #app-shell.menu-softened{
   filter:blur(2px) saturate(.88) brightness(.88);
@@ -46,12 +54,18 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 }
 
 /* â”€â”€ NAV â”€â”€ */
-.nav{display:flex;flex-direction:column;gap:10px;padding:14px 16px 0;flex-shrink:0}
-.nav-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
-.nav-title{font-size:24px;line-height:1;font-weight:600;letter-spacing:-.03em}
-.subnav{display:none}
-.subtab{padding:6px 12px;font-size:12px;border:none;background:transparent;color:var(--tx2);border-radius:11px;transition:all .18s}
-.subtab.on{background:var(--s3);color:var(--tx);font-weight:500}
+.nav{display:flex;flex-direction:column;gap:8px;padding:14px 16px 0;flex-shrink:0}
+.nav-head{display:flex;align-items:center;justify-content:center;gap:12px}
+.nav-title{text-align:center;font-size:24px;line-height:1;font-weight:600;letter-spacing:-.03em}
+.subnav{display:flex;align-items:center;justify-content:center;gap:8px;min-height:12px}
+.subdot{
+  width:6px;height:6px;border:none;border-radius:999px;background:rgba(255,255,255,.18);
+  transition:transform .18s ease,background .18s ease,opacity .18s ease,width .18s ease;
+  opacity:.72
+}
+.subdot.on{
+  width:18px;background:var(--acc);opacity:1
+}
 .module-view{display:none;flex:1;min-height:0}
 .module-view.on{display:flex;flex-direction:column;min-height:0}
 .module-pane{display:none}
@@ -74,8 +88,20 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   position:relative;display:block;
   padding:18px 14px 20px;pointer-events:auto;min-height:118px;overflow:visible;
   width:100%;margin:0 auto;
-  background:#09090a;box-shadow:0 -10px 24px rgba(0,0,0,.22)
+  background:transparent;box-shadow:none;isolation:isolate
 }
+.bottom-nav-shape{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+  z-index:1;
+  pointer-events:none;
+  filter:drop-shadow(0 -10px 24px rgba(0,0,0,.22));
+}
+.bottom-nav-shape .bottom-nav-band{fill:#09090a}
+.bottom-nav-shape .bottom-nav-cut{fill:var(--bg)}
 .bottom-side{
   position:relative;z-index:2;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;align-items:end;min-width:0;
   width:calc(50% - 44px);
@@ -189,9 +215,25 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .module-liquid-center img{width:33px;height:33px;object-fit:contain;display:block;opacity:1;filter:brightness(0) saturate(100%) invert(95%) sepia(5%) saturate(122%) hue-rotate(306deg) brightness(109%) contrast(92%)}
 
 /* â”€â”€ DAY ROW â”€â”€ */
-.day-row{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:10px 16px 0;flex-shrink:0}
-.dp{padding:8px 2px;border-radius:8px;font-size:12px;font-weight:500;border:1px solid var(--b1);background:transparent;color:var(--tx2);text-align:center;transition:all .18s}
-.dp.on{color:#f8f6f2;font-weight:700;background:linear-gradient(180deg,#9c3924,var(--acc));border-color:#9f3a25;box-shadow:inset 0 1px 0 rgba(255,255,255,.08), inset 0 0 0 1px rgba(255,255,255,.03), inset 0 -2px 5px rgba(57,16,10,.24)}
+.day-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:10px 16px 0;flex-shrink:0}
+.dp{
+  border:none;background:transparent;color:var(--tx2);text-align:center;transition:all .18s;
+  display:flex;align-items:center;justify-content:center;padding:0;position:relative
+}
+.dp-core{
+  width:100%;height:48px;border-radius:16px;border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.015);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;font-size:13px;font-weight:600;letter-spacing:-.02em;color:inherit;
+  transition:all .18s ease
+}
+.dp-letter{font-size:13px;font-weight:700;line-height:1}
+.dp-date{font-size:10px;font-family:'DM Mono',monospace;line-height:1;color:var(--tx3);transition:color .18s ease,opacity .18s ease}
+.dp.on .dp-core{
+  color:#f8f6f2;border-color:#9f3a25;
+  background:linear-gradient(180deg,#9c3924,var(--acc));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08), inset 0 0 0 1px rgba(255,255,255,.03), inset 0 -2px 5px rgba(57,16,10,.24)
+}
+.dp.on .dp-date{color:rgba(248,246,242,.72)}
 
 /* â”€â”€ VIEWS â”€â”€ */
 .view{display:none;flex:1;min-height:0;overflow-y:auto;overflow-x:visible;padding:0 16px 180px}
@@ -748,6 +790,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 <body>
 
 <div id="app-shell">
+<div id="app-shell-clip">
 <div class="nav">
   <div class="nav-head">
     <div class="nav-title" id="module-title">Train</div>
@@ -850,6 +893,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   </div>
 </div>
 </div>
+</div>
 
 <div id="toast"></div>
 
@@ -857,6 +901,10 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 
 <div class="bottom-nav" id="bottom-nav">
   <div class="bottom-nav-inner">
+    <svg class="bottom-nav-shape" viewBox="0 0 520 118" preserveAspectRatio="none" aria-hidden="true">
+      <path class="bottom-nav-band" d="M24 0H496C509.255 0 520 10.745 520 24V118H0V24C0 10.745 10.745 0 24 0Z"></path>
+      <path class="bottom-nav-cut" d="M180 0C202 0 212 20 223 34C233 47 245 55 260 55C275 55 287 47 297 34C308 20 318 0 340 0L340 -2H180Z"></path>
+    </svg>
     <div class="bottom-side" id="bottom-left"></div>
     <div class="bottom-side" id="bottom-right"></div>
   </div>
@@ -1692,6 +1740,20 @@ function lsLoad(){
 }
 
 function today(){return new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});}
+function getTodayWeekIndex(){
+  return ((new Date().getDay()+6)%7);
+}
+function getWeekDayNumbers(){
+  const now=new Date();
+  const monday=new Date(now);
+  monday.setHours(0,0,0,0);
+  monday.setDate(now.getDate()-getTodayWeekIndex());
+  return Array.from({length:7},(_,i)=>{
+    const d=new Date(monday);
+    d.setDate(monday.getDate()+i);
+    return d.getDate();
+  });
+}
 
 // â•â• VIEWS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function getModuleIconHTML(mod){
@@ -1752,12 +1814,17 @@ function renderBottomNav(){
 }
 function renderShell(){
   const mod=MODULES[currentModule];
-  document.getElementById('module-title').textContent=mod.label;
+  const activeTab=(mod.tabs||[]).find(tab=>tab.id===subViews[currentModule])||(mod.tabs||[])[0];
+  document.getElementById('module-title').textContent=activeTab?.label||mod.label;
+  document.getElementById('subnav').innerHTML=(mod.tabs||[]).map(tab=>
+    `<button class="subdot${subViews[currentModule]===tab.id?' on':''}" type="button" onclick="showSubView('${currentModule}','${tab.id}')" aria-label="${tab.label}"></button>`
+  ).join('');
   document.querySelectorAll('.module-view').forEach(el=>el.classList.remove('on'));
   document.getElementById('module-'+currentModule).classList.add('on');
   renderBottomNav();
 
   if(currentModule==='train'){
+    if(subViews.train==='week') curDay=getTodayWeekIndex();
     document.querySelectorAll('#module-train .view').forEach(el=>el.classList.remove('on'));
     document.getElementById('view-'+subViews.train).classList.add('on');
     document.getElementById('day-row').style.display=subViews.train==='week'?'grid':'none';
@@ -1904,8 +1971,9 @@ function closeTopUiLayer(fromBack=false){
 
 // â•â• DAY ROW â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function renderDayRow(){
+  const dayNums=getWeekDayNumbers();
   document.getElementById('day-row').innerHTML=DL.map((l,i)=>
-    `<button class="dp${i===curDay?' on':''}" data-d="${i}" onclick="selDay(${i})">${l}</button>`
+    `<button class="dp${i===curDay?' on':''}" data-d="${i}" onclick="selDay(${i})"><span class="dp-core"><span class="dp-letter">${l}</span><span class="dp-date">${dayNums[i]}</span></span></button>`
   ).join('');
 }
 function selDay(i){
