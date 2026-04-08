@@ -122,14 +122,14 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .module-hub{display:none}
 .module-switcher{
   position:fixed;left:50%;bottom:-18px;transform:translateX(-50%);z-index:130;
-  width:78px;height:196px;opacity:1;pointer-events:auto;overflow:visible
+  width:78px;height:196px;opacity:1;pointer-events:none;overflow:visible
 }
 .module-liquid{
   --module-center-y:135px;
   --module-core-bottom:27px;
   --module-fill-bottom:32px;
   --module-slot-gap:48px;
-  position:relative;width:100%;height:100%
+  position:relative;width:100%;height:100%;pointer-events:none
 }
 .module-liquid-core,.module-liquid-fill,.module-liquid-wing{
   position:absolute;left:50%;border-radius:999px;border:none;box-shadow:none;pointer-events:none;
@@ -160,7 +160,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 }
 .module-liquid-center{
   top:var(--module-center-y);width:72px;height:72px;transform:translate(-50%,-50%);
-  color:#0e0e0f;z-index:4;transition:none
+  color:#0e0e0f;z-index:4;transition:none;pointer-events:auto
 }
 .module-liquid-slot{
   width:44px;height:40px;color:#f8f6f2;opacity:0;pointer-events:none;z-index:5;
@@ -269,11 +269,18 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   background:transparent;border:1px solid var(--b1);color:var(--tx2);
   border-radius:6px;font-size:11px;font-family:'DM Mono',monospace
 }
+.day-run-toggle img{
+  width:14px;height:14px;object-fit:contain;display:block;flex-shrink:0;
+  filter:brightness(0) saturate(100%) invert(70%) sepia(4%) saturate(173%) hue-rotate(11deg) brightness(92%) contrast(87%)
+}
 .day-run-toggle.on{
   color:#f8f6f2;
   border-color:#9f3a25;
   background:linear-gradient(180deg,#9c3924,var(--acc));
   box-shadow:inset 0 1px 0 rgba(255,255,255,.08), inset 0 0 0 1px rgba(255,255,255,.03), inset 0 -2px 5px rgba(57,16,10,.24)
+}
+.day-run-toggle.on img{
+  filter:brightness(0) saturate(100%) invert(95%) sepia(5%) saturate(122%) hue-rotate(306deg) brightness(109%) contrast(92%)
 }
 .day-type-wrap{position:relative;display:block;height:28px;min-width:108px;z-index:6}
 .day-type-select{
@@ -632,6 +639,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 }
 .exc-detail-add{font-size:12px;color:var(--tx2);background:none;border:none;padding:0;text-align:left;align-self:flex-start}
 .exc-detail-actions{display:flex;flex-direction:column;gap:8px}
+.exc-detail-cta-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
 .exc-detail .btn-save{
   width:100%;align-self:stretch;background:rgba(248,246,242,.94);color:#0e0e0f;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 6px 16px rgba(0,0,0,.12)
@@ -1507,7 +1515,7 @@ const CONTEXT_FILTERS=[
 ];
 
 // â•â• STATE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-let curDay=0;
+let curDay=getTodayWeekIndex();
 let openDayTypeMenu=null;
 let currentModule='train';
 let moduleMenuOpen=false;
@@ -1749,6 +1757,17 @@ function lsLoad(){
 function today(){return new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});}
 function getTodayWeekIndex(){
   return ((new Date().getDay()+6)%7);
+}
+function isStandaloneApp(){
+  try{
+    return !!(
+      (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+      window.navigator.standalone===true ||
+      document.referrer.startsWith('android-app://')
+    );
+  }catch(_){
+    return false;
+  }
 }
 function getWeekDayNumbers(){
   const now=new Date();
@@ -2017,6 +2036,7 @@ function renderDay(){
         <div class="dh-title">${DAYS[di]}</div>
         <div class="day-controls">
           <button class="day-run-toggle${cfg.run?' on':''}" onclick="toggleRun(${di})">
+            <img src="./icons/run.png" alt="">
             <span>Correr</span>
           </button>
           <div class="day-type-wrap" id="day-type-wrap-${di}">
@@ -2435,6 +2455,7 @@ function excTap(ev,di,i){
 }
 
 function setupPullToRefresh(){
+  if(isStandaloneApp()) return;
   const weekView=document.getElementById('view-week');
   if(!weekView) return;
   weekView.addEventListener('touchstart',(ev)=>{
@@ -3052,7 +3073,6 @@ function renderDetailSetsHTML(){
 }
 
 function renderInlineDetail(di,i,ex){
-  const hasSG=!!ex.superGroup;
   return `
     <div class="exc-detail" onclick="event.stopPropagation()">
       <div class="exc-detail-stage">
@@ -3067,9 +3087,10 @@ function renderInlineDetail(di,i,ex){
         <div class="detail-sets-list">${renderDetailSetsHTML()}</div>
         <div class="exc-detail-actions">
           <button class="exc-detail-add" type="button" onclick="addDetailSet()">+ agregar set</button>
-          ${hasSG?`<button class="btn-secondary" type="button" onclick="separateFromSuper(${di},${i})">Separar de la superserie</button>`:''}
-          <button class="btn-secondary" type="button" onclick="closeInlineDetail()">Cancelar</button>
-          <button class="btn-save" type="button" onclick="saveDetail()">Guardar</button>
+          <div class="exc-detail-cta-row">
+            <button class="btn-secondary" type="button" onclick="closeInlineDetail()">Cancelar</button>
+            <button class="btn-save" type="button" onclick="saveDetail()">Guardar</button>
+          </div>
         </div>
       </div>
     </div>`;
