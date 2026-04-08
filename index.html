@@ -33,7 +33,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   width:min(100%,520px);display:flex;flex-direction:column;
   background:var(--bg);border-bottom-left-radius:28px;border-bottom-right-radius:28px;
   overflow:hidden;z-index:95;pointer-events:none;
-  transition:filter .22s ease,opacity .22s ease
+  transition:none
 }
 #app-shell-clip{
   position:relative;
@@ -42,9 +42,10 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   flex-direction:column;
   min-height:100%;
   pointer-events:none;
+  transition:filter .22s ease,opacity .22s ease
 }
 .nav,#app-shell .module-view{position:relative;z-index:1;pointer-events:auto}
-#app-shell.menu-softened{
+#app-shell.menu-softened #app-shell-clip{
   filter:blur(2px) saturate(.88) brightness(.88);
   opacity:.74
 }
@@ -99,6 +100,9 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   z-index:1;
   pointer-events:none;
   filter:drop-shadow(0 -10px 24px rgba(0,0,0,.22));
+}
+.bottom-nav.open .bottom-nav-shape{
+  filter:none;
 }
 .bottom-nav-shape .bottom-nav-band{fill:#09090a}
 .bottom-nav-shape .bottom-nav-cut{fill:var(--bg)}
@@ -189,8 +193,8 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .bottom-nav.open .module-liquid-slot,
 .module-switcher.open .module-liquid-slot{opacity:1;pointer-events:auto}
 .module-switcher.open .module-liquid-core{
-  filter:blur(2px) saturate(.88) brightness(.88);
-  opacity:.74
+  filter:none;
+  opacity:1
 }
 .bottom-nav.open .module-liquid-slot.left,
 .module-switcher.open .module-liquid-slot.left{transform:translate(-50%,-50%) translateY(calc(var(--module-slot-gap) * -2.55)) scale(1);transition-delay:.08s}
@@ -324,9 +328,14 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   margin-left:calc(var(--card-edge,4px) + var(--swipe-left-gap,0px));
   margin-right:calc(var(--card-edge,4px) + var(--swipe-right-gap,0px));
   background:#111214;
-  transition:width .18s ease,margin-left .18s ease,margin-right .18s ease;
+  transition:width .18s ease,margin-left .18s ease,margin-right .18s ease,border-color .24s ease,box-shadow .24s ease,background .24s ease,transform .24s ease;
   border:1px solid rgba(255,255,255,.05);
   border-radius:var(--rs)
+}
+.exc.expanded .exc-body{
+  background:#121316;
+  border-color:rgba(255,255,255,.08);
+  box-shadow:0 14px 28px rgba(0,0,0,.18);
 }
 .exc.group-start,
 .exc.group-mid{margin-bottom:0}
@@ -599,11 +608,193 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .btn-secondary{width:100%;padding:10px;background:transparent;color:var(--tx2);border:1px solid var(--b1);border-radius:var(--rs);font-size:12px}
 .exc-detail{
   width:100%;margin-top:2px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05);
-  display:flex;flex-direction:column;gap:10px
+  display:flex;flex-direction:column;gap:12px;
+  animation:detailReveal .26s cubic-bezier(.22,.61,.36,1)
 }
 .exc-detail-stage{
   width:100%;max-width:100%;margin:0;
   display:flex;flex-direction:column;gap:10px
+}
+.train-shell{
+  display:flex;flex-direction:column;gap:12px;
+  padding:12px 0 2px;
+}
+.train-topline{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+}
+.train-timer-copy{
+  min-width:0;
+  display:flex;flex-direction:column;gap:4px;
+}
+.train-kicker{
+  font-size:10px;
+  font-family:'DM Mono',monospace;
+  color:var(--tx3);
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.train-timer-value{
+  font-size:26px;
+  line-height:.95;
+  letter-spacing:-.04em;
+  font-weight:600;
+}
+.train-timer-status{
+  font-size:12px;
+  color:var(--tx2);
+}
+.train-top-actions,
+.train-rest-actions,
+.train-cta-row{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.train-chip-btn,
+.train-ghost-btn,
+.train-main-btn,
+.train-rest-step{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:none;
+  border-radius:999px;
+  color:var(--tx);
+  background:rgba(255,255,255,.04);
+}
+.train-chip-btn,
+.train-ghost-btn,
+.train-rest-step{
+  height:34px;
+  padding:0 12px;
+  font-size:12px;
+}
+.train-chip-btn{
+  background:rgba(255,255,255,.08);
+  color:var(--tx);
+}
+.train-chip-btn.is-primary{
+  background:rgba(244,241,235,.94);
+  color:#0f1114;
+}
+.train-ghost-btn{
+  border:1px solid rgba(255,255,255,.08);
+  color:var(--tx2);
+}
+.train-main-btn{
+  min-height:40px;
+  padding:0 16px;
+  font-size:13px;
+  font-weight:600;
+  background:rgba(109,168,255,.16);
+  border:1px solid rgba(109,168,255,.26);
+}
+.train-main-btn[disabled]{
+  opacity:.45;
+}
+.train-rest-row{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+}
+.train-rest-stepper{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.train-rest-step{
+  min-width:54px;
+  color:var(--tx2);
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.06);
+}
+.train-rest-pill{
+  min-width:92px;
+  height:34px;
+  padding:0 14px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.035);
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:12px;
+  font-family:'DM Mono',monospace;
+  color:var(--tx);
+}
+.train-progress-head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.train-progress-copy{
+  font-size:12px;
+  color:var(--tx2);
+}
+.train-set-track{
+  display:flex;flex-wrap:wrap;gap:8px;
+}
+.train-set-chip{
+  min-width:42px;
+  height:38px;
+  padding:0 12px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.025);
+  color:var(--tx2);
+  font-size:12px;
+  font-family:'DM Mono',monospace;
+  transition:transform .18s ease,background .2s ease,border-color .2s ease,color .2s ease,box-shadow .2s ease;
+}
+.train-set-chip.is-next{
+  color:var(--tx);
+  border-color:rgba(109,168,255,.28);
+  background:rgba(109,168,255,.08);
+}
+.train-set-chip.is-done{
+  color:#0f1114;
+  border-color:rgba(255,255,255,.18);
+  background:rgba(244,241,235,.94);
+}
+.train-set-chip:active{
+  transform:scale(.97);
+}
+.train-rest-live{
+  display:flex;flex-direction:column;gap:8px;
+  padding:10px 12px;
+  border-radius:14px;
+  background:rgba(255,255,255,.02);
+  border:1px solid rgba(255,255,255,.05);
+  transition:border-color .2s ease,background .2s ease,box-shadow .2s ease;
+}
+.train-rest-live.on{
+  background:rgba(91,151,255,.08);
+  border-color:rgba(109,168,255,.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.train-rest-live-top{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+}
+.train-rest-label{
+  font-size:12px;
+  color:var(--tx2);
+}
+.train-rest-live.on .train-rest-label{
+  color:var(--tx);
+}
+.train-rest-value{
+  font-size:24px;
+  line-height:1;
+  letter-spacing:-.04em;
+  font-weight:600;
+}
+.train-rest-bar{
+  height:4px;
+  border-radius:999px;
+  overflow:hidden;
+  background:rgba(255,255,255,.08);
+}
+.train-rest-bar span{
+  display:block;
+  width:100%;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,rgba(109,168,255,.28),rgba(244,241,235,.92));
+  transform-origin:left center;
+  transform:scaleX(0);
+}
+.train-rest-actions .train-ghost-btn[disabled]{
+  opacity:.4;
 }
 .exc-detail-top{display:flex;flex-direction:column;gap:7px}
 .exc-detail .sets-title{margin-bottom:1px}
@@ -684,6 +875,16 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   font-size:12px;font-family:'DM Mono',monospace;text-align:left
 }
 .detail-unit-opt.on{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.06);color:var(--tx)}
+@keyframes detailReveal{
+  from{
+    opacity:0;
+    transform:translateY(-6px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
 
 /* â”€â”€ TYPE PICKER â”€â”€ */
 .picker-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none;align-items:flex-end;justify-content:center}
@@ -799,6 +1000,22 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   .plan-grid{grid-template-columns:52px 1fr 58px;gap:6px}
   .set-row{grid-template-columns:26px minmax(0,1fr) 48px minmax(0,1fr) 48px 22px;gap:5px}
   .set-del{width:22px;height:22px;font-size:12px}
+  .train-topline{flex-direction:column}
+  .train-timer-value{font-size:24px}
+  .train-top-actions,.train-rest-row,.train-progress-head,.train-cta-row{width:100%}
+  .train-top-actions .train-chip-btn,
+  .train-top-actions .train-ghost-btn,
+  .train-cta-row .train-main-btn,
+  .train-cta-row .train-ghost-btn{
+    flex:1 1 0;
+    justify-content:center;
+  }
+  .train-set-track{gap:6px}
+  .train-set-chip{
+    min-width:38px;
+    height:36px;
+    padding:0 10px;
+  }
 }
 </style>
 </head>
@@ -1546,6 +1763,22 @@ let detailCtx={dayIdx:null,exIdx:null};
 let detailSets=[];
 let detailPlan={sets:'',reps:'',unit:'rep'};
 let detailUnitMenu=null;
+const TRAINING_KEY='rs_training';
+let trainingTicker=null;
+let trainingAudioCtx=null;
+let trainingState={
+  sessionDayIdx:null,
+  timerRunning:false,
+  startedAt:0,
+  elapsedMs:0,
+  restRunning:false,
+  restStartedAt:0,
+  restDurationMs:0,
+  restRemainingMs:0,
+  restDayIdx:null,
+  restExIdx:null,
+  restSetIdx:null,
+};
 
 // edit exercise state
 let eeCtx={id:null,sourceName:null,sourceType:null,sourceMuscle:null,sourceModality:null};
@@ -1753,6 +1986,34 @@ function lsLoad(){
   for(let i=0;i<7;i++) if(!dayCfg[i]) dayCfg[i]={...DEF_DAY[i]};
   syncState.pending=localStorage.getItem(SYNC_PENDING_KEY)==='1';
 }
+function saveTrainingState(){
+  try{
+    localStorage.setItem(TRAINING_KEY,JSON.stringify(trainingState));
+  }catch(_){}
+}
+function loadTrainingState(){
+  try{
+    const raw=localStorage.getItem(TRAINING_KEY);
+    if(!raw) return;
+    const parsed=JSON.parse(raw);
+    if(!parsed || typeof parsed!=='object') return;
+    trainingState={
+      ...trainingState,
+      ...parsed,
+      sessionDayIdx:Number.isFinite(parsed.sessionDayIdx)?parsed.sessionDayIdx:null,
+      timerRunning:!!parsed.timerRunning,
+      startedAt:Number(parsed.startedAt)||0,
+      elapsedMs:Number(parsed.elapsedMs)||0,
+      restRunning:!!parsed.restRunning,
+      restStartedAt:Number(parsed.restStartedAt)||0,
+      restDurationMs:Number(parsed.restDurationMs)||0,
+      restRemainingMs:Number(parsed.restRemainingMs)||0,
+      restDayIdx:Number.isFinite(parsed.restDayIdx)?parsed.restDayIdx:null,
+      restExIdx:Number.isFinite(parsed.restExIdx)?parsed.restExIdx:null,
+      restSetIdx:Number.isFinite(parsed.restSetIdx)?parsed.restSetIdx:null,
+    };
+  }catch(_){}
+}
 
 function today(){return new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});}
 function getTodayWeekIndex(){
@@ -1768,6 +2029,262 @@ function isStandaloneApp(){
   }catch(_){
     return false;
   }
+}
+function getTargetSetCount(ex){
+  return Math.min(Math.max(parseInt(ex?.sets||0,10)||1,1),20);
+}
+function getExerciseRestSeconds(ex){
+  return Math.min(Math.max(parseInt(ex?.restSec,10)||90,0),600);
+}
+function formatClock(totalSeconds){
+  const safe=Math.max(0,Math.floor(totalSeconds||0));
+  const hours=Math.floor(safe/3600);
+  const minutes=Math.floor((safe%3600)/60);
+  const seconds=safe%60;
+  if(hours){
+    return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+  }
+  return `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+}
+function formatRestDisplay(totalSeconds){
+  if(totalSeconds<=0) return 'Off';
+  return formatClock(totalSeconds);
+}
+function getRoutineElapsedMs(){
+  const base=Math.max(0,Number(trainingState.elapsedMs)||0);
+  if(!trainingState.timerRunning || !trainingState.startedAt) return base;
+  return base+Math.max(0,Date.now()-trainingState.startedAt);
+}
+function hasRestCountdown(){
+  return (Number(trainingState.restDurationMs)||0)>0 && (trainingState.restRunning || (Number(trainingState.restRemainingMs)||0)>0);
+}
+function getRestRemainingMs(){
+  if(!(Number(trainingState.restDurationMs)||0)) return 0;
+  if(trainingState.restRunning && trainingState.restStartedAt){
+    const live=(Number(trainingState.restDurationMs)||0)-Math.max(0,Date.now()-trainingState.restStartedAt);
+    return Math.max(0,live);
+  }
+  return Math.max(0,Number(trainingState.restRemainingMs)||0);
+}
+function isRestForExercise(di,i){
+  return hasRestCountdown() && trainingState.restDayIdx===di && trainingState.restExIdx===i;
+}
+function buildEmptyLoggedSet(unit){
+  return {val:'',unit:unit==='seg'?'seg':'rep',weight:'',wunit:'kg',done:false};
+}
+function ensureTodayLogEntry(ex,create=false){
+  if(!ex) return null;
+  if(!Array.isArray(ex.logs)){
+    if(!create) return null;
+    ex.logs=[];
+  }
+  let entry=ex.logs.find(l=>l.date===today());
+  if(!entry && create){
+    entry={date:today(),sets:[]};
+    ex.logs.push(entry);
+  }
+  if(entry && !Array.isArray(entry.sets)) entry.sets=[];
+  return entry||null;
+}
+function ensureLogSet(entry,idx,unit){
+  if(!entry) return null;
+  while(entry.sets.length<=idx){
+    entry.sets.push(buildEmptyLoggedSet(unit));
+  }
+  const existing=entry.sets[idx]||{};
+  entry.sets[idx]={
+    ...buildEmptyLoggedSet(unit),
+    ...existing,
+    unit:existing.unit==='seg'?'seg':(unit==='seg'?'seg':'rep'),
+    wunit:'kg',
+    done:!!existing.done,
+  };
+  return entry.sets[idx];
+}
+function setHasLoggedValue(set){
+  if(!set) return false;
+  return (set.val??'').toString().trim()!=='' || (set.weight??'').toString().trim()!=='';
+}
+function isSetComplete(set){
+  return !!(set && (set.done || setHasLoggedValue(set)));
+}
+function getExerciseLoggedSets(ex){
+  const entry=ensureTodayLogEntry(ex,false);
+  return Array.isArray(entry?.sets) ? entry.sets : [];
+}
+function getNextIncompleteSetIdx(ex){
+  const total=getTargetSetCount(ex);
+  const values=getExerciseLoggedSets(ex);
+  for(let idx=0;idx<total;idx++){
+    if(!isSetComplete(values[idx])) return idx;
+  }
+  return -1;
+}
+function getCompletedSetCount(ex){
+  const total=getTargetSetCount(ex);
+  const values=getExerciseLoggedSets(ex);
+  let count=0;
+  for(let idx=0;idx<total;idx++){
+    if(isSetComplete(values[idx])) count++;
+  }
+  return count;
+}
+function primeTrainingAudio(){
+  try{
+    const Ctx=window.AudioContext||window.webkitAudioContext;
+    if(!Ctx) return;
+    if(!trainingAudioCtx) trainingAudioCtx=new Ctx();
+    if(trainingAudioCtx.state==='suspended') trainingAudioCtx.resume().catch(()=>{});
+  }catch(_){}
+}
+function playTrainingAlert(){
+  try{
+    primeTrainingAudio();
+    if(!trainingAudioCtx) return;
+    const tones=[880,660,880];
+    const start=trainingAudioCtx.currentTime;
+    tones.forEach((hz,idx)=>{
+      const when=start+(idx*0.16);
+      const osc=trainingAudioCtx.createOscillator();
+      const gain=trainingAudioCtx.createGain();
+      osc.type='sine';
+      osc.frequency.setValueAtTime(hz,when);
+      gain.gain.setValueAtTime(0.0001,when);
+      gain.gain.exponentialRampToValueAtTime(0.12,when+0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001,when+0.12);
+      osc.connect(gain);
+      gain.connect(trainingAudioCtx.destination);
+      osc.start(when);
+      osc.stop(when+0.13);
+    });
+  }catch(_){}
+}
+function stopTrainingTicker(){
+  if(!trainingTicker) return;
+  clearInterval(trainingTicker);
+  trainingTicker=null;
+}
+function updateTrainingLiveUI(){
+  const timerText=formatClock(Math.round(getRoutineElapsedMs()/1000));
+  document.querySelectorAll('[data-routine-timer]').forEach(el=>{el.textContent=timerText;});
+  document.querySelectorAll('[data-routine-status]').forEach(el=>{
+    const sameDay=trainingState.sessionDayIdx===null || trainingState.sessionDayIdx===curDay;
+    el.textContent=trainingState.timerRunning ? (sameDay?'En marcha':'En marcha en otro dia') : 'Pausado';
+  });
+  const restActive=isRestForExercise(detailCtx.dayIdx,detailCtx.exIdx);
+  const restPanel=document.querySelector('[data-rest-panel]');
+  const restLabel=document.querySelector('[data-rest-label]');
+  const restValue=document.querySelector('[data-rest-value]');
+  const restFill=document.querySelector('[data-rest-fill]');
+  const restToggle=document.querySelector('[data-rest-toggle]');
+  const restSkip=document.querySelector('[data-rest-skip]');
+  if(restPanel && restLabel && restValue && restFill && restToggle && restSkip){
+    const remaining=restActive ? getRestRemainingMs() : 0;
+    const total=Math.max(1,Number(trainingState.restDurationMs)||1);
+    restPanel.classList.toggle('on',restActive);
+    restLabel.textContent=restActive ? 'Descanso en curso' : 'Sin descanso activo';
+    restValue.textContent=restActive ? formatClock(Math.ceil(remaining/1000)) : '--:--';
+    restFill.style.transform=`scaleX(${restActive ? Math.max(0,Math.min(1,remaining/total)) : 0})`;
+    restToggle.textContent=trainingState.restRunning ? 'Pausar' : 'Reanudar';
+    restToggle.disabled=!restActive;
+    restSkip.disabled=!restActive;
+  }
+}
+function syncTrainingTicker(){
+  const needsTicker=trainingState.timerRunning || hasRestCountdown();
+  if(needsTicker && !trainingTicker){
+    trainingTicker=setInterval(()=>{
+      if(hasRestCountdown() && getRestRemainingMs()<=0){
+        finishRestCountdown(true);
+        return;
+      }
+      updateTrainingLiveUI();
+    },250);
+  }else if(!needsTicker){
+    stopTrainingTicker();
+  }
+  updateTrainingLiveUI();
+  saveTrainingState();
+}
+function finishRestCountdown(notify=false){
+  trainingState.restRunning=false;
+  trainingState.restStartedAt=0;
+  trainingState.restDurationMs=0;
+  trainingState.restRemainingMs=0;
+  trainingState.restDayIdx=null;
+  trainingState.restExIdx=null;
+  trainingState.restSetIdx=null;
+  saveTrainingState();
+  syncTrainingTicker();
+  if(notify){
+    try{
+      if(typeof navigator!=='undefined' && typeof navigator.vibrate==='function') navigator.vibrate([220,110,220]);
+    }catch(_){}
+    playTrainingAlert();
+    toast('Descanso terminado');
+  }
+}
+function startRestCountdown(di,i,seconds,setIdx){
+  const duration=Math.max(0,seconds||0)*1000;
+  if(!duration){
+    finishRestCountdown(false);
+    return;
+  }
+  trainingState.restRunning=true;
+  trainingState.restStartedAt=Date.now();
+  trainingState.restDurationMs=duration;
+  trainingState.restRemainingMs=duration;
+  trainingState.restDayIdx=di;
+  trainingState.restExIdx=i;
+  trainingState.restSetIdx=setIdx;
+  saveTrainingState();
+  syncTrainingTicker();
+}
+function toggleRestCountdown(){
+  if(!hasRestCountdown()) return;
+  primeTrainingAudio();
+  if(trainingState.restRunning){
+    trainingState.restRemainingMs=getRestRemainingMs();
+    trainingState.restRunning=false;
+    trainingState.restStartedAt=0;
+  }else{
+    trainingState.restRunning=true;
+    trainingState.restStartedAt=Date.now();
+    if(!(Number(trainingState.restRemainingMs)||0)){
+      trainingState.restRemainingMs=Number(trainingState.restDurationMs)||0;
+    }
+  }
+  saveTrainingState();
+  syncTrainingTicker();
+  renderDay();
+}
+function stopRestCountdown(render=true){
+  finishRestCountdown(false);
+  if(render) renderDay();
+}
+function toggleRoutineTimer(di){
+  primeTrainingAudio();
+  if(trainingState.timerRunning){
+    trainingState.elapsedMs=getRoutineElapsedMs();
+    trainingState.timerRunning=false;
+    trainingState.startedAt=0;
+  }else{
+    trainingState.sessionDayIdx=di;
+    trainingState.startedAt=Date.now();
+    trainingState.timerRunning=true;
+  }
+  saveTrainingState();
+  syncTrainingTicker();
+  renderDay();
+}
+function resetRoutineTimer(di){
+  trainingState.sessionDayIdx=di;
+  trainingState.timerRunning=false;
+  trainingState.startedAt=0;
+  trainingState.elapsedMs=0;
+  saveTrainingState();
+  syncTrainingTicker();
+  renderDay();
 }
 function getWeekDayNumbers(){
   const now=new Date();
@@ -2140,18 +2657,19 @@ function getSetProgress(ex){
   const sets=Math.min(Math.max(parseInt(ex.sets||0,10)||0,1),5);
   const snapshot=getLatestSetSnapshot(ex);
   const values=snapshot?.sets||[];
-  const hasAnyValue=values.some(s=>(s?.val??'').toString().trim()!=='');
+  const hasAnyValue=values.some(s=>isSetComplete(s));
   return Array.from({length:sets},(_,i)=>({
     label:`S${i+1}`,
     value:(values[i]?.val??'').toString().trim(),
+    done:isSetComplete(values[i]),
     hasAnyValue,
   }));
 }
 
 function getSetProgressHTML(ex){
   return getSetProgress(ex).map(item=>{
-    const done=item.hasAnyValue && item.value;
-    const text=item.hasAnyValue ? (item.value||'-') : '-';
+    const done=item.done;
+    const text=item.value || (done?'ok':'-');
     return `<span class="exc-progress-chip${done?' done':''}">${text}</span>`;
   }).join('');
 }
@@ -2505,7 +3023,7 @@ function excHTML(ex,di,i,inGroup,superBorder='',superAccent='',warmItem=false,gr
     : '';
   const warmClass=warmItem?' warm-item':'';
   const groupCls=groupKind?` group-${groupKind} group-${groupPos}`:' group-single';
-  return `<div class="exc${inGroup?'':' standalone'}${ex.superGroup?' sup-item':''}${warmClass}${openRight?' sw-open-right':''}${openLeft?' sw-open-left':''}${groupCls}"${rowStyle}
+  return `<div class="exc${inGroup?'':' standalone'}${ex.superGroup?' sup-item':''}${warmClass}${openRight?' sw-open-right':''}${openLeft?' sw-open-left':''}${isExpanded?' expanded':''}${groupCls}"${rowStyle}
     onclick="excTap(event,${di},${i})"
     onpointerdown="excPointerDown(event,${di},${i})"
     onpointermove="excPointerMove(event)"
@@ -2567,6 +3085,7 @@ function getTypeEmoji(t){
 function removeFromDay(di,i){
   const ex=weekData?.[di]?.[i];
   if(!ex) return;
+  if(trainingState.restDayIdx===di) finishRestCountdown(false);
   weekData[di].splice(i,1);
   normalizeSupersets(di);
   pendingSuperLink=null;
@@ -3001,20 +3520,26 @@ function openDetail(di,i){
   if(snapshot&&snapshot.sets&&snapshot.sets.length){
     detailSets=JSON.parse(JSON.stringify(snapshot.sets.slice(0,5)));
   } else {
-    detailSets=Array.from({length:targetSets},()=>({val:'',unit:ex.unit||'rep',weight:'',wunit:'kg'}));
+    detailSets=Array.from({length:targetSets},()=>({val:'',unit:ex.unit||'rep',weight:'',wunit:'kg',done:false}));
   }
   while(detailSets.length<targetSets){
-    detailSets.push({val:'',unit:ex.unit||'rep',weight:'',wunit:'kg'});
+    detailSets.push({val:'',unit:ex.unit||'rep',weight:'',wunit:'kg',done:false});
   }
-  if(!detailSets.length) detailSets=[{val:'',unit:ex.unit||'rep',weight:'',wunit:'kg'}];
+   if(!detailSets.length) detailSets=[{val:'',unit:ex.unit||'rep',weight:'',wunit:'kg',done:false}];
   detailPlan.unit=detailPlan.unit==='seg'?'seg':'rep';
   detailSets=detailSets.map(s=>({
     ...s,
     unit:s.unit==='seg'?'seg':'rep',
-    wunit:'kg'
+    wunit:'kg',
+    done:!!s.done,
   }));
   pushUiBackLayer('inline-detail');
   renderDay();
+  setTimeout(()=>{
+    const active=document.querySelector('.exc.expanded');
+    active?.scrollIntoView?.({behavior:'smooth',block:'nearest'});
+    updateTrainingLiveUI();
+  },40);
 }
 
 function renderDetailUnitDropdown(key,value,mode,idx=null){
@@ -3072,10 +3597,74 @@ function renderDetailSetsHTML(){
     </div>`).join('');
 }
 
+function renderTrainingSetTrack(di,i,ex){
+  const total=getTargetSetCount(ex);
+  const values=getExerciseLoggedSets(ex);
+  const nextIdx=getNextIncompleteSetIdx(ex);
+  let html='';
+  for(let idx=0;idx<total;idx++){
+    const done=isSetComplete(values[idx]);
+    const next=nextIdx===idx;
+    html+=`<button class="train-set-chip${done?' is-done':''}${next?' is-next':''}" type="button" onclick="event.stopPropagation();toggleTrainingSet(${di},${i},${idx})">S${idx+1}</button>`;
+  }
+  return html;
+}
+function renderTrainingPanel(di,i,ex){
+  const total=getTargetSetCount(ex);
+  const completed=getCompletedSetCount(ex);
+  const nextIdx=getNextIncompleteSetIdx(ex);
+  const restActive=isRestForExercise(di,i);
+  const restRemaining=restActive ? getRestRemainingMs() : 0;
+  const restDuration=Math.max(1,Number(trainingState.restDurationMs)||1);
+  return `
+    <div class="train-shell">
+      <div class="train-topline">
+        <div class="train-timer-copy">
+          <span class="train-kicker">Rutina</span>
+          <strong class="train-timer-value" data-routine-timer>${formatClock(Math.round(getRoutineElapsedMs()/1000))}</strong>
+          <span class="train-timer-status" data-routine-status>${trainingState.timerRunning?'En marcha':'Pausado'}</span>
+        </div>
+        <div class="train-top-actions">
+          <button class="train-chip-btn is-primary" type="button" onclick="event.stopPropagation();toggleRoutineTimer(${di})">${trainingState.timerRunning?'Pausar':'Iniciar'}</button>
+          <button class="train-ghost-btn" type="button" onclick="event.stopPropagation();resetRoutineTimer(${di})">Reset</button>
+        </div>
+      </div>
+      <div class="train-rest-row">
+        <span class="train-kicker">Descanso</span>
+        <div class="train-rest-stepper">
+          <button class="train-rest-step" type="button" onclick="event.stopPropagation();adjustExerciseRest(${di},${i},-15)">-15s</button>
+          <span class="train-rest-pill">${formatRestDisplay(getExerciseRestSeconds(ex))}</span>
+          <button class="train-rest-step" type="button" onclick="event.stopPropagation();adjustExerciseRest(${di},${i},15)">+15s</button>
+        </div>
+      </div>
+      <div class="train-progress-head">
+        <span class="train-kicker">Sets</span>
+        <span class="train-progress-copy">${completed}/${total} completos</span>
+      </div>
+      <div class="train-set-track">${renderTrainingSetTrack(di,i,ex)}</div>
+      <div class="train-cta-row">
+        <button class="train-main-btn" type="button" onclick="event.stopPropagation();markNextTrainingSet(${di},${i})"${nextIdx<0?' disabled':''}>${nextIdx>=0?`Marcar S${nextIdx+1}`:'Rutina completa'}</button>
+        <button class="train-ghost-btn" type="button" onclick="event.stopPropagation();stopRestCountdown()"${restActive?'':' disabled'}>Saltar descanso</button>
+      </div>
+      <div class="train-rest-live${restActive?' on':''}" data-rest-panel>
+        <div class="train-rest-live-top">
+          <span class="train-rest-label" data-rest-label>${restActive?'Descanso en curso':'Sin descanso activo'}</span>
+          <strong class="train-rest-value" data-rest-value>${restActive?formatClock(Math.ceil(restRemaining/1000)):'--:--'}</strong>
+        </div>
+        <div class="train-rest-bar"><span data-rest-fill style="transform:scaleX(${restActive?Math.max(0,Math.min(1,restRemaining/restDuration)):0})"></span></div>
+        <div class="train-rest-actions">
+          <button class="train-ghost-btn" data-rest-toggle type="button" onclick="event.stopPropagation();toggleRestCountdown()"${restActive?'':' disabled'}>${trainingState.restRunning?'Pausar':'Reanudar'}</button>
+          <button class="train-ghost-btn" data-rest-skip type="button" onclick="event.stopPropagation();stopRestCountdown()"${restActive?'':' disabled'}>Listo</button>
+        </div>
+      </div>
+    </div>`;
+}
+
 function renderInlineDetail(di,i,ex){
   return `
     <div class="exc-detail" onclick="event.stopPropagation()">
       <div class="exc-detail-stage">
+        ${renderTrainingPanel(di,i,ex)}
         <div class="exc-detail-top">
           <div class="plan-grid">
             <span class="detail-base-tag">B</span>
@@ -3098,8 +3687,8 @@ function renderInlineDetail(di,i,ex){
 
 function addDetailSet(){
   if(detailSets.length>=5) return;
-  const prev=detailSets[detailSets.length-1]||{val:'',unit:'rep',weight:'',wunit:'kg'};
-  detailSets.push({val:'',unit:prev.unit==='seg'?'seg':'rep',weight:'',wunit:'kg'});
+  const prev=detailSets[detailSets.length-1]||{val:'',unit:'rep',weight:'',wunit:'kg',done:false};
+  detailSets.push({val:'',unit:prev.unit==='seg'?'seg':'rep',weight:'',wunit:'kg',done:false});
   renderDay();
 }
 
@@ -3109,21 +3698,71 @@ function saveDetail(){
   const plannedSets=Math.min(Math.max(parseInt(detailPlan.sets||0,10)||1,1),20);
   const plannedReps=(detailPlan.reps||'').toString().trim();
   const plannedUnit=detailPlan.unit==='seg'?'seg':'rep';
+  const existingEntry=ensureTodayLogEntry(ex,false);
+  const trailing=Array.isArray(existingEntry?.sets) ? existingEntry.sets.slice(5) : [];
   const cleaned=detailSets.slice(0,5).map(s=>({
     val:(s.val??'').toString().trim(),
     unit:s.unit==='seg'?'seg':plannedUnit,
     weight:(s.weight??'').toString().trim(),
-    wunit:'kg'
+    wunit:'kg',
+    done:!!s.done || (s.val??'').toString().trim()!=='' || (s.weight??'').toString().trim()!==''
   }));
   ex.sets=plannedSets;
   ex.reps=plannedReps;
   ex.unit=plannedUnit;
   if(!ex.logs) ex.logs=[];
   const todayIdx=ex.logs.findIndex(l=>l.date===today());
-  const payload={date:today(),sets:cleaned};
+  const payload={date:today(),sets:[...cleaned,...trailing]};
   if(todayIdx>=0) ex.logs[todayIdx]=payload;
   else ex.logs.push(payload);
   sbSave();closeInlineDetail();
+}
+
+function adjustExerciseRest(di,i,delta){
+  const ex=(weekData[di]||[])[i];
+  if(!ex) return;
+  ex.restSec=Math.min(Math.max(getExerciseRestSeconds(ex)+delta,0),600);
+  sbSave();
+  renderDay();
+}
+function markNextTrainingSet(di,i){
+  const ex=(weekData[di]||[])[i];
+  if(!ex) return;
+  const nextIdx=getNextIncompleteSetIdx(ex);
+  if(nextIdx<0) return;
+  toggleTrainingSet(di,i,nextIdx,true);
+}
+function toggleTrainingSet(di,i,setIdx,forceDone=false){
+  const ex=(weekData[di]||[])[i];
+  if(!ex) return;
+  primeTrainingAudio();
+  const entry=ensureTodayLogEntry(ex,true);
+  const set=ensureLogSet(entry,setIdx,ex.unit);
+  if(!set) return;
+  const valuePresent=setHasLoggedValue(set);
+  const currentlyDone=isSetComplete(set);
+  const nextDone=forceDone ? true : (currentlyDone && !valuePresent ? false : true);
+  set.done=nextDone;
+  if(detailCtx.dayIdx===di && detailCtx.exIdx===i && setIdx<5){
+    while(detailSets.length<=setIdx){
+      detailSets.push({val:'',unit:ex.unit==='seg'?'seg':'rep',weight:'',wunit:'kg',done:false});
+    }
+    detailSets[setIdx]={
+      ...detailSets[setIdx],
+      done:nextDone,
+      unit:set.unit==='seg'?'seg':'rep',
+      wunit:'kg'
+    };
+  }
+  const allDone=getNextIncompleteSetIdx(ex)<0;
+  if(nextDone && !allDone){
+    startRestCountdown(di,i,getExerciseRestSeconds(ex),setIdx);
+  }else if(!nextDone || allDone){
+    finishRestCountdown(false);
+    if(allDone && nextDone) toast('Ejercicio completo');
+  }
+  sbSave();
+  renderDay();
 }
 
 function separateFromSuper(di,i){
@@ -3463,6 +4102,7 @@ function renderRoutinePicker(){
 function applyRoutine(routineId){
   const r=routines.find(x=>x.id===routineId);if(!r) return;
   if(!confirm(`Aplicar rutina "${r.name}" al ${DAYS[curDay]}? Reemplazara los ejercicios actuales.`)) return;
+  if(trainingState.restDayIdx===curDay) finishRestCountdown(false);
   weekData[curDay]=(r.items||[]).map(ex=>({...ex,logs:[]}));
   dayCfg[curDay].type=r.type||'push';
   sbSave();renderDayRow();renderDay();closeSheet('routine-picker-sheet');
@@ -3662,6 +4302,7 @@ function closeImageZoom(fromBack=false){
 (async()=>{
   ensureUiHistoryBase();
   lsLoad();
+  loadTrainingState();
   const bootNamesChanged=normalizeAllExerciseNames();
   const bootModalitiesChanged=normalizeAllExerciseModalities();
   if(bootNamesChanged || bootModalitiesChanged) lsSave();
@@ -3669,6 +4310,8 @@ function closeImageZoom(fromBack=false){
   renderDay();
   renderShell();
   setupPullToRefresh();
+  if(hasRestCountdown() && getRestRemainingMs()<=0) finishRestCountdown(false);
+  syncTrainingTicker();
   document.addEventListener('click',(ev)=>{
     if(Date.now()<suppressDismissClickUntil){
       ev.preventDefault();
@@ -3720,7 +4363,10 @@ function closeImageZoom(fromBack=false){
   });
   document.addEventListener('visibilitychange',()=>{
     if(document.visibilityState==='hidden' && syncState.pending) flushSync({keepalive:true});
-    if(document.visibilityState==='visible') refreshFromRemote({force:true});
+    if(document.visibilityState==='visible'){
+      refreshFromRemote({force:true});
+      syncTrainingTicker();
+    }
   });
   window.addEventListener('pagehide',()=>{ if(syncState.pending) flushSync({keepalive:true}); });
 })();
