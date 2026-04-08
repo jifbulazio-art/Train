@@ -2426,9 +2426,11 @@ function excTap(ev,di,i){
     return;
   }
   if(detailCtx.dayIdx===di && detailCtx.exIdx===i){
+    vibrateTap(14);
     closeInlineDetail();
     return;
   }
+  vibrateTap(14);
   openDetail(di,i);
 }
 
